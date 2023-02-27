@@ -1,0 +1,23 @@
+{
+	"compilerOptions": {
+		"paths": {
+			"$lib": ["./src/lib"],
+			"$lib/*": ["./src/lib/*"],
+			"$types": ["./src/types"],
+			"$types/*": ["./src/types/*"],
+		},
+		"allowJs": true,
+		"checkJs": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"sourceMap": true,
+		"strict": true,
+		"types": ["vitest/globals"],
+		"outDir": "dist",
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true
+		},
+	"lib": ["es2015"]
+}
