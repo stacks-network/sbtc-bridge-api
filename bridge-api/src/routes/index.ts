@@ -23,19 +23,25 @@ router.get("/bridge-api/v1/btc/address/:address/utxos", async (req, res) => {
   return res.send(response);
 });
 
-router.get("/bridge-api/v1/stx/sbtc/address/:address/balance", async (req, res) => {
+router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res) => {
   const controller = new SbtcWalletController();
   const response = await controller.fetchUserSbtcBalance(req.params.address);
   return res.send(response);
 });
 
-router.get("/bridge-api/v1/stx/sbtc/events", async (req, res) => {
+router.get("/bridge-api/v1/sbtc/events", async (req, res) => {
   const controller = new SbtcWalletController();
   const response = await controller.fetchSbtcEvents();
   return res.send(response);
 });
 
-router.get("/bridge-api/v1/stx/sbtc/wallet-address", async (req, res) => {
+router.get("/bridge-api/v1/sbtc/data", async (req, res) => {
+  const controller = new SbtcWalletController();
+  const response = await controller.fetchSbtcContractData();
+  return res.send(response);
+});
+
+router.get("/bridge-api/v1/sbtc/wallet-address", async (req, res) => {
   const controller = new SbtcWalletController();
   const response = await controller.fetchSbtcWalletAddress();
   return res.send(response);
@@ -52,5 +58,10 @@ router.get("/bridge-api/v1/config/:param", async (req, res) => {
   const response = await controller.getParam(req.params.param);
   return res.send(response);
 });
+
+router.get('*', function(req, res) {
+  res.sendStatus(404).send("Welcome to the Mini sBTC Bridge");
+});
+
 
 export default router;

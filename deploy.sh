@@ -16,21 +16,20 @@ export DOCKER_CMD='docker'
 
 docker-compose build
 $DOCKER_CMD tag mijoco/bridge_api mijoco/bridge_api
-
 $DOCKER_CMD push mijoco/bridge_api:latest
 
-echo --- stxeco:copying to [ $PATH_DEPLOY ] --------------------------------------------------------------------------------;
-printf "\n\n Connectiong to $SERVER.\n"
+printf "\nConnecting to $SERVER.\n\n"
 
 ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
-  cd /home/bob/hubgit/bridge-api
-  # git pull
+  cd /home/bob/hubgit/sbtc-bridge-api
+  pwd
+  git pull
   # cp .env.production .env
   cat .env
   docker login
   . ~/.profile
-  docker compose -f docker-compose-images.yml pull
   docker compose -f docker-compose-images.yml down
+  docker compose -f docker-compose-images.yml pull
   docker compose -f docker-compose-images.yml up -d
 ";
 

@@ -7,6 +7,86 @@ import { bytesToHex } from "micro-stacks/common";
 import { sbtcContractId, stacksApi, network } from './config';
 import { readTx } from './bitcoin/mempool_api';
 import fetch from 'node-fetch';
+import type { BalanceI, SbtcContractDataI } from '../controllers/StacksRPCController';
+
+const noArgMethods = [
+  'get-coordinator-data',
+  'get-bitcoin-wallet-address',
+  'get-num-keys',
+  'get-num-parties',
+  'get-threshold',
+  'get-trading-halted',
+  'get-token-uri',
+  'get-total-supply',
+  'get-decimals',
+  'get-name',
+]
+
+export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
+  const result = {} as SbtcContractDataI
+  const contractId = sbtcContractId;
+  const data = {
+    contractAddress: contractId!.split('.')[0],
+    contractName: contractId!.split('.')[1],
+    functionName: '',
+    functionArgs: [],
+    network
+  }
+  for (let arg in noArgMethods) {
+    let funcname = noArgMethods[arg]
+    try {
+      data.functionName = funcname;
+      const response = await callContractReadOnly(data);
+      resolveArg(result, response, funcname)
+    } catch (err) {
+      console.log('Error fetching data from sbtc contrcat: ' + funcname)
+    }
+  }
+  return result;
+}
+
+function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
+  let current = response
+  if (response.value && response.value.value) {
+    current = response.value.value
+  }
+  let property = '';
+  switch (arg) {
+    case 'get-coordinator-data':
+      result.coordinator = current.value;
+      break;
+    case 'get-bitcoin-wallet-address':
+      result.bitcoinWalletAddress = current.value;
+      break;
+    case 'get-num-keys':
+      result.numKeys = current.value;
+      break;
+    case 'get-num-parties':
+      result.numKeys = current.value;
+      break;
+    case 'get-threshold':
+      result.threshold = Number(current.value);
+      break;
+    case 'get-trading-halted':
+      result.tradingHalted = current.value;
+      break;
+    case 'get-token-uri':
+      result.totalSupply = Number(current.value);
+      break;
+    case 'get-total-supply':
+      result.totalSupply = Number(current);
+      break;
+    case 'get-decimals':
+      result.decimals = Number(current);
+      break;
+    case 'get-name':
+      result.name = current;
+      break;
+    default:
+      break;
+  }
+}
+
 
 export async function fetchSbtcEvents() {
   try {
@@ -52,7 +132,7 @@ export async function fetchSbtcWalletAddress() {
   }
 }
 
-export async function fetchUserSbtcBalance(stxAddress:string) {
+export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> {
   try {
     const contractId = sbtcContractId;
     //const functionArgs = [`0x${bytesToHex(serializeCV(uintCV(1)))}`, `0x${bytesToHex(serializeCV(standardPrincipalCV(address)))}`];

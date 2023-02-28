@@ -1,5 +1,6 @@
 import {config as configDotenv} from 'dotenv'
 import {resolve} from 'path'
+import type { IStringToStringDictionary } from '../controllers/ConfigController';
 
 switch(process.env.NODE_ENV) {
     case "development":
@@ -22,7 +23,7 @@ switch(process.env.NODE_ENV) {
       break
     case "staging":
       configDotenv({
-        path: resolve(__dirname, "../../../.env.staging")
+        path: resolve(__dirname, "../../.env.staging")
       })
       break
     // Add 'staging' and 'production' cases here as well!
@@ -52,7 +53,7 @@ export const btcRpcUser = process.env.BTC_RPC_USER
 export const btcRpcPwd = process.env.BTC_RPC_PWD
 export const btcNode = (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'dev-docker') ? 'localhost:18332' : process.env.BTC_NODE
 
-export function dumpConfig() {
+export function dumpConfig():IStringToStringDictionary {
   return {
     environment: process.env.NODE_ENV,
     host: host,

@@ -13,7 +13,7 @@
     "coverage": "vitest run --coverage",
     "predev": "npm run swagger",
     "prebuild": "npm run swagger",
-    "dev": "concurrently \"NODE_ENV=dev-docker nodemon\" \"NODE_ENV=dev-docker nodemon -x tsoa spec\"",
+    "dev": "concurrently \"NODE_ENV=staging nodemon\" \"NODE_ENV=staging nodemon -x tsoa spec\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
