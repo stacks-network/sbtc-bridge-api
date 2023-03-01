@@ -17,6 +17,7 @@ services:
     container_name: "bridge_api"
     environment:
       - BTC_RPC_USER=${BTC_RPC_USER}
+      - BTC_RPC_USER=${BTC_RPC_USER}
       - BTC_RPC_PWD=${BTC_RPC_PWD}
       - BTC_NODE=${BTC_NODE}
     ports:

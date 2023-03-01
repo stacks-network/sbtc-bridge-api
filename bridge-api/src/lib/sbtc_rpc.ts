@@ -34,12 +34,13 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   }
   for (let arg in noArgMethods) {
     let funcname = noArgMethods[arg]
+    let  response;
     try {
       data.functionName = funcname;
-      const response = await callContractReadOnly(data);
+      response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err) {
-      console.log('Error fetching data from sbtc contrcat: ' + funcname)
+      console.log('Error fetching data from sbtc contrcat: ' + funcname + ' : ', response)
     }
   }
   return result;
@@ -50,19 +51,18 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
   if (response.value && response.value.value) {
     current = response.value.value
   }
-  let property = '';
   switch (arg) {
     case 'get-coordinator-data':
-      result.coordinator = current.value;
+      result.coordinator = response.value.value;
       break;
     case 'get-bitcoin-wallet-address':
-      result.bitcoinWalletAddress = current.value;
+      result.bitcoinWalletAddress = response.value.value;
       break;
     case 'get-num-keys':
       result.numKeys = current.value;
       break;
     case 'get-num-parties':
-      result.numKeys = current.value;
+      result.numParties = current.value;
       break;
     case 'get-threshold':
       result.threshold = Number(current.value);
@@ -71,7 +71,7 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
       result.tradingHalted = current.value;
       break;
     case 'get-token-uri':
-      result.totalSupply = Number(current.value);
+      result.tokenUri = current.value;
       break;
     case 'get-total-supply':
       result.totalSupply = Number(current);

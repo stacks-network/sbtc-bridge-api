@@ -1,4 +1,4 @@
-import { fetchUtxoSet } from '../src/lib/bitcoin/gateway'
+import { fetchUtxoSet } from '../src/lib/bitcoin/psbt_builder'
 import util from 'util'
 
 describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {

@@ -5,7 +5,7 @@ export interface BalanceI {
   balance: number;
 }
 export interface SbtcContractDataI {
-  coordinator: string;
+  coordinator: { addr:string, key:string };
   bitcoinWalletAddress: string;
   numKeys: number;
   numParties: number;

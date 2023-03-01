@@ -13,7 +13,7 @@ app.use(express.static("public"));
 app.use(cors());
 
 app.use(
-  "/docs",
+  "/bridge-api/docs",
   swaggerUi.serve,
   swaggerUi.setup(undefined, {
     swaggerOptions: {

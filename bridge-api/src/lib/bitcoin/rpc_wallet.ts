@@ -1,4 +1,4 @@
-import { BASE_URL, OPTIONS, handleError } from './gateway'
+import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController'
 import fetch from 'node-fetch';
 import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController'
 import util from 'util'

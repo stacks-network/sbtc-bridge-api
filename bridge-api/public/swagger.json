@@ -60,7 +60,19 @@
 			"SbtcContractDataI": {
 				"properties": {
 					"coordinator": {
-						"type": "string"
+						"properties": {
+							"key": {
+								"type": "string"
+							},
+							"addr": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"key",
+							"addr"
+						],
+						"type": "object"
 					},
 					"bitcoinWalletAddress": {
 						"type": "string"
@@ -171,26 +183,33 @@
 				]
 			}
 		},
-		"/bridge-api/v1/btc-fee-estimate": {
+		"/bridge-api/v1/btc/tx/{txid}": {
 			"get": {
-				"operationId": "GetFeeEstimate",
+				"operationId": "FetchRawTransaction",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/FeeEstimateResponse"
-								}
+								"schema": {}
 							}
 						}
 					}
 				},
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txid",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
-		"/bridge-api/v1/btc/address/{address}/utxos": {
+		"/bridge-api/v1/btc/wallet/address/{address}/utxos": {
 			"get": {
 				"operationId": "FetchUtxoSet",
 				"responses": {
@@ -214,6 +233,59 @@
 						}
 					}
 				]
+			}
+		},
+		"/bridge-api/v1/btc/blocks/fee-estimate": {
+			"get": {
+				"operationId": "GetFeeEstimate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/FeeEstimateResponse"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bridge-api/v1/btc/blocks/info": {
+			"get": {
+				"operationId": "GetInfo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bridge-api/v1/btc/blocks/count": {
+			"get": {
+				"operationId": "GetCount",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/bridge-api/v1/sbtc/events": {

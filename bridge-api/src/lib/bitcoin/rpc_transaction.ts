@@ -1,11 +1,11 @@
 import fetch from 'node-fetch';
-import { BASE_URL, OPTIONS, handleError } from './gateway'
+import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController'
 
-export async function fetchRawTransaction(txid:string, verbose:boolean) {
+export async function fetchRawTx(txid:string, verbose:boolean) {
   let dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getrawtransaction","params":["${txid}", ${verbose}]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'scantxoutset not found');
+  //await handleError(response, 'fetchRawTransaction not found');
   const result = await response.json();
   return result.result;
 }

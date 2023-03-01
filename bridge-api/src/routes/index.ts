@@ -1,5 +1,5 @@
 import express from "express";
-import { DefaultController, FeeEstimationController, UTXOController } from "../controllers/BitcoinRPCController";
+import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController";
 import { SbtcWalletController } from "../controllers/StacksRPCController";
 import { ConfigController } from "../controllers/ConfigController";
 
@@ -11,15 +11,33 @@ router.get('/', (req, res) => {
   return res.send(response);
 });
 
-router.get("/bridge-api/v1/btc-fee-estimate", async (_req, res) => {
-  const controller = new FeeEstimationController();
+router.get("/bridge-api/v1/btc/blocks/count", async (req, res) => {
+  const controller = new BlocksController();
+  const response = await controller.getCount();
+  return res.send(response);
+});
+
+router.get("/bridge-api/v1/btc/blocks/info", async (req, res) => {
+  const controller = new BlocksController();
+  const response = await controller.getInfo();
+  return res.send(response);
+});
+
+router.get("/bridge-api/v1/btc/blocks/fee-estimate", async (req, res) => {
+  const controller = new BlocksController();
   const response = await controller.getFeeEstimate();
   return res.send(response);
 });
 
-router.get("/bridge-api/v1/btc/address/:address/utxos", async (req, res) => {
-  const controller = new UTXOController();
+router.get("/bridge-api/v1/btc/wallet/address/:address/utxos", async (req, res) => {
+  const controller = new WalletController();
   const response = await controller.fetchUtxoSet(req.params.address);
+  return res.send(response);
+});
+
+router.get("/bridge-api/v1/btc/tx/:txid", async (req, res) => {
+  const controller = new TransactionController();
+  const response = await controller.fetchRawTransaction(req.params.txid);
   return res.send(response);
 });
 

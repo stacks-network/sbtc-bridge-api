@@ -6,24 +6,24 @@ switch(process.env.NODE_ENV) {
     case "development":
       console.log("Environment is 'development'")
       configDotenv({
-        path: resolve(__dirname, "../../.env")
+        path: resolve(__dirname, "../../../.env")
       })
       break
     case "dev-docker":
       console.log("Environment is 'development'")
       configDotenv({
-        path: resolve(__dirname, "../../.env")
+        path: resolve(__dirname, "../../../.env")
       })
       break
     case "test":
       console.log("Environment is 'test'")
       configDotenv({
-        path: resolve(__dirname, "../../../.env.test")
+        path: resolve(__dirname, "../../.env.test")
       })
       break
     case "staging":
       configDotenv({
-        path: resolve(__dirname, "../../.env.staging")
+        path: resolve(__dirname, "../../../.env.staging")
       })
       break
     // Add 'staging' and 'production' cases here as well!
