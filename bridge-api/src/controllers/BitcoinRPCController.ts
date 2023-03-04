@@ -1,6 +1,6 @@
 import { Get, Route } from "tsoa";
 import { fetchRawTx } from '../lib/bitcoin/rpc_transaction';
-import { getAddressInfo, estimateSmartFee } from "../lib/bitcoin/rpc_wallet";
+import { getAddressInfo, estimateSmartFee, listUnspent } from "../lib/bitcoin/rpc_wallet";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain";
 import { fetchUTXOs } from "../lib/bitcoin/mempool_api";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api";
@@ -8,11 +8,12 @@ import { btcNode, btcRpcUser, btcRpcPwd } from '../lib/config';
 
 export interface FeeEstimateResponse {
     feeInfo: {
-        low_fee_per_kb:number, 
-        medium_fee_per_kb:number, 
-        high_fee_per_kb:number
+        low_fee_per_kb:number;
+        medium_fee_per_kb:number;
+        high_fee_per_kb:number;
     };
 }
+
 export async function handleError (response:any, message:string) {
   if (response?.status !== 200) {
     const result = await response.json();
@@ -47,7 +48,10 @@ export class WalletController {
     public async fetchUtxoSet(address:string): Promise<any> {
       const result = await getAddressInfo(address);
       console.log('fetchUtxoSet : result : ', result);
+      // mempool 
       const utxos = await fetchUTXOs(address);
+      // bitcoin rpc - only usefull with own/imported addresses: const utxos = await listUnspent();
+      // other; electrumx, hiro ??
       console.log('fetchUtxoSet : utxos : ', utxos);
       for (let utxo of utxos) {
         const tx = await fetchRawTx(utxo.txid, true);
@@ -58,7 +62,6 @@ export class WalletController {
       console.log('fetchUtxoSet: ', result.utxos);
       return result;
     }
-
 }
 
 @Route("/bridge-api/v1/btc/blocks")
@@ -67,10 +70,9 @@ export class BlocksController {
   @Get("/fee-estimate")
   public async getFeeEstimate(): Promise<FeeEstimateResponse> {
     try {
-      return estimateSmartFee();
-    } catch(err) {
-      console.log('fetchCurrentFeeRates:', err)
       return fetchCurrentFeeRatesCypher();
+    } catch(err) {
+      return estimateSmartFee();
     }
   }
   

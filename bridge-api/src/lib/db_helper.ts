@@ -1,7 +1,5 @@
 import mongoose from "mongoose";
 import { mongoUrl } from './config';
-import type { Thread } from "../types/thread";
-import type { Reply } from "../types/reply";
 
 mongoose.set('strictQuery', true);
 

@@ -6,9 +6,9 @@ export async function fetchCurrentFeeRates() {
     const url = blockCypherUrl;
     const response = await fetch(url!);
     const info = await response.json();
-    return info;
+    return { feeInfo: { low_fee_per_kb:info.low_fee_per_kb, medium_fee_per_kb:info.medium_fee_per_kb, high_fee_per_kb:info.high_fee_per_kb }};
   } catch (err) {
     console.log(err);
-    return { low_fee_per_kb:20000, medium_fee_per_kb:30000, high_fee_per_kb:40000 };
+    return { feeInfo: { low_fee_per_kb:20000, medium_fee_per_kb:30000, high_fee_per_kb:40000 }};
   }
 }

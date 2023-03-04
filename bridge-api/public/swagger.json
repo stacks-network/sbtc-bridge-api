@@ -74,7 +74,7 @@
 						],
 						"type": "object"
 					},
-					"bitcoinWalletAddress": {
+					"sbtcWalletAddress": {
 						"type": "string"
 					},
 					"numKeys": {
@@ -109,7 +109,7 @@
 				},
 				"required": [
 					"coordinator",
-					"bitcoinWalletAddress",
+					"sbtcWalletAddress",
 					"numKeys",
 					"numParties",
 					"tradingHalted",

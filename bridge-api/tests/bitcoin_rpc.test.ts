@@ -40,7 +40,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   })
 
   it.concurrent('Check listUnspent() returns correct info', async () => {
-    const result = await listUnspent('tb1q6ue638m4t5knwxl4kwhwyuffttlp0ffee3zn3e');
+    const result = await listUnspent();
     expect(result.length).equals(0);
   })
 
