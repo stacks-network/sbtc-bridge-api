@@ -56,7 +56,7 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
       result.coordinator = response.value.value;
       break;
     case 'get-bitcoin-wallet-address':
-      result.bitcoinWalletAddress = response.value.value;
+      result.sbtcWalletAddress = response.value.value;
       break;
     case 'get-num-keys':
       result.numKeys = current.value;

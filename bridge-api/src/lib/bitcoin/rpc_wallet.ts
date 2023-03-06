@@ -3,7 +3,7 @@ import fetch from 'node-fetch';
 import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController'
 import util from 'util'
 
-export async function listUnspent(address:string) {
+export async function listUnspent() {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"listunspent","params":[3, 6, []]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
@@ -18,7 +18,7 @@ export async function estimateSmartFee(): Promise<FeeEstimateResponse> {
   const response = await fetch(BASE_URL, OPTIONS);
   await handleError(response, 'Fee info not found');
   const result = await response.json();
-  const feeRate = result.result.feerate;
+  const feeRate = result.result.feerate * 100000000; // to go to sats
   return {
     feeInfo: {
 		  low_fee_per_kb: feeRate / 2,
@@ -33,6 +33,33 @@ export async function listReceivedByAddress() {
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
   await handleError(response, 'Receive by address error: ');
+  const result = await response.json();
+  return result.result;
+}
+
+export async function listWallets() {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"listwallets","params":[]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result;
+}
+
+export async function unloadWallet(name:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"unloadwallet","params":["${name}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result;
+}
+
+export async function loadWallet(name:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"loadwallet","params":["${name}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
   const result = await response.json();
   return result.result;
 }

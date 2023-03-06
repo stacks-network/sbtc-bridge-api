@@ -44,7 +44,9 @@
     "vitest-fetch-mock": "^0.2.2"
   },
   "dependencies": {
+    "@noble/secp256k1": "^1.7.1",
     "@scure/base": "^1.1.1",
+    "@scure/bip32": "^1.1.0",
     "@vitest/coverage-c8": "^0.29.1",
     "body-parser": "^1.20.1",
     "c32check": "^2.0.0",
@@ -57,7 +59,6 @@
     "mongoose": "^6.9.2",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.9",
-    "rpc-bitcoin": "^2.0.0",
     "swagger-ui-express": "^4.6.2",
     "tsoa": "^5.1.1"
   }

@@ -23,7 +23,7 @@ printf "\nConnecting to $SERVER.\n\n"
 ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
   cd /home/bob/hubgit/sbtc-bridge-api
   pwd
-  git pull
+  #git pull
   # cp .env.production .env
   cat .env
   docker login

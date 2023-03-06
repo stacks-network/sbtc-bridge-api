@@ -74,7 +74,7 @@
 						],
 						"type": "object"
 					},
-					"bitcoinWalletAddress": {
+					"sbtcWalletAddress": {
 						"type": "string"
 					},
 					"numKeys": {
@@ -109,7 +109,7 @@
 				},
 				"required": [
 					"coordinator",
-					"bitcoinWalletAddress",
+					"sbtcWalletAddress",
 					"numKeys",
 					"numParties",
 					"tradingHalted",
@@ -233,6 +233,49 @@
 						}
 					}
 				]
+			}
+		},
+		"/bridge-api/v1/btc/wallet/loadwallet/{name}": {
+			"get": {
+				"operationId": "LoadWallet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/v1/btc/wallet/listwallets": {
+			"get": {
+				"operationId": "ListWallets",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/bridge-api/v1/btc/blocks/fee-estimate": {

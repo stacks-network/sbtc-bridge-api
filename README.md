@@ -7,7 +7,7 @@ API documentation (swagger docs) is available at /docs.
 
 ## Development
 
-To run the server in watch mode for rapid development;
+To run the server in watch mode (nodemon) for rapid development;
 
 ```bash
 cd bridge-api

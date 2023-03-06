@@ -1,8 +1,8 @@
-version: "3"
+version: "3.9"
 
 services:
   mongodb:
-    image: mongo:4.2
+    image: mongo:latest
     container_name: "bridge_db"
     environment:
       - MONGO_DATA_DIR=/data/db
@@ -13,10 +13,9 @@ services:
       - 27020:27017
     command: mongod --bind_ip_all --logpath=/dev/null
   bridge_api:
-    image: mijoco/bridge_api:latest
+    image: mijoco/bridge_api
     container_name: "bridge_api"
     environment:
-      - BTC_RPC_USER=${BTC_RPC_USER}
       - BTC_RPC_USER=${BTC_RPC_USER}
       - BTC_RPC_PWD=${BTC_RPC_PWD}
       - BTC_NODE=${BTC_NODE}

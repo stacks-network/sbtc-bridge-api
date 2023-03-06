@@ -39,6 +39,7 @@ switch(process.env.NODE_ENV) {
 
 export const host = process.env.VITE_HOST
 export const port = process.env.VITE_PORT
+export const walletPath = (!process.env.VITE_BITCOIN_WALLET_PATH) ? '' : process.env.VITE_BITCOIN_WALLET_PATH
 export const mongoUrl = process.env.VITE_MONGO_URL
 export const network = process.env.VITE_NETWORK
 export const sbtcContractId = process.env.VITE_SBTC_CONTRACT_ID
@@ -58,6 +59,7 @@ export function dumpConfig():IStringToStringDictionary {
     environment: process.env.NODE_ENV,
     host: host,
     port: port,
+    walletPath: walletPath,
     mongoUrl: mongoUrl,
     network: network,
     sbtcContractId: sbtcContractId,
