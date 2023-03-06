@@ -59,7 +59,6 @@
     "mongoose": "^6.9.2",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.9",
-    "rpc-bitcoin": "^2.0.0",
     "swagger-ui-express": "^4.6.2",
     "tsoa": "^5.1.1"
   }

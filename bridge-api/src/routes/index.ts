@@ -51,6 +51,25 @@ router.get("/bridge-api/v1/btc/wallet/address/:address/utxos", async (req, res, 
   }
 });
 
+router.get("/bridge-api/v1/btc/wallet/loadwallet/:name", async (req, res, next) => {
+  try {
+    const controller = new WalletController();
+    const response = await controller.loadWallet(req.params.name);
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+router.get("/bridge-api/v1/btc/wallet/listwallets", async (req, res, next) => {
+  try {
+    const controller = new WalletController();
+    const response = await controller.listWallets();
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+
 router.get("/bridge-api/v1/btc/tx/:txid", async (req, res, next) => {
   try {
     const controller = new TransactionController();

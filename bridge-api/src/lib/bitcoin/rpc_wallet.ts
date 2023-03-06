@@ -37,6 +37,33 @@ export async function listReceivedByAddress() {
   return result.result;
 }
 
+export async function listWallets() {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"listwallets","params":[]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result;
+}
+
+export async function unloadWallet(name:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"unloadwallet","params":["${name}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result;
+}
+
+export async function loadWallet(name:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"loadwallet","params":["${name}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result.result;
+}
+
 export async function getAddressInfo(address:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getaddressinfo","params":["${address}"]}`;
   OPTIONS.body = dataString;
