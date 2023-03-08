@@ -1,5 +1,5 @@
 import { Get, Route } from "tsoa";
-import { fetchNoArgsReadOnly, fetchSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc';
+import { findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc';
 
 export interface BalanceI {
   balance: number;
@@ -19,9 +19,19 @@ export interface SbtcContractDataI {
 
 @Route("/bridge-api/v1/sbtc")
 export class SbtcWalletController {
-  @Get("/events")
-  public async fetchSbtcEvents(): Promise<any> {
-    return await fetchSbtcEvents();
+  @Get("/events/save")
+  public async saveAllSbtcEvents(): Promise<any> {
+    return await saveAllSbtcEvents();
+  }
+
+  @Get("/events/save/:page")
+  public async saveSbtcEvents(page:number): Promise<any> {
+    return await saveSbtcEvents(page);
+  }
+
+  @Get("/events/:page")
+  public async findSbtcEvents(page:number): Promise<any> {
+    return await findSbtcEvents(page);
   }
 
   @Get("/address/:address/balance")

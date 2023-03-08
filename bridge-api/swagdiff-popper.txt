@@ -1,3 +1,9 @@
+/usr/src/app # cat package.json | grep swagger
+    "predev": "npm run swagger",
+    "prebuild": "npm run swagger",
+    "swagger": "tsoa spec"
+    "@types/swagger-ui-express": "^4.1.3",
+    "swagger-ui-express": "^4.6.2",
 {
 	"components": {
 		"examples": {},
@@ -331,9 +337,9 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save": {
+		"/bridge-api/v1/sbtc/events": {
 			"get": {
-				"operationId": "SaveAllSbtcEvents",
+				"operationId": "FetchAllSbtcEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -348,36 +354,9 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save/{page}": {
-			"get": {
-				"operationId": "SaveSbtcEvents",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "page",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
 		"/bridge-api/v1/sbtc/events/{page}": {
 			"get": {
-				"operationId": "FindSbtcEvents",
+				"operationId": "FetchSbtcEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -472,4 +451,4 @@
 			"url": "/"
 		}
 	]
-}
+}/usr/src/app #

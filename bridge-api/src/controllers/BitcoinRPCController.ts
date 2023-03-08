@@ -36,7 +36,6 @@ export const OPTIONS = {
 export class TransactionController {
   @Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
-    console.log('fetchRawTx: ' + txid);
     return await fetchRawTx(txid, true);
   }
 }
@@ -54,9 +53,9 @@ export class WalletController {
     // other; electrumx, hiro ??
     console.log('fetchUtxoSet : utxos : ', utxos);
     for (let utxo of utxos) {
-      const tx = await fetchRawTx(utxo.txid, true);
+      const tx = await fetchRawTx(utxo.txid, false);
       console.log('fetchUtxoSet : tx : ', tx);
-      utxo.tx = tx;
+      utxo.tx = tx; 
     }
     result.utxos = utxos
     console.log('fetchUtxoSet: ', result.utxos);

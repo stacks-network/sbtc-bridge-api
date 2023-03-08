@@ -5,9 +5,13 @@ import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
 import { principalCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
 import { sbtcContractId, stacksApi, network } from './config';
-import { readTx } from './bitcoin/mempool_api';
+import { fetchPegTxData } from './bitcoin/rpc_transaction';
 import fetch from 'node-fetch';
 import type { BalanceI, SbtcContractDataI } from '../controllers/StacksRPCController';
+import { SbtcEventModel } from './data/sbtc_events_model';
+import util from 'util'
+
+const limit = 10;
 
 const noArgMethods = [
   'get-coordinator-data',
@@ -87,26 +91,50 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
   }
 }
 
+export async function saveAllSbtcEvents() {
+  let count = await SbtcEventModel.countDocuments();
+  let events:Array<any>;
+  console.log('count: ', util.inspect(count, false, null, true /* enable colors */));
+  do {
+    events = await saveSbtcEvents(count);
+    count += limit;
+  } while (events.length === limit);
+}
 
-export async function fetchSbtcEvents() {
+export async function saveSbtcEvents(count:number):Promise<Array<any>> {
   try {
+    const sbtcEvents:Array<any> = []
     const contractId = sbtcContractId;
-    const url = stacksApi + '/extended/v1/contract/' + contractId + '/events';
+    const url = stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + count;
     const response = await fetch(url);
     const result:any = await response.json();
-    console.log('events: ', result)
+    //console.log('saveSbtcEvents: ', util.inspect(result, false, null, true /* enable colors */));
     for (const event of result.results) {
-      event.data = cvToJSON(deserializeCV(event.contract_log.value.hex));
+      const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
+      const pegData = await fetchPegTxData(edata.value, true);
+      let newEvent = {
+        contractId: event.contract_log.contract_id,
+        eventIndex: event.event_index,
+        txid: event.tx_id,
+        bitcoinTxid: edata.value,
+        pegData,
+      };
+      const sbtcEventModel = new SbtcEventModel(newEvent);
+      try {
+        sbtcEventModel.save();
+        console.log('sbtcEventModel: ', util.inspect(sbtcEventModel, false, null, true /* enable colors */));
+      } catch (err) {
+        console.log('saveSbtcEvents: ', util.inspect(err, false, null, true /* enable colors */));
+      }
     }
-    const txs = [];
-    for (let event of result.results) {
-      event.txData = await readTx(event.data.value);
-    }
-  
-    return { events: result.results };
+    return sbtcEvents;
   } catch (err) {
-    return { events: [] };
+    return [];
   }
+}
+
+export async function findSbtcEvents(count:number):Promise<Array<any>> {
+  return SbtcEventModel.find();
 }
 
 export async function fetchSbtcWalletAddress() {
