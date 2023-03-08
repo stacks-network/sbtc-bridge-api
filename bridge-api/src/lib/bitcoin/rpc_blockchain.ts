@@ -26,6 +26,15 @@ export async function getBlockChainInfo() {
   return result.result;
 }
 
+export async function getBlock(hash:string, verbosity:number) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getblock","params":["${hash}", ${verbosity}]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'getBlock error: ');
+  const result = await response.json();
+  return result.result;
+}
+
 export async function getBlockCount() {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getblockcount","params":[]}`;
   OPTIONS.body = dataString;

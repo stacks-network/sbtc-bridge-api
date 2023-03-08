@@ -1,4 +1,4 @@
-{
+export const swagger = {
 	"components": {
 		"examples": {},
 		"headers": {},
@@ -331,9 +331,9 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save": {
+		"/bridge-api/v1/sbtc/events": {
 			"get": {
-				"operationId": "SaveAllSbtcEvents",
+				"operationId": "FetchAllSbtcEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -348,36 +348,9 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save/{page}": {
-			"get": {
-				"operationId": "SaveSbtcEvents",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "page",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
 		"/bridge-api/v1/sbtc/events/{page}": {
 			"get": {
-				"operationId": "FindSbtcEvents",
+				"operationId": "FetchSbtcEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",

@@ -1,10 +1,11 @@
 import { dumpConfig, sbtcContractId, host, port } from './lib/config';
+import { swagger } from './lib/swagger'
 import express, { Application } from "express";
 import morgan from "morgan";
 import cors from "cors";
-import { findThreadById } from './lib/db_helper';
 import Router from "./routes";
-import swaggerUi from "swagger-ui-express";
+import { serve, setup } from 'swagger-ui-express';
+import { sbtcEventJob } from './controllers/JobScheduler';
 
 const app = express();
 app.use(express.json());
@@ -14,10 +15,11 @@ app.use(cors());
 
 app.use(
   "/bridge-api/docs",
-  swaggerUi.serve,
-  swaggerUi.setup(undefined, {
+  serve,
+  setup(undefined, {
     swaggerOptions: {
-      url: "/swagger.json",
+      spec: swagger
+      //url: "/swagger.json",
     },
   })
 );
@@ -30,4 +32,5 @@ app.listen(port, () => {
   return;
 });
 
+sbtcEventJob.start();
 console.log(`Running on ${host}:${port}\n\n`);

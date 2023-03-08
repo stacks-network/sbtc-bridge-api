@@ -16,7 +16,6 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const result = await estimateSmartFee();
     expect(result.feeInfo.low_fee_per_kb).equals(result.feeInfo.medium_fee_per_kb / 2);
     expect(result.feeInfo.high_fee_per_kb).equals(result.feeInfo.medium_fee_per_kb * 2);
-    //console.log('estimateSmartFee: ', util.inspect(result, false, null, true /* enable colors */));
   })
 
   /** 

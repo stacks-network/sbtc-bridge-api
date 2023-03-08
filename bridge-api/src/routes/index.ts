@@ -90,10 +90,31 @@ router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res, next
   }
 });
 
-router.get("/bridge-api/v1/sbtc/events", async (req, res, next) => {
+router.get("/bridge-api/v1/sbtc/events/save", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
-    const response = await controller.fetchSbtcEvents();
+    controller.saveAllSbtcEvents();
+    const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
+router.get("/bridge-api/v1/sbtc/events/save/:page", async (req, res, next) => {
+  try {
+    const controller = new SbtcWalletController();
+    const response = await controller.saveSbtcEvents(Number(req.params.page));
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
+router.get("/bridge-api/v1/sbtc/events/:page", async (req, res, next) => {
+  try {
+    const controller = new SbtcWalletController();
+    const response = await controller.findSbtcEvents(Number(req.params.page));
     return res.send(response);
   } catch (error) { // manually catching
     next(error) // passing to default middleware error handler
@@ -141,7 +162,7 @@ router.get("/bridge-api/v1/config/:param", async (req, res, next) => {
 });
 
 router.get('*', function(req, res) {
-  res.sendStatus(404).send("Welcome to the Mini sBTC Bridge");
+  res.sendStatus(404);
 });
 
 
