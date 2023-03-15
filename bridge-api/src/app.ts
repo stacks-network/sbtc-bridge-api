@@ -2,10 +2,10 @@ import { dumpConfig, sbtcContractId, host, port } from './lib/config';
 import { swagger } from './lib/swagger'
 import express, { Application } from "express";
 import morgan from "morgan";
-import cors from "cors";
 import Router from "./routes";
 import { serve, setup } from 'swagger-ui-express';
 import { sbtcEventJob } from './controllers/JobScheduler';
+import cors from "cors";
 
 const app = express();
 app.use(express.json());

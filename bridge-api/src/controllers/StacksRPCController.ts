@@ -1,5 +1,5 @@
 import { Get, Route } from "tsoa";
-import { findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc';
+import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc';
 
 export interface BalanceI {
   balance: number;
@@ -22,6 +22,11 @@ export class SbtcWalletController {
   @Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {
     return await saveAllSbtcEvents();
+  }
+
+  @Get("/events/index/stacks/:txid")
+  public async indexSbtcEvent(txid:string): Promise<any> {
+    return await indexSbtcEvent(txid);
   }
 
   @Get("/events/save/:page")

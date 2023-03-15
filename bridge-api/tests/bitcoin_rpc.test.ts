@@ -34,7 +34,6 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
 
   it.concurrent('Check getAddressInfo() returns correct info', async () => {
     const result = await getAddressInfo('tb1q6ue638m4t5knwxl4kwhwyuffttlp0ffee3zn3e');
-    console.log('getAddressInfo: ', util.inspect(result, false, null, true /* enable colors */));
     expect(result.iswitness).equals(true);
   })
 
@@ -51,7 +50,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   it.concurrent('Check listReceivedByAddress() returns correct info', async () => {
     const result = await listReceivedByAddress();
     expect(result.length).equals(1);
-    expect(result[0].txids.length).equals(6);
+    expect(result[0].txids.length).equals(7);
   })
 
 })
