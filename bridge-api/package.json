@@ -2,7 +2,8 @@
   "name": "bridge-api",
   "version": "1.0.0",
   "description": "Enables caching of contract data for the sBTC Bridge app",
-  "main": "dist/app.js",
+  "main": "dist/src/app.js",
+  "type": "module",
   "scripts": {
     "start": "NODE_ENV=development tsc && NODE_ENV=development node dist/src/app.js",
     "start-stag": "NODE_ENV=staging tsc && NODE_ENV=staging node dist/src/app.js",
@@ -13,7 +14,7 @@
     "coverage": "vitest run --coverage",
     "predev": "npm run swagger",
     "prebuild": "npm run swagger",
-    "dev": "concurrently \"NODE_ENV=test nodemon\" \"NODE_ENV=test nodemon -x tsoa spec\"",
+    "dev": "concurrently \"NODE_ENV=test nodemon \" \"NODE_ENV=test nodemon -x tsoa spec\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
@@ -21,7 +22,10 @@
       "src"
     ],
     "ext": "ts",
-    "exec": "ts-node src/app.ts"
+    "exec": "ts-node src/app.ts",
+    "execMap": {
+      "ts": "ts-node"
+    }
   },
   "keywords": [],
   "author": "",
@@ -49,13 +53,15 @@
     "@noble/secp256k1": "^1.7.1",
     "@scure/base": "^1.1.1",
     "@scure/bip32": "^1.1.0",
+    "@scure/btc-signer": "^0.5.0",
+    "@stacks/encryption": "^6.2.0",
     "@vitest/coverage-c8": "^0.29.1",
     "body-parser": "^1.20.1",
     "c32check": "^2.0.0",
     "cors": "^2.8.5",
+    "esm": "^3.2.25",
     "express": "^4.18.2",
     "jsontokens": "^4.0.1",
-    "micro-btc-signer": "^0.4.2",
     "micro-stacks": "^1.1.4",
     "mongodb": "^5.0.1",
     "mongoose": "^6.9.2",
@@ -63,6 +69,7 @@
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.9",
     "swagger-ui-express": "^4.6.2",
-    "tsoa": "^5.1.1"
+    "tsoa": "^5.1.1",
+    "uninstall": "^0.0.0"
   }
 }

@@ -36,6 +36,10 @@ docker-compose build
 docker-compose up -d
 ```
 
+## Swagger API Docs
+
+See https://testnet.stx.eco/bridge-api/docs/#/
+
 ## Deployment
 
 Deployment builds, tags and pushes the images and then uses ssh to log on to remote server
@@ -55,3 +59,10 @@ This is automated using the deploy script;
 
 Note: requires docker hub access and ssh key registered on server. This will change when deployment
 moves to Google Cloud.
+
+## SBTC Wallet
+
+The SBTC Wallet is a taproot wallet with addresses (most recent first);
+
+- tb1pmmkznvm0pq5unp6geuwryu2f0m8xr6d229yzg2erx78nnk0ms48sk9s6q7
+- tb1pf74xr0x574farj55t4hhfvv0vpc9mpgerasawmf5zk9suauckugqdppqe8

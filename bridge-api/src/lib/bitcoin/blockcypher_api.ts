@@ -1,4 +1,4 @@
-import { blockCypherUrl } from '../config';
+import { blockCypherUrl } from '../config.js';
 import fetch from 'node-fetch';
 
 export async function fetchCurrentFeeRates() {

@@ -1,5 +1,5 @@
-import { mempoolUrl } from '../config';
-import { hexToAscii, decodeStacksAddress } from "../stacks_helper";
+import { mempoolUrl } from '../config.js';
+import { hexToAscii, decodeStacksAddress } from "../stacks_helper.js";
 import fetch from 'node-fetch';
 
 /**
@@ -50,41 +50,9 @@ export async function readTx(txid:string) {
   const result = await response.json();
   let error = '';
   try {
-    return decodePegInOutputs(result.vout);
+    return (result.vout);
   } catch (err:any) {
     error = err.message;
   }
   throw new Error(error);
-}
-
-function decodePegInOutputs(outputs:any) {
-  if (!outputs || outputs.length < 2) throw new Error('Incorrect number of outputs for a peg in.');
-  const outZeroType = outputs[0].scriptpubkey_type.toLowerCase();
-  if (outZeroType !== 'op_return') throw new Error('OP_RETURN in output 0 was expected but not found.');
-  const stxAddress = hexToAscii(outputs[0].scriptpubkey).substring(2);
-  try {
-    decodeStacksAddress(stxAddress)
-    const amountSats = (outputs[1]) ? outputs[1].value : 0;
-    const sbtcWallet = outputs[1].scriptpubkey_address;
-    return {
-      type: 'pegin',
-      stxAddress,
-      amountSats,
-      sbtcWallet
-    }  
-  } catch (err) {
-    return decodePegOutOutputs(outputs);
-  }
-}
-
-function decodePegOutOutputs(outputs:any) {
-  const pegOutValue = Number(hexToAscii(outputs[0].scriptpubkey).substring(2));
-  const amountSats = outputs[1].value;
-  const sbtcWallet = outputs[1].scriptpubkey_address;
-  return {
-    type: 'pegout',
-    stxAddress: '',
-    amountSats: pegOutValue,
-    sbtcWallet
-  }
 }

@@ -1,11 +1,11 @@
-import { dumpConfig, sbtcContractId, host, port } from './lib/config';
-import { swagger } from './lib/swagger'
+import { dumpConfig, sbtcContractId, host, port } from './lib/config.js';
+import { swagger } from './lib/swagger.js'
 import express, { Application } from "express";
 import morgan from "morgan";
-import cors from "cors";
-import Router from "./routes";
+import Router from "./routes/index.js";
 import { serve, setup } from 'swagger-ui-express';
-import { sbtcEventJob } from './controllers/JobScheduler';
+import { sbtcEventJob } from './controllers/JobScheduler.js';
+import cors from "cors";
 
 const app = express();
 app.use(express.json());

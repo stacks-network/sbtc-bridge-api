@@ -1,7 +1,7 @@
 import express from "express";
-import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController";
-import { SbtcWalletController } from "../controllers/StacksRPCController";
-import { ConfigController } from "../controllers/ConfigController";
+import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
+import { SbtcWalletController } from "../controllers/StacksRPCController.js";
+import { ConfigController } from "../controllers/ConfigController.js";
 
 const router = express.Router();
 
@@ -90,15 +90,18 @@ router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res, next
   }
 });
 
-router.get("/bridge-api/v1/sbtc/events/save", async (req, res, next) => {
-  try {
-    const controller = new SbtcWalletController();
-    controller.saveAllSbtcEvents();
-    const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
-    return res.send(response);
-  } catch (error) { // manually catching
-    next(error) // passing to default middleware error handler
-  }
+router.get("/bridge-api/v1/sbtc/events/save", (req, res, next) => {
+  const controller = new SbtcWalletController();
+  controller.saveAllSbtcEvents();
+  const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
+  return res.send(response);
+});
+
+router.get("/bridge-api/v1/sbtc/events/index/stacks/:txid", async (req, res, next) => {
+  const controller = new SbtcWalletController();
+  const response = await controller.indexSbtcEvent(req.params.txid);
+  //const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
+  return res.send(response);
 });
 
 router.get("/bridge-api/v1/sbtc/events/save/:page", async (req, res, next) => {

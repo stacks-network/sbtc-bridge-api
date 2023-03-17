@@ -18,4 +18,4 @@ export function hexToAscii(input:string) {
 	const buf = Buffer.from(input, "hex");
 	return buf.toString("ascii");
 }
-  
+

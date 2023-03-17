@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { mongoUrl } from '../config';
+import { mongoUrl } from '../config.js';
 /** */
 mongoose.set('strictQuery', true);
 
@@ -23,10 +23,12 @@ const SbtcEventSchema = new Schema({
 	bitcoinTxid: { type : String , unique : true, required : true },
 	pegData: {
 		pegType: String,
+		opType: String,
 		stxAddress: String,
 		amountSats: Number,
 		signature: String,
 		dustAmount: Number,
+		compression: Number,
 		burnBlockHeight: { type : Number , required : true },
 		sbtcWallet: { type : String , required : true },
 	}
@@ -34,19 +36,6 @@ const SbtcEventSchema = new Schema({
 
 // Compile model from schema
 export const SbtcEventModel = mongoose.model("SbtcEvent", SbtcEventSchema);
-
-export async function countSbtcEvents() {
-	const count = await SbtcEventModel.countDocuments();
-	return count;
-}
-
-export async function updateOneSbtcEvent(event:any) {
-	return SbtcEventModel.updateOne(event);
-}
-
-export async function insertSbtcEvents(events: Array<any>) {
-	return SbtcEventModel.insertMany(events);
-}
 
 export async function findAll(event: any) {
 	console.log('findSbtcEventById:SbtcEventId:');

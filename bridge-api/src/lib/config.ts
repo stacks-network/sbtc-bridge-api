@@ -1,6 +1,11 @@
-import {config as configDotenv} from 'dotenv'
+import path from 'path';
+import { fileURLToPath } from 'url';
+import {config, config as configDotenv} from 'dotenv'
 import {resolve} from 'path'
-import type { IStringToStringDictionary } from '../controllers/ConfigController';
+import type { IStringToStringDictionary } from '../controllers/ConfigController.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 switch(process.env.NODE_ENV) {
     case "development":

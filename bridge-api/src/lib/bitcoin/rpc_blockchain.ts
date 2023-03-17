@@ -1,6 +1,6 @@
-import { getAddressInfo } from './rpc_wallet'
+import { getAddressInfo } from './rpc_wallet.js'
 import fetch from 'node-fetch';
-import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController'
+import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
 
 export async function startScantxoutset(address:string) {
   const addressInfo:any = await getAddressInfo(address);

@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2017",
-		"module": "commonjs",
+		"module": "es2020",
 		"moduleResolution": "node",
 		"paths": {
 			"$lib": ["./src/lib"],
@@ -9,6 +9,7 @@
 			"$types": ["./src/types"],
 			"$types/*": ["./src/types/*"],
 		},
+		"allowSyntheticDefaultImports": true,
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
@@ -20,7 +21,10 @@
 		"types": ["vitest/globals"],
 		"outDir": "dist",
 		"experimentalDecorators": true,
-		"emitDecoratorMetadata": true
-		},
-	"lib": ["es2015"]
+		"emitDecoratorMetadata": true,
+	},
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
+	}
 }

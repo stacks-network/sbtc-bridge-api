@@ -1,6 +1,6 @@
-import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController'
+import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
 import fetch from 'node-fetch';
-import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController'
+import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController.js'
 import util from 'util'
 
 export async function listUnspent() {
