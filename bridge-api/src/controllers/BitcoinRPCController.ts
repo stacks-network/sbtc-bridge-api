@@ -1,10 +1,10 @@
 import { Get, Route } from "tsoa";
-import { fetchRawTx } from '../lib/bitcoin/rpc_transaction';
-import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet";
-import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain";
-import { fetchUTXOs } from "../lib/bitcoin/mempool_api";
-import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api";
-import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config';
+import { fetchRawTx } from '../lib/bitcoin/rpc_transaction.js';
+import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
+import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
+import { fetchUTXOs } from "../lib/bitcoin/mempool_api.js";
+import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
+import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
 
 export interface FeeEstimateResponse {
     feeInfo: {

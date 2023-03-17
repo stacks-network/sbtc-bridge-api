@@ -1,7 +1,7 @@
 import express from "express";
-import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController";
-import { SbtcWalletController } from "../controllers/StacksRPCController";
-import { ConfigController } from "../controllers/ConfigController";
+import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
+import { SbtcWalletController } from "../controllers/StacksRPCController.js";
+import { ConfigController } from "../controllers/ConfigController.js";
 
 const router = express.Router();
 

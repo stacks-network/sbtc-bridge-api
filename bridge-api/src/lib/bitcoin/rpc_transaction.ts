@@ -1,23 +1,14 @@
 import fetch from 'node-fetch';
-import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController'
-import { hexToAscii, decodeStacksAddress } from "../stacks_helper";
+import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController.js'
+import { hexToAscii, decodeStacksAddress } from "../stacks_helper.js";
 import util from 'util'
-//import btc from '@scure/btc-signer';
-import { getBlock } from './rpc_blockchain';
-import { bitcoinToSats } from '../utils';
-import { network } from '../config';
-import { getStacksAddressFromSignature } from '../structured-data'
-//import * as btc from '@scure/btc-signer';
-
-//const btc = async ():Promise<any> => {
-//  await import('micro-btc-signer');
-//};
-//console.log('btc0 ', util.inspect(btc, false, null, true /* enable colors */));
- 
-//const btc = await import('micro-btc-signer');
-//import btc from '@scure/btc-signer';
-//const btc = (...args: any[]) => import('@scure/btc-signer').then(({default: btc}) => (...args: any));
-//const { NETWORK } = await import('micro-btc-signer');
+import { getBlock } from './rpc_blockchain.js';
+import { bitcoinToSats } from '../utils.js';
+import { getDataToSign, getStacksAddressFromSignature } from '../structured-data.js';
+import * as  btc from '@scure/btc-signer';
+import { hex } from '@scure/base';
+import { network } from '../config.js';
+import { hashMessage } from '@stacks/encryption';
 
 export async function fetchRawTx(txid:string, verbose:boolean) {
   let dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getrawtransaction","params":["${txid}", ${verbose}]}`;
@@ -54,17 +45,16 @@ async function decodePegInOutputs(outputs:any) {
       pegType: 'pegin',
       opType: res.opType,
       stxAddress: res.address,
-      amountSats, 
+      amountSats,
       sbtcWallet
     }
     return pegIn;
   } catch (err) {
     return await decodePegOutOutputs(outputs);
-  }
+  } 
 }
 
 function readStacksAddressForPegIn(scriptPubKey:any):{opType:string, address:string} {
-  console.log('attemptStacksAddressForPegIn:scriptPubKey ', util.inspect(scriptPubKey, false, null, true /* enable colors */));
   if (scriptPubKey.type === 'nulldata') {
     // op_return?
     const addrHex = scriptPubKey.asm.split(' ')[1]
@@ -76,63 +66,122 @@ function readStacksAddressForPegIn(scriptPubKey:any):{opType:string, address:str
   }
 }
 
-async function decodePegOutOutputs(outputs:any) {
-  console.log('decodePegOutOutputs:scriptPubKey ', util.inspect(outputs[0].scriptPubKey, false, null, true /* enable colors */));
+async function decodePegOutOutputs(outputs:any) { 
+  console.log('decodePegOutOutputs:outputs ', util.inspect(outputs, false, null, true /* enable colors */));
+  // dust amount is sent to sbtc wallet in output 1
+  let parsed = parseOutputs(outputs);
+  console.log('decodePegOutOutputs:parsed ', util.inspect(parsed, false, null, true /* enable colors */));
+  const dataToSign = getDataToSign(parsed.amountSats, parsed.sbtcWallet);
+  const msgHash = hashMessage(dataToSign.toString('hex'));
+  console.log('msgHash: ' + msgHash); 
+  const stxAddress = getStacksAddressFromSignature(msgHash, parsed.signature.toString('binary'), parsed.compression);
+  parsed.stxAddress = (network === 'testnet') ? stxAddress.tp2pkh : stxAddress.mp2pkh;
+  console.log('decodePegOutOutputs:stxAddress ', util.inspect(stxAddress, false, null, true /* enable colors */));
+  return parsed; 
+}
+
+type parsedDataType = {
+  pegType: string;
+  opType: string;
+  stxAddress?: string;
+  sbtcWallet: string;
+  signature: Buffer;
+  compression: number,
+  amountSats: number;
+  dustAmount: number;
+};
+
+export function parseOutputs(outputs:Array<any>):parsedDataType {
   if (outputs[0].scriptPubKey.type === 'nulldata') {
     // op_return
     const data = Buffer.from(outputs[0].scriptPubKey.hex, 'hex');
-    //console.log('buffer ', util.inspect(data.toString('hex'), false, null, true /* enable colors */));
-    const signature = data.subarray(12);
-    const pegOutAmount = data.subarray(3,11).readUInt32LE();
-    const stxAddress = await getOutput2ScriptPubKey(pegOutAmount, outputs[1].scriptPubKey.address, signature);
+    const sig = data.subarray(12);
+    const amt = data.subarray(3,11).readUInt32LE();
+    console.log('sif: ' + sig);
+    console.log('amt: ' + data.subarray(3,13).toString('hex'));
+    console.log('amt: ' + amt);
     return {
       pegType: 'pegout',
       opType: 'return',
-      stxAddress,
-      signature: (signature) ? signature.toString('hex') : '',
-      amountSats: pegOutAmount,
+      compression: 0,
       sbtcWallet: outputs[1].scriptPubKey.address,
+      signature: sig,
+      amountSats: amt,
       dustAmount: bitcoinToSats(outputs[1].value)
-    };
-  } else {
+    }
+  } else if (outputs[0].scriptPubKey.type === 'nonstandard') {
     // op_drop
-    const dropData = outputs[0].scriptPubKey.asm.split(' ')[0]
-    const data = Buffer.from(dropData, 'hex');
-    const pegOutAmount = data.subarray(0,8).readUInt32LE();
-    const signature = data.subarray(9);
-    const stxAddress = await getOutput2ScriptPubKey(pegOutAmount, outputs[0].scriptPubKey.address, signature);
+	  const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const asm = outputs[0].scriptPubKey.asm.split(' ');
+    const script = asm[4] 
+
+    const asmScript = btc.Script.encode(['DUP', 'HASH160', Buffer.from(script, 'hex'), 'EQUALVERIFY', 'CHECKSIG'])
+
+    console.log('getOpDropP2shScript:asmScript: ', asmScript)
+
+    console.log('getOpDropP2shScript:script : ', script);
+		const addr = btc.OutScript.decode(Uint8Array.from(Buffer.from(script, 'hex')));
+		const addr1 = btc.Address(net).encode(addr);
+		console.log('getOpDropP2shScript:addr : ', addr);
+		console.log('getOpDropP2shScript:addr1 : ', addr1);
+
+
+
+
+
+
+
+
+
+    //const p2pkh = outputs[0].scriptPubKey.asm.split(' ').slice(2);
+    //const encscript = btc.Script.encode(fromASM(p2pkh));
+    //console.log('encscript: ', encscript)
+    //const script = btc.OutScript.decode(Buffer.from(outputs[0].scriptPubKey.asm))
+    //const addr = outputs[1].scriptPubKey.address;
+    //console.log('addr.encode(script): ', addr.encode(script))
+    //console.log('script: ', script)
+    //const data = Buffer.from(outputs[1].scriptPubKey.hex, 'hex');
+    //const dropData = outputs[0].scriptPubKey.asm.split(' ')[0]
+    //const data = Buffer.from(dropData, 'hex');
+    //const pegOutAmount = data.subarray(0,8).readUInt32LE();
+    //const signature = data.subarray(9);
+ 
+    const data = Buffer.from(outputs[0].scriptPubKey.hex, 'hex');
+    const amt = data.subarray(2,10).readUInt32LE();
+    const sig = data.subarray(11, 141); 
+    console.log('sif: ' + sig);
+    console.log('amt: ' + data.subarray(2,10).toString('hex'));
+    console.log('amt: ' + amt);
     return {
       pegType: 'pegout',
       opType: 'drop',
-      stxAddress: '',
-      signature: (signature) ? signature.toString('hex') : '',
-      amountSats: pegOutAmount,
-      sbtcWallet: outputs[0].scriptPubKey.address,
-      dustAmount: bitcoinToSats(outputs[0].value)
-    };
+      compression: 1,
+      sbtcWallet: outputs[1].scriptPubKey.address,
+      signature: sig,
+      amountSats: amt,
+      dustAmount: bitcoinToSats(outputs[1].value)
+    }
+  } else {
+    console.log('Error parsing : ', outputs)
+    throw new Error('Outputs not parsable');
   }
 }
 
-export async function getOutput2ScriptPubKey(amount:number, sbtcWalletAddress:string, signature:Buffer):Promise<string> {
-  console.log('getOutput2ScriptPubKey:');
-  //console.log('btc:', btc);
-  //let btc = await import('../../../node_modules/micro-btc-signer/index');
-  //let btc = await import('micro-btc-signer');
-  let btc = await import('@scure/btc-signer');
-  console.log('btc:', btc);
-  //const {TEST_NETWORK, NETWORK,Address,OutScript} = await import('@scure/btc-signer');
-  //console.log('OutScript:', OutScript);
-  const amtBuf = Buffer.alloc(9);
-  amtBuf.writeUInt32LE(amount, 0);
-  const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-  //console.log('btc1 ', util.inspect(btc, false, null, true /* enable colors */));
-  const script = btc.OutScript.encode(btc.Address(net).decode(sbtcWalletAddress))
-  console.log('decodePegOutOutputs ', util.inspect(Buffer.from(script).toString('hex'), false, null, true /* enable colors */));
-  const scriptBuf = Buffer.from(script);
-  const data = Buffer.concat([amtBuf, scriptBuf]);
-  console.log('decodePegOutOutputs ', util.inspect(data, false, null, true /* enable colors */));
-  //return { script: data }
-  const stxAddress = getStacksAddressFromSignature(data.toString('hex'), signature.toString('hex'));
-  return (network === 'testnet') ? stxAddress.tp2pkh : stxAddress.mp2pkh;
+export function fromASM(asm:string) {
+  const ops = asm.split(' '); 
+  const out = [];
+  for (const op of ops) {
+    if (op.startsWith('OP_')) {
+      let opName:any = op.slice(3);
+      if (opName === 'FALSE') opName = 0;
+      if (opName === 'TRUE') opName = 1;
+      // Handle numeric opcodes
+      if (String(Number(opName)) === opName) opName = +opName;
+      else if (btc.OP[opName] === undefined) throw new Error(`Wrong opcode='${op}'`);
+      out.push(opName);
+    } else {
+      out.push(hex.decode(op));
+    }
+  }
+  return out;
 }
-

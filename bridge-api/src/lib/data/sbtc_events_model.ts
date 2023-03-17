@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { mongoUrl } from '../config';
+import { mongoUrl } from '../config.js';
 /** */
 mongoose.set('strictQuery', true);
 
@@ -28,6 +28,7 @@ const SbtcEventSchema = new Schema({
 		amountSats: Number,
 		signature: String,
 		dustAmount: Number,
+		compression: Number,
 		burnBlockHeight: { type : Number , required : true },
 		sbtcWallet: { type : String , required : true },
 	}

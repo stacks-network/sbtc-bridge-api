@@ -4,11 +4,11 @@
 import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
 import { principalCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
-import { sbtcContractId, stacksApi, network } from './config';
-import { fetchPegTxData } from './bitcoin/rpc_transaction';
+import { sbtcContractId, stacksApi, network } from './config.js';
+import { fetchPegTxData } from './bitcoin/rpc_transaction.js';
 import fetch from 'node-fetch';
-import type { BalanceI, SbtcContractDataI } from '../controllers/StacksRPCController';
-import { SbtcEventModel } from './data/sbtc_events_model';
+import type { BalanceI, SbtcContractDataI } from '../controllers/StacksRPCController.js';
+import { SbtcEventModel } from './data/sbtc_events_model.js';
 import util from 'util'
 
 const limit = 10;
@@ -98,13 +98,14 @@ export async function indexSbtcEvent(txid:string) {
     const response = await fetch(url);
     const result:any = await response.json();
     console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
-    //return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
+    return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
 
+    /**
     const events = result.events.filter((o:any) => o.event_type === 'smart_contract_log');
     const edata = cvToJSON(deserializeCV(events[0].contract_log.value.hex));
     const pegData = await fetchPegTxData(edata.value, true);
     console.log('Sbtc Events: : pegData=', pegData);
-
+    */
   } catch (err) {
     console.log('err indexSbtcEvent: ', util.inspect(err, false, null, true /* enable colors */));
     return [];
@@ -143,6 +144,7 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
 async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
+      console.log('Sbtc Events: : event=', util.inspect(event, false, null, true /* enable colors */));
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
       const pegData = await fetchPegTxData(edata.value, true);
       console.log('Sbtc Events: : pegData=', pegData);
@@ -160,7 +162,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
       console.log('saveSbtcEvents: saved one: ' + newEvent.pegData.pegType + ' : ' + newEvent.pegData.opType + ' : ' + newEvent.pegData.stxAddress);
       
     } catch (err:any) {
-      //console.log('saveSbtcEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
+      console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
     }
   }
   return sbtcEvents;

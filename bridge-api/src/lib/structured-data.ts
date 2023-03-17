@@ -2,12 +2,12 @@ import { serializeCV, type ClarityValue } from "micro-stacks/clarity";
 import { sha256 } from "@noble/hashes/sha256";
 import { bytesToHex, concatByteArrays } from "micro-stacks/common";
 import { tupleCV, bufferCV, uintCV, stringAsciiCV } from "micro-stacks/clarity";
-import { publicAppName, publicAppVersion, network } from './config';
+import { publicAppName, publicAppVersion, network } from './config.js';
 import { recoverSignature, verifyMessageSignature, makeStructuredDataHash } from "micro-stacks/connect";
 import { hexToBytes } from "micro-stacks/common";
 import { recoverPublicKey, Signature } from '@noble/secp256k1';
 import { publicKeyToStxAddress, StacksNetworkVersion } from 'micro-stacks/crypto';
-import { hashMessage } from '@stacks/encryption';
+import * as  btc from '@scure/btc-signer';
 
 const prefix = Uint8Array.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]); // SIP018
 
@@ -68,11 +68,15 @@ export function verifyStructuredDataSignature(message: Message, public_key: Uint
 	});
 }
 
-export function getStacksAddressFromSignature(message:string, signature:string) {
+export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string, compression:number) {
 	const sig = recoverSignature({ signature: signature, mode: 'rsv' });
+	//console.log('getStacksAddressFromSignature:sig ', signature);
+	//console.log('getStacksAddressFromSignature:sig ', sig);
 	const s1 = new Signature(sig.signature.r, sig.signature.s)
-	let pubkey:Uint8Array|string = recoverPublicKey(hashMessage(message), s1, 0, true);
+	//console.log('getStacksAddressFromSignature:s1 ', s1);
+	let pubkey:Uint8Array|string = recoverPublicKey(messageHash, s1, compression, true);
 	pubkey = bytesToHex(pubkey);
+	console.log('getStacksAddressFromSignature:pubkey ', pubkey);
 	//const pubkey0 = getPublicKeyFromSignature({ hash: Buffer.from(msgUint8), signature: sig.signature, recoveryBytes: sig.recoveryBytes });	
 	const addresses = {
 		tp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2PKH),
@@ -81,4 +85,19 @@ export function getStacksAddressFromSignature(message:string, signature:string) 
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
 	return addresses;
+}
+
+export function getDataToSign(amount:number, sbtcWalletAddress:string):Buffer {
+	//console.log('getDataToSign:amount ', amount);
+	//console.log('getDataToSign:sbtcWalletAddress ', sbtcWalletAddress);
+	const amtBuf = Buffer.alloc(9);
+	amtBuf.writeUInt32LE(amount, 0);
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const script = btc.OutScript.encode(btc.Address(net).decode(sbtcWalletAddress))
+	//console.log('decodePegOutOutputs ', util.inspect(Buffer.from(script).toString('hex'), false, null, true /* enable colors */));
+	const scriptBuf = Buffer.from(script);
+	//console.log('getDataToSign:amtBuf ', amtBuf.toString('hex'));
+	//console.log('getDataToSign:scriptBuf ', scriptBuf.toString('hex'));
+	const data = Buffer.concat([amtBuf, scriptBuf]);
+	return data;
 }

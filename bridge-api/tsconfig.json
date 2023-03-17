@@ -1,7 +1,7 @@
 {
 	"compilerOptions": {
 		"target": "es2017",
-		"module": "commonjs",
+		"module": "es2020",
 		"moduleResolution": "node",
 		"paths": {
 			"$lib": ["./src/lib"],
@@ -22,5 +22,9 @@
 		"outDir": "dist",
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
+	},
+	"ts-node": {
+		"esm": true,
+		"experimentalSpecifierResolution": "node"
 	}
 }

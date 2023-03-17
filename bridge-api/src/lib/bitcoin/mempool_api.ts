@@ -1,5 +1,5 @@
-import { mempoolUrl } from '../config';
-import { hexToAscii, decodeStacksAddress } from "../stacks_helper";
+import { mempoolUrl } from '../config.js';
+import { hexToAscii, decodeStacksAddress } from "../stacks_helper.js";
 import fetch from 'node-fetch';
 
 /**
