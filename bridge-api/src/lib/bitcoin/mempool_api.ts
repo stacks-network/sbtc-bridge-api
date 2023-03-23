@@ -1,5 +1,4 @@
 import { mempoolUrl } from '../config.js';
-import { hexToAscii, decodeStacksAddress } from "../stacks_helper.js";
 import fetch from 'node-fetch';
 
 /**
@@ -62,7 +61,7 @@ export async function sendRawTx(hex:string) {
   console.log('sendRawTx:mempoolUrl: ', url)
   const response = await fetch(url, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    //headers: { 'Content-Type': 'application/json' },
     body: hex
   });
   let result:any;

@@ -42,15 +42,12 @@ export class TransactionController {
   public async sendRawTransaction(hex:string): Promise<any> {
       try {
         const resp = await sendRawTx(hex);
-        console.log('TransactionController:sendRawTransaction: ', resp);
         return resp;
       } catch (err) {
-        console.log('TransactionController:sendRawTransaction:error: ', err);
         const resp =  await sendRawTxRpc(hex);
-        console.log('TransactionController:sendRawTransaction:bitcoind: ', resp);
         return resp;
-      } 
-  } 
+      }
+  }
 }
  
 @Route("/bridge-api/v1/btc/wallet")
@@ -61,8 +58,7 @@ export class WalletController {
     const utxos = await fetchUTXOs(address);
     for (let utxo of utxos) {
       const tx = await fetchRawTx(utxo.txid, verbose);
-      console.log('fetchUtxoSet : tx : ', tx);
-      utxo.tx = tx; 
+      utxo.tx = tx;
     }
     result.utxos = utxos
     return result;
