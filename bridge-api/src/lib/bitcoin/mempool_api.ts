@@ -56,3 +56,21 @@ export async function readTx(txid:string) {
   }
   throw new Error(error);
 }
+
+export async function sendRawTx(hex:string) {
+  const url = mempoolUrl + '/tx';
+  console.log('sendRawTx:mempoolUrl: ', url)
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: hex
+  });
+  let result:any;
+  if (response.status !== 200) throw new Error('Mempool error: ' + response.status + ' : ' + response.statusText);
+  try {
+    result = await response.json();
+  } catch (err) {
+    result = await response.text();
+  }
+  return result;
+}

@@ -1,0 +1,34 @@
+{
+    "global": {
+      "unsignedTx": {
+        "version": 2,
+        "segwitFlag": false,
+        "inputs": [
+          {
+            "txid": "ca4a31ceb3dcee8a2d2c362b34de639c36f7fed8f018a40054a6913a316c6d85",
+            "index": 0,
+            "finalScriptSig": "",
+            "sequence": 4294967295
+          }
+        ],
+        "outputs": [
+          {
+            "amount": "0",
+            "script": "6a295354334e34414a465a5a594334424b39394835335850384b44475846475132505253504e455438544e"
+          },
+          {
+            "amount": "1657958",
+            "script": "5120deec29b36f0829c98748cf1c3271497ece61e9aa5148242b23378f39d9fb854f"
+          }
+        ],
+        "lockTime": 0
+      }
+    },
+    "inputs": [
+      {}
+    ],
+    "outputs": [
+      {},
+      {}
+    ]
+  }

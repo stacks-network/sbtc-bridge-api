@@ -1,8 +1,8 @@
-import { Get, Route } from "tsoa";
-import { fetchRawTx } from '../lib/bitcoin/rpc_transaction.js';
+import { Get, Post, Route } from "tsoa";
+import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs } from "../lib/bitcoin/mempool_api.js";
+import { fetchUTXOs, sendRawTx } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
 
@@ -38,6 +38,19 @@ export class TransactionController {
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
   }
+  //@Post("/sendrawtx")
+  public async sendRawTransaction(hex:string): Promise<any> {
+      try {
+        const resp = await sendRawTx(hex);
+        console.log('TransactionController:sendRawTransaction: ', resp);
+        return resp;
+      } catch (err) {
+        console.log('TransactionController:sendRawTransaction:error: ', err);
+        const resp =  await sendRawTxRpc(hex);
+        console.log('TransactionController:sendRawTransaction:bitcoind: ', resp);
+        return resp;
+      } 
+  } 
 }
 
 @Route("/bridge-api/v1/btc/wallet")
