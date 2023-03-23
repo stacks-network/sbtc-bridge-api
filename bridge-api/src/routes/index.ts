@@ -44,7 +44,7 @@ router.get("/bridge-api/v1/btc/blocks/fee-estimate", async (req, res, next) => {
 router.get("/bridge-api/v1/btc/wallet/address/:address/utxos", async (req, res, next) => {
   try {
     const controller = new WalletController();
-    const response = await controller.fetchUtxoSet(req.params.address);
+    const response = await controller.fetchUtxoSet(req.params.address, (req.query.verbose) ? true : false);
     return res.send(response);
   } catch (error) {
     next(error)
@@ -102,7 +102,7 @@ router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res, next
     next(error) // passing to default middleware error handler
   }
 });
-
+ 
 router.get("/bridge-api/v1/sbtc/events/save", (req, res, next) => {
   const controller = new SbtcWalletController();
   controller.saveAllSbtcEvents();

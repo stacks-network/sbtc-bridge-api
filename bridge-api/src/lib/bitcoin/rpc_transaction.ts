@@ -58,6 +58,16 @@ type parsedDataType = {
   burnBlockHeight: number;
 };
 
+function setSbtcWallet(outputs:Array<any>, parsed:parsedDataType) {
+  if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
+    parsed.sbtcWallet = outputs[1].scriptPubKey.address;
+  } else {
+    const scriptHex = outputs[0].scriptPubKey.asm.split(' ')[6];
+    const encscript = btc.OutScript.decode(hex.decode(scriptHex));
+    parsed.sbtcWallet = btc.Address(getNet()).encode(encscript);
+  }
+}
+
 export function parseOutputs(outputs:Array<any>) {
   const parsed = {
     pegType: 'pegin',
@@ -94,6 +104,7 @@ export function parseOutputs(outputs:Array<any>) {
     parsed.stxAddress = c32address(addr0, addr1);
     parsed.cname = d1.subarray(24).toString('utf8');
     if (parsed.cname.startsWith('\x00\x00\x00\x00\x00')) parsed.cname = undefined;
+    setSbtcWallet(outputs, parsed);
   } else if (opcode.toUpperCase() === '3E') {
     parsed.pegType = 'pegout';
     parsed.dustAmount = bitcoinToSats(outputs[0].value);
@@ -106,13 +117,7 @@ export function parseOutputs(outputs:Array<any>) {
 
     parsed.compression = (outputs[0].scriptPubKey.type === 'nulldata') ? 0 : 1;
 
-    if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
-      parsed.sbtcWallet = outputs[1].scriptPubKey.address;
-    } else {
-      const scriptHex = outputs[0].scriptPubKey.asm.split(' ')[6];
-      const encscript = btc.OutScript.decode(hex.decode(scriptHex));
-      parsed.sbtcWallet = btc.Address(getNet()).encode(encscript);
-    }
+    setSbtcWallet(outputs, parsed)
 		console.log('getOpDropP2shScript:amountSats : ', parsed.amountSats);
 		console.log('getOpDropP2shScript:sbtcWallet : ', parsed.sbtcWallet);
 
@@ -128,3 +133,4 @@ export function parseOutputs(outputs:Array<any>) {
   }
   return parsed;
 }
+

@@ -52,32 +52,24 @@ export class TransactionController {
       } 
   } 
 }
-
+ 
 @Route("/bridge-api/v1/btc/wallet")
 export class WalletController {
 
-  @Get("/address/:address/utxos")
-  public async fetchUtxoSet(address:string): Promise<any> {
-    console.log('BASE_URL : ' + BASE_URL);
+  public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     const result = await getAddressInfo(address);
-    // mempool 
     const utxos = await fetchUTXOs(address);
-    // bitcoin rpc - only usefull with own/imported addresses: const utxos = await listUnspent();
-    // other; electrumx, hiro ??
-    console.log('fetchUtxoSet : utxos : ', utxos);
     for (let utxo of utxos) {
-      const tx = await fetchRawTx(utxo.txid, false);
+      const tx = await fetchRawTx(utxo.txid, verbose);
       console.log('fetchUtxoSet : tx : ', tx);
       utxo.tx = tx; 
     }
     result.utxos = utxos
-    console.log('fetchUtxoSet: ', result.utxos);
     return result;
   }
   @Get("/loadwallet/:name")
   public async loadWallet(name:string): Promise<any> {
     const wallets = await listWallets();
-    console.log('wallets: ', wallets)
     for (const wallet in wallets) {
       try {
         await unloadWallet(name);
@@ -91,7 +83,6 @@ export class WalletController {
   @Get("/listwallets")
   public async listWallets(): Promise<any> {
     const wallets = await listWallets();
-    console.log('wallets: ', wallets)
     const result = await listWallets();
     return result;
   }
