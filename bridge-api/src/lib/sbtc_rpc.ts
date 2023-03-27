@@ -146,6 +146,8 @@ async function indexEvents(sbtcEvents:Array<any>) {
     try {
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
       const pegData = await fetchPegTxData(edata.value, true);
+      console.log('indexEvents ', util.inspect(pegData, false, null, true /* enable colors */));
+
       let newEvent = {
         contractId: event.contract_log.contract_id,
         eventIndex: event.event_index,

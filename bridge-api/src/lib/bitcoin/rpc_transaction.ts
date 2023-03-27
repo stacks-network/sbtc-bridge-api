@@ -39,7 +39,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
  
 export async function fetchPegTxData(txid:string, verbose:boolean) {
   const res = await fetchRawTx(txid, true);
-  console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
+  //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
   const parsed = parseOutputs(res.vout);
   parsed.burnBlockHeight = res.block.height;
   return parsed;
@@ -77,7 +77,6 @@ function setPegInAmountSats(outputs:Array<any>, parsed:parsedDataType) {
 export function parseOutputs(outputs:Array<any>) {
   const parsed = {
     pegType: 'pegin',
-    opType: 'return',
     compression: 0,
   } as parsedDataType;
   let d1;
@@ -86,7 +85,7 @@ export function parseOutputs(outputs:Array<any>) {
     parsed.opType = 'drop';
   } else {
     d1 = Buffer.from(outputs[0].scriptPubKey.asm.split(' ')[1], 'hex');
-    parsed.opType = 'drop';
+    parsed.opType = 'return';
   }
   const magic = d1.subarray(0,2);
   //console.log('parseOutputs : d1 : ' + d1.toString('hex') + ' : ' + parsed.opType);
