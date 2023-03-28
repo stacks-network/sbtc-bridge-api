@@ -97,7 +97,7 @@ export async function indexSbtcEvent(txid:string) {
     const url = stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
     const response = await fetch(url);
     const result:any = await response.json();
-    console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
+    //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
     return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
 
     /**
@@ -144,10 +144,10 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
 async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
-      console.log('Sbtc Events: : event=', util.inspect(event, false, null, true /* enable colors */));
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
       const pegData = await fetchPegTxData(edata.value, true);
-      console.log('Sbtc Events: : pegData=', pegData);
+      console.log('indexEvents ', util.inspect(pegData, false, null, true /* enable colors */));
+
       let newEvent = {
         contractId: event.contract_log.contract_id,
         eventIndex: event.event_index,

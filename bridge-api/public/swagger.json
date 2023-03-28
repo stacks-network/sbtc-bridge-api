@@ -209,32 +209,6 @@
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/address/{address}/utxos": {
-			"get": {
-				"operationId": "FetchUtxoSet",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "address",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
 		"/bridge-api/v1/btc/wallet/loadwallet/{name}": {
 			"get": {
 				"operationId": "LoadWallet",

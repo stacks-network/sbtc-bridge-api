@@ -76,7 +76,6 @@ export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:
 	//console.log('getStacksAddressFromSignature:s1 ', s1);
 	let pubkey:Uint8Array|string = recoverPublicKey(messageHash, s1, compression, true);
 	pubkey = bytesToHex(pubkey);
-	console.log('getStacksAddressFromSignature:pubkey ', pubkey);
 	//const pubkey0 = getPublicKeyFromSignature({ hash: Buffer.from(msgUint8), signature: sig.signature, recoveryBytes: sig.recoveryBytes });	
 	const addresses = {
 		tp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2PKH),
@@ -84,6 +83,8 @@ export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:
 		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
+	//console.log('getStacksAddressFromSignature:pubkey ', addresses);
+	//console.log('getStacksAddressFromSignature:pubkey ', pubkey);
 	return addresses;
 }
 

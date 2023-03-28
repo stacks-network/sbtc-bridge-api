@@ -1,8 +1,8 @@
-import { Get, Route } from "tsoa";
-import { fetchRawTx } from '../lib/bitcoin/rpc_transaction.js';
+import { Get, Post, Route } from "tsoa";
+import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs } from "../lib/bitcoin/mempool_api.js";
+import { fetchUTXOs, sendRawTx } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
 
@@ -38,33 +38,34 @@ export class TransactionController {
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
   }
+  //@Post("/sendrawtx")
+  public async sendRawTransaction(hex:string): Promise<any> {
+      try {
+        const resp = await sendRawTx(hex);
+        return resp;
+      } catch (err) {
+        const resp =  await sendRawTxRpc(hex);
+        return resp;
+      }
+  }
 }
-
+ 
 @Route("/bridge-api/v1/btc/wallet")
 export class WalletController {
 
-  @Get("/address/:address/utxos")
-  public async fetchUtxoSet(address:string): Promise<any> {
-    console.log('BASE_URL : ' + BASE_URL);
+  public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     const result = await getAddressInfo(address);
-    // mempool 
     const utxos = await fetchUTXOs(address);
-    // bitcoin rpc - only usefull with own/imported addresses: const utxos = await listUnspent();
-    // other; electrumx, hiro ??
-    console.log('fetchUtxoSet : utxos : ', utxos);
     for (let utxo of utxos) {
-      const tx = await fetchRawTx(utxo.txid, false);
-      console.log('fetchUtxoSet : tx : ', tx);
-      utxo.tx = tx; 
+      const tx = await fetchRawTx(utxo.txid, verbose);
+      utxo.tx = tx;
     }
     result.utxos = utxos
-    console.log('fetchUtxoSet: ', result.utxos);
     return result;
   }
   @Get("/loadwallet/:name")
   public async loadWallet(name:string): Promise<any> {
     const wallets = await listWallets();
-    console.log('wallets: ', wallets)
     for (const wallet in wallets) {
       try {
         await unloadWallet(name);
@@ -78,7 +79,6 @@ export class WalletController {
   @Get("/listwallets")
   public async listWallets(): Promise<any> {
     const wallets = await listWallets();
-    console.log('wallets: ', wallets)
     const result = await listWallets();
     return result;
   }
