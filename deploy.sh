@@ -28,9 +28,9 @@ ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
   cat .env
   docker login
   . ~/.profile
-  docker compose -f docker-compose-images.yml down
-  docker compose -f docker-compose-images.yml pull
-  docker compose -f docker-compose-images.yml up -d
+  docker compose -f docker-compose.yml down
+  docker compose -f docker-compose.yml pull
+  docker compose -f docker-compose.yml up -d
 ";
 
 printf "Finished....\n"

@@ -3,6 +3,7 @@ import { fileURLToPath } from 'url';
 import {config, config as configDotenv} from 'dotenv'
 import {resolve} from 'path'
 import type { IStringToStringDictionary } from '../controllers/ConfigController.js';
+import {Int32} from "mongodb";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,13 +38,24 @@ switch(process.env.NODE_ENV) {
           path: resolve(__dirname, "../../../.env.production")
         })
         break
-      // Add 'staging' and 'production' cases here as well!  
+    case "prod-mainnet":
+      configDotenv({
+        path: resolve(__dirname, "../../../.env.prod-mainnet")
+      })
+      break
+    case "prod-testnet":
+      configDotenv({
+        path: resolve(__dirname, "../../../.env.prod-testnet")
+      })
+    break
+      // Add 'staging' and 'production' cases here as well!
     default:
       throw new Error(`'NODE_ENV' ${process.env.NODE_ENV} is not handled!`)
 }
 
 export const host = process.env.VITE_HOST
-export const port = process.env.VITE_PORT
+// export const port = process.env.VITE_PORT
+export const port = parseInt(process.env.PORT || "3000");
 export const walletPath = (!process.env.VITE_BITCOIN_WALLET_PATH) ? '' : process.env.VITE_BITCOIN_WALLET_PATH
 export const mongoUrl = process.env.VITE_MONGO_URL
 export const network = process.env.VITE_NETWORK
@@ -63,7 +75,7 @@ export function dumpConfig():IStringToStringDictionary {
   return {
     environment: process.env.NODE_ENV,
     host: host,
-    port: port,
+    port: port.toString(),
     walletPath: walletPath,
     mongoUrl: mongoUrl,
     network: network,

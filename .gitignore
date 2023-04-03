@@ -1,8 +1,5 @@
 .DS_Store
 node_modules
-bridge-api/node_modules
-bridge-api/dist
-bridge-api/build
 /build
 /.svelte-kit
 /package

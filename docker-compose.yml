@@ -3,25 +3,40 @@ version: "3.9"
 services:
   mongodb:
     image: mongo:latest
-    container_name: "bridge_db"
+    container_name: "mongodb"
     environment:
       - MONGO_DATA_DIR=/data/db
       - MONGO_LOG_DIR=/dev/null
     volumes:
       - ./volumes/data/db:/data/db
     ports:
-      - 27020:27017
+      - 27017:27017
     command: mongod --bind_ip_all --logpath=/dev/null
-  bridge_api:
+  sbtc-bridge-api-mainnet:
     build:
-      context: ./bridge-api
-    image: mijoco/bridge_api
-    container_name: "bridge_api"
+      context: ./sbtc-bridge-api
+    image: us-central1-docker.pkg.dev/core-eng/core-eng-repo/sbtc-bridge-api:latest
+    container_name: "sbtc-bridge-api-mainnet"
     environment:
-      - BTC_RPC_USER=${BTC_RPC_USER}
-      - BTC_RPC_PWD=${BTC_RPC_PWD}
-      - BTC_NODE=${BTC_NODE}
+      - NODE_ENV=prod-mainnet
+      - PORT=80
     ports:
-      - "3010:3010"
+      - "80:80"
+    labels:
+      kompose.service.type: nodeport
+    links:
+      - mongodb
+  sbtc-bridge-api-testnet:
+    build:
+      context: ./sbtc-bridge-api
+    image: us-central1-docker.pkg.dev/core-eng/core-eng-repo/sbtc-bridge-api:latest
+    container_name: "sbtc-bridge-api-testnet"
+    environment:
+      - NODE_ENV=prod-testnet
+      - PORT=80
+    ports:
+      - "80:80"
+    labels:
+      kompose.service.type: nodeport
     links:
       - mongodb

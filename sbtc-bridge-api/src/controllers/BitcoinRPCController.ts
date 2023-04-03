@@ -4,7 +4,7 @@ import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTx } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
-import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
+import { btcNode, btcRpcUser, btcRpcPwd, walletPath, network } from '../lib/config.js';
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -110,6 +110,6 @@ export class BlocksController {
 
 export class DefaultController {
     public getFeeEstimate(): string {
-      return "Welcome to SBTC Bridge API...";
+      return `Welcome to SBTC Bridge API for ${network}`;
     }
 }
