@@ -1,4 +1,4 @@
-# SBTC Bridge Service
+# sBTC Bridge Service
 
 Indexes and caches contract data to make the api client application faster
 and more flexible.
@@ -13,7 +13,7 @@ To run the server in watch mode (nodemon) for rapid development;
 cd bridge-api
 npm install
 npm run dev
-```
+``` 
 
 Note: the dev script concurrently builds the [swagger docs](http://localhost:3010/docs) for
 the application.
@@ -60,9 +60,9 @@ This is automated using the deploy script;
 Note: requires docker hub access and ssh key registered on server. This will change when deployment
 moves to Google Cloud.
 
-## SBTC Wallet
+## sBTC Wallet
 
-The SBTC Wallet is a taproot wallet with addresses (most recent first);
+The sBTC Wallet is a taproot wallet with addresses (most recent first);
 
 - tb1pmmkznvm0pq5unp6geuwryu2f0m8xr6d229yzg2erx78nnk0ms48sk9s6q7
 - tb1pf74xr0x574farj55t4hhfvv0vpc9mpgerasawmf5zk9suauckugqdppqe8

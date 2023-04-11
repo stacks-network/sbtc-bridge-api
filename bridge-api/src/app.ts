@@ -1,4 +1,5 @@
-import { dumpConfig, sbtcContractId, host, port } from './lib/config.js';
+import { dumpConfig, sbtcContractId, host, port, walletPath, btcNode } from './lib/config.js';
+
 import { swagger } from './lib/swagger.js'
 import express, { Application } from "express";
 import morgan from "morgan";
@@ -28,7 +29,9 @@ app.use(Router);
 
 app.listen(port, () => {
   dumpConfig();
-  console.log(`Express is listening at http://localhost:${port} \nwallet: ${sbtcContractId}`);
+  console.log(`Express is listening at http://localhost:${port} \n\nsBTC Wallet: ${sbtcContractId}`);
+  console.log(`\n\nBitcoin connection at ${btcNode} \nBitcoin Wallet Path: ${walletPath}`);
+  
   return;
 });
 

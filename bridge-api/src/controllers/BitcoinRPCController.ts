@@ -1,8 +1,8 @@
 import { Get, Post, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
-import { getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
+import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs, sendRawTx } from "../lib/bitcoin/mempool_api.js";
+import { fetchUTXOs, sendRawTx, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
 
@@ -52,15 +52,45 @@ export class TransactionController {
  
 @Route("/bridge-api/v1/btc/wallet")
 export class WalletController {
+  
+  public async validateAddress(address:string): Promise<any> {
+    const result = await validateAddress(address);
+    return result;
+  }
+
+  public async processPsbt(psbtHex:string): Promise<any> {
+    const result = await walletProcessPsbt(psbtHex);
+    return result;
+  }
+
+  public async fetchAddressTransactions(address:string): Promise<any> {
+    const result = await fetchAddressTransactions(address);
+    return result;
+  }
 
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     const result = await getAddressInfo(address);
-    const utxos = await fetchUTXOs(address);
-    for (let utxo of utxos) {
-      const tx = await fetchRawTx(utxo.txid, verbose);
-      utxo.tx = tx;
+    try {
+      const addressValidation = await validateAddress(address);
+      result.addressValidation = addressValidation
+    } catch (err:any) {
+      console.log('fetchUtxoSet: addressValidation: ' + err.message)
+      // carry on
     }
-    result.utxos = utxos
+    try {
+      console.log('fetchUtxoSet1:', result)
+      const utxos = await fetchUTXOs(address);
+      console.log('fetchUtxoSet2:', utxos)
+      for (let utxo of utxos) {
+        const tx = await fetchRawTx(utxo.txid, verbose);
+        console.log('fetchUtxoSet3:', tx)
+        utxo.tx = tx;
+      }
+      result.utxos = utxos
+    } catch (err:any) {
+      console.log('fetchUtxoSet: fetchUTXOs: ' + err.message)
+      // carry on
+    }
     return result;
   }
   @Get("/loadwallet/:name")

@@ -3,6 +3,7 @@ import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController.js'
 import { c32address } from 'c32check';
 import util from 'util'
 import { getBlock } from './rpc_blockchain.js';
+import { fetchTransaction, fetchTransactionHex } from './mempool_api.js';
 import { bitcoinToSats } from '../utils.js';
 import { getDataToSign, getStacksAddressFromSignature } from '../structured-data.js';
 import * as  btc from '@scure/btc-signer';
@@ -27,11 +28,19 @@ export async function sendRawTxRpc(hex:string) {
 export async function fetchRawTx(txid:string, verbose:boolean) {
   let dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getrawtransaction","params":["${txid}", ${verbose}]}`;
   OPTIONS.body = dataString; 
-  const response = await fetch(BASE_URL, OPTIONS);
-  //await handleError(response, 'fetchRawTransaction not found');
-  const result = await response.json();
-  const res = result.result;
-  if (verbose) {
+  let res;
+  try {
+    const response = await fetch(BASE_URL, OPTIONS);
+    //await handleError(response, 'fetchRawTransaction not found');
+    const result = await response.json();
+    res = result.result;
+  } catch (err) {}
+  console.log('fetchRawTx: res1: ', res);
+  if (!res) {
+    res = await fetchTransaction(txid);
+    res.hex = await fetchTransactionHex(txid);
+  }
+  if (res && verbose) {
     res.block = await getBlock(res.blockhash, 1)
   }
   return res;

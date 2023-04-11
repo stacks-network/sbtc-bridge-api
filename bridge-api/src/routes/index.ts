@@ -1,7 +1,8 @@
 import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
-import { SbtcWalletController } from "../controllers/StacksRPCController.js";
+import { SbtcWalletController, PaymentsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
+import type { PeginRequestI } from '../types/pegin_request.js';
 
 const router = express.Router();
 
@@ -38,6 +39,38 @@ router.get("/bridge-api/v1/btc/blocks/fee-estimate", async (req, res, next) => {
     return res.send(response);
   } catch (error) { // manually catching
     next(error) // passing to default middleware error handler
+  }
+});
+
+router.get("/bridge-api/v1/btc/wallet/validate/:address", async (req, res, next) => {
+  try {
+    const controller = new WalletController();
+    const response = await controller.validateAddress(req.params.address);
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+
+router.post("/bridge-api/v1/btc/wallet/walletprocesspsbt", async (req, res, next) => {
+  try {
+    console.log('/btc/tx/sendrawtx', req.body);
+    const tx = req.body;
+    const controller = new WalletController();
+    const response = await controller.processPsbt(tx.hex);
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+
+router.get("/bridge-api/v1/btc/wallet/address/:address/txs", async (req, res, next) => {
+  try {
+    const controller = new WalletController();
+    const response = await controller.fetchAddressTransactions(req.params.address);
+    return res.send(response);
+  } catch (error) {
+    next(error)
   }
 });
 
@@ -156,6 +189,40 @@ router.get("/bridge-api/v1/sbtc/wallet-address", async (req, res, next) => {
     next(error) // passing to default middleware error handler
   }
 });
+
+router.get("/bridge-api/v1/btc/payments/address/:stxAddress", async (req, res, next) => {
+  try {
+    const controller = new PaymentsController();
+    const response = await controller.findPaymentRequests(req.params.stxAddress);
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
+router.post("/bridge-api/v1/btc/payments/request", async (req, res, next) => {
+  try {
+    console.log('/btc/payments/request', req.body);
+    const peginRequest:PeginRequestI = req.body;
+    const controller = new PaymentsController();
+    const response = await controller.savePaymentRequest(peginRequest);
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+
+router.get("/bridge-api/v1/btc/payments/scan", async (req, res, next) => {
+  try {
+    const controller = new PaymentsController();
+    const response = await controller.scanPeginRequests();
+    return res.send(response);
+  } catch (error) {
+    next(error)
+  }
+});
+
+
 
 router.get("/bridge-api/v1/config", async (req, res, next) => {
   try {

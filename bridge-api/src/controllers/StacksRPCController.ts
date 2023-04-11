@@ -1,21 +1,34 @@
 import { Get, Route } from "tsoa";
 import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
+import { savePaymentRequest, findAllInitialPeginRequests, findPeginRequestsByStxAddress } from '../lib/payments_rpc.js';
+import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
+import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
+import type { PeginRequestI } from '../types/pegin_request.js';
+import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
 
 export interface BalanceI {
   balance: number;
 }
-export interface SbtcContractDataI {
-  coordinator: { addr:string, key:string };
-  sbtcWalletAddress: string;
-  numKeys: number;
-  numParties: number;
-  tradingHalted: boolean;
-  tokenUri: string;
-  threshold: number;
-  totalSupply: number;
-  decimals: number;
-  name: string;
+
+@Route("/bridge-api/v1/payments")
+export class PaymentsController {
+  
+  public async findPaymentRequests(stxAddress:string): Promise<any> {
+    const result = await findPeginRequestsByStxAddress(stxAddress);
+    return result;
+  }
+
+  public async savePaymentRequest(peginRequest:PeginRequestI): Promise<any> {
+    const result = await savePaymentRequest(peginRequest);
+    return result;
+  }
+
+  @Get("/scan")
+  public async scanPeginRequests(): Promise<any> {
+    return await findAllInitialPeginRequests();
+  }
 }
+
 
 @Route("/bridge-api/v1/sbtc")
 export class SbtcWalletController {
@@ -46,7 +59,10 @@ export class SbtcWalletController {
 
   @Get("/data")
   public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
-    const sbtcContractData = await fetchNoArgsReadOnly();
+    const sbtcContractData:SbtcContractDataI = await fetchNoArgsReadOnly();
+    sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
+    const bc = await getBlockCount();
+    sbtcContractData.burnHeight = bc.count;
     return sbtcContractData;
   }
 

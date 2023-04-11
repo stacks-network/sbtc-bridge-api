@@ -12,6 +12,15 @@ export async function listUnspent() {
   return result.result;
 }
 
+export async function validateAddress(address:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"validateaddress","params":["${address}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'Unspent not found');
+  const result = await response.json();
+  return result.result;
+}
+
 export async function estimateSmartFee(): Promise<FeeEstimateResponse> {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"estimatesmartfee","params":[6]}`;
   OPTIONS.body = dataString;
@@ -60,6 +69,15 @@ export async function loadWallet(name:string) {
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
   await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result.result;
+}
+
+export async function walletProcessPsbt(psbtHex:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"walletprocesspsbt","params":["${psbtHex}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  await handleError(response, 'getAddressInfo internal error');
   const result = await response.json();
   return result.result;
 }

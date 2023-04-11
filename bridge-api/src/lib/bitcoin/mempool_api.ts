@@ -35,6 +35,14 @@ export async function fetchTransaction(txid:string) {
   return tx;
 }
 
+export async function fetchAddressTransactions(address:string) {
+  const url = mempoolUrl + '/address/' + address + '/txs';
+  const response = await fetch(url);
+  if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
+  const result = await response.json();
+  return result;
+}
+
 export async function fetchUTXOs(address:string) {
   const url = mempoolUrl + '/address/' + address + '/utxo';
   const response = await fetch(url);

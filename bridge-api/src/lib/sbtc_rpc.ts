@@ -7,9 +7,10 @@ import { bytesToHex } from "micro-stacks/common";
 import { sbtcContractId, stacksApi, network } from './config.js';
 import { fetchPegTxData } from './bitcoin/rpc_transaction.js';
 import fetch from 'node-fetch';
-import type { BalanceI, SbtcContractDataI } from '../controllers/StacksRPCController.js';
-import { SbtcEventModel } from './data/sbtc_events_model.js';
+import type { BalanceI } from '../controllers/StacksRPCController.js';
+import { SbtcEventModel } from './data/db_models.js';
 import util from 'util'
+import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
 
 const limit = 10;
 

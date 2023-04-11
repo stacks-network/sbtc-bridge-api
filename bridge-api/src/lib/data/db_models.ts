@@ -34,8 +34,32 @@ const SbtcEventSchema = new Schema({
 	}
 });
 
+const PeginRequestSchema = new Schema({
+	btcTxid: String,
+	updated: Number,
+	status: Number,
+	fromBtcAddress: String,
+	stacksAddress: String,
+	sbtcWalletAddress: String,
+	timeBasedPegin: {
+		paymentType: String,
+		address: String,
+		script:  { type : String , unique : true, required : true },
+		redeemScript: String,
+		witnessScript: String,
+	},
+	vout: {
+		scriptpubkey: String,
+		scriptpubkey_asm: String,
+		scriptpubkey_type: String,
+		scriptpubkey_address: String,
+		value: Number,
+	}
+});
+
 // Compile model from schema
 export const SbtcEventModel = mongoose.model("SbtcEvent", SbtcEventSchema);
+export const PeginRequestModel = mongoose.model("PeginRequest", PeginRequestSchema);
 
 export async function findAll(event: any) {
 	console.log('findSbtcEventById:SbtcEventId:');
