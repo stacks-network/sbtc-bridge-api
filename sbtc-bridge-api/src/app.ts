@@ -37,6 +37,7 @@ app.listen(getConfig().port, () => {
 
   console.log(`Express is listening at http://localhost:${getConfig().port} \n\nsBTC Wallet: ${getConfig().sbtcContractId}`);
   console.log('\n\nStartup Environment: ', process.env.NODE_ENV);
+  console.log('\n\nStartup Target: ', process.env.TARGET_ENV);
   console.log(`\n\nBitcoin connection at ${getConfig().btcNode} \nBitcoin Wallet Path: ${getConfig().walletPath}`);
   console.log('\n\nConfig: ', getConfig());
 

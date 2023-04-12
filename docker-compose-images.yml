@@ -16,6 +16,7 @@ services:
     image: mijoco/bridge_api
     container_name: "bridge_api"
     environment:
+      - TARGET_ENV=${TARGET_ENV}
       - btcRpcUser=${BTC_RPC_USER}
       - btcRpcPwd=${BTC_RPC_PWD}
       - btcNode=${BTC_NODE}

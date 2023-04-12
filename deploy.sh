@@ -14,7 +14,7 @@ export DOCKER_ID_USER='mijoco'
 export DOCKER_COMPOSE_CMD='docker compose'
 export DOCKER_CMD='docker'
 
-docker-compose build
+docker-compose -f docker-compose-local.yml build
 $DOCKER_CMD tag mijoco/bridge_api mijoco/bridge_api
 $DOCKER_CMD push mijoco/bridge_api:latest
 

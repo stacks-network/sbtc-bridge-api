@@ -104,23 +104,23 @@ function setOverrides() {
 }
 
 function isDev() {
-  const environ = process.env.NODE_ENV;
+  const environ = process.env.TARGET_ENV;
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
 }
 
 function isLinode() {
-  const environ = process.env.NODE_ENV;
+  const environ = process.env.TARGET_ENV;
   return (environ && environ.indexOf('linode') > -1)
 }
 
 function isTMMainnet() {
   const environ = process.env.NODE_ENV;
-  return (environ === 'production' || environ === 'prod')
+  return ((!isLinode() || isDev()) && (environ === 'production' || environ === 'prod'))
 }
 
 function isTMTestnet() {
   const environ = process.env.NODE_ENV;
-  return (environ === 'staging' || environ === 'stag')
+  return ((!isLinode() || isDev()) && (environ === 'staging' || environ === 'stag'))
 }
 
 export function setConfig(search:string) {
