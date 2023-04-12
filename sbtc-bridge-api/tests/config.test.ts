@@ -12,7 +12,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
 
   it.concurrent('Check estimateSmartFee() returns correct fees', async () => {
     //console.log('walletInfoResult: ', util.inspect(result, false, null, true /* enable colors */));
-    expect(getConfig().btcNode).equals('localhost:18332');
+    expect(getConfig().btcNode).equals('bitcoind.testnet.stacks.co');
   })
 
 })
