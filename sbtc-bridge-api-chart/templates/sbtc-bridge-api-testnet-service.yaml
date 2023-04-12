@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert --chart --out sbtc-bridge-api-chart
+    kompose.service.type: nodeport
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: sbtc-bridge-api-testnet
+  name: sbtc-bridge-api-testnet
+spec:
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+  selector:
+    io.kompose.service: sbtc-bridge-api-testnet
+  type: NodePort
+status:
+  loadBalancer: {}

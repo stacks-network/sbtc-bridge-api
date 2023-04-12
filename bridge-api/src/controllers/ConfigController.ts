@@ -1,7 +1,7 @@
 import { Get, Route } from "tsoa";
 import { dumpConfig } from '../lib/config.js';
 
-export interface IStringToStringDictionary { [key: string]: string|undefined; }
+export interface IStringToStringDictionary { [key: string]: string|number|undefined; }
 @Route("/bridge-api/v1/config")
 export class ConfigController {
   @Get("/")
