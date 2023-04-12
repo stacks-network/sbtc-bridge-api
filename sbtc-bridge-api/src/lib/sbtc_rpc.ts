@@ -4,11 +4,11 @@
 import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
 import { principalCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
-import { sbtcContractId, stacksApi, network } from './config.js';
+import { getConfig } from './config.js';
 import { fetchPegTxData } from './bitcoin/rpc_transaction.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
-import { SbtcEventModel } from './data/db_models.js';
+import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
 import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
 
@@ -29,13 +29,13 @@ const noArgMethods = [
 
 export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   const result = {} as SbtcContractDataI
-  const contractId = sbtcContractId;
+  const contractId = getConfig().sbtcContractId;
   const data = {
     contractAddress: contractId!.split('.')[0],
     contractName: contractId!.split('.')[1],
     functionName: '',
     functionArgs: [],
-    network
+    network: getConfig().network
   }
   for (let arg in noArgMethods) {
     let funcname = noArgMethods[arg]
@@ -94,8 +94,8 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
 
 export async function indexSbtcEvent(txid:string) {
   try {
-    const contractId = sbtcContractId;
-    const url = stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
+    const contractId = getConfig().sbtcContractId;
+    const url = getConfig().stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
     const response = await fetch(url);
     const result:any = await response.json();
     //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
@@ -115,7 +115,7 @@ export async function indexSbtcEvent(txid:string) {
 
 export async function saveAllSbtcEvents() {
   try {
-    let offset = await SbtcEventModel.countDocuments(); // + 1; // point to the next one
+    let offset = await countSbtcEvents();
     let events:Array<any>;
     do {
       events = await saveSbtcEvents(offset);
@@ -130,8 +130,8 @@ export async function saveAllSbtcEvents() {
 export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
   try {
     const sbtcEvents:Array<any> = []
-    const contractId = sbtcContractId;
-    const url = stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + offset;
+    const contractId = getConfig().sbtcContractId;
+    const url = getConfig().stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + offset;
     const response = await fetch(url);
     const result:any = await response.json();
     //console.log('Sbtc Events: : offset=' + offset + ' limit=' + limit + ' results=' + result.results.length);
@@ -156,10 +156,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
         bitcoinTxid: edata.value,
         pegData,
       };
-      //console.log('newEvent: ', util.inspect(newEvent, false, null, true /* enable colors */));
-      const sbtcEventModel = new SbtcEventModel(newEvent);
-      //console.log('sbtcEventModel: saving... ');
-      const result = await sbtcEventModel.save();
+      const result = await saveNewSbtcEvent(newEvent);
       console.log('saveSbtcEvents: saved one: ' + newEvent.pegData.pegType + ' : ' + newEvent.pegData.opType + ' : ' + newEvent.pegData.stxAddress);
       
     } catch (err:any) {
@@ -170,25 +167,25 @@ async function indexEvents(sbtcEvents:Array<any>) {
 }
 
 export async function findSbtcEvents(offset:number):Promise<Array<any>> {
-  return SbtcEventModel.find();
+  return findSbtcEventsByFilter({});
 }
 
 export async function fetchSbtcWalletAddress() {
   try {
-    const contractId = sbtcContractId;
+    const contractId = getConfig().sbtcContractId;
     const data = {
       contractAddress: contractId!.split('.')[0],
       contractName: contractId!.split('.')[1],
       functionName: 'get-bitcoin-wallet-address',
       functionArgs: [],
-      network
+      network: getConfig().network
     }
     const result = await callContractReadOnly(data);
     if (result.value && result.value.value) {
       return result.value.value
     }
     if (result.type.indexOf('some') > -1) return result.value
-    if (network === 'testnet') {
+    if (getConfig().network === 'testnet') {
       return 'tb1q....'; // alice
     }
   } catch (err) {
@@ -198,7 +195,7 @@ export async function fetchSbtcWalletAddress() {
 
 export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> {
   try {
-    const contractId = sbtcContractId;
+    const contractId = getConfig().sbtcContractId;
     //const functionArgs = [`0x${bytesToHex(serializeCV(uintCV(1)))}`, `0x${bytesToHex(serializeCV(standardPrincipalCV(address)))}`];
     const functionArgs = [`0x${bytesToHex(serializeCV(principalCV(stxAddress)))}`];
     const data = {
@@ -206,7 +203,7 @@ export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> 
       contractName: contractId!.split('.')[1],
       functionName: 'get-balance',
       functionArgs,
-      network
+      network: getConfig().network
     }
     const result = await callContractReadOnly(data);
     if (result.value && result.value.value) {
@@ -219,7 +216,7 @@ export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> 
 }
 
 async function callContractReadOnly(data:any) {
-  const url = stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
+  const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
   let val;
   try {
     const response = await fetch(url, {

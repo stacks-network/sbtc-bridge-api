@@ -1,7 +1,0 @@
-/usr/src/app # cat package.json |grep swagger
-    "predev": "npm run swagger",
-    "prebuild": "npm run swagger",
-    "swagger": "tsoa spec"
-    "@types/swagger-ui-express": "^4.1.3",
-    "swagger-ui-express": "^4.6.2",
-/usr/src/app #

@@ -1,16 +1,24 @@
 import mongoose from "mongoose";
-import { mongoUrl } from '../config.js';
+import { getConfig } from '../config.js';
+import { PeginRequestI } from "$types/pegin_request.js";
 /** */
 mongoose.set('strictQuery', true);
 
+const mongMainnet = mongoose.createConnection(getConfig().mongoUrl + getConfig().dbNameMainnet);
+const mongTestnet = mongoose.createConnection(getConfig().mongoUrl + getConfig().dbNameTestnet);
+console.log('Running mainnet db: ', mongMainnet.config);
+console.log('Running testnet db: ', mongTestnet.config);
+
 try {
-	mongoose.connect(mongoUrl!);
-	const db = mongoose.connection;
-	console.log(`Running db ${db}\n`);	
-	// Bind connection to error event (to get notification of connection errors)
-	db.on("error", console.error.bind(console, "MongoDB connection error:"));
+	mongMainnet.on("error", console.error.bind(console, "MongoDBMainnet connection error:"));
 } catch(err) {
-	console.log('unable to connect to mongoose on: ' + mongoUrl);
+	console.log('unable to connect to mongoose mainnet on: ' + getConfig().mongoUrl);
+}
+
+try {
+	mongTestnet.on("error", console.error.bind(console, "MongoDBTestnet connection error:"));
+} catch(err) {
+	console.log('unable to connect to mongoose testnet on: ' + getConfig().mongoUrl);
 }
 
 // Get the default connection
@@ -33,7 +41,6 @@ const SbtcEventSchema = new Schema({
 		sbtcWallet: { type : String , required : true },
 	}
 });
-
 const PeginRequestSchema = new Schema({
 	btcTxid: String,
 	updated: Number,
@@ -58,13 +65,44 @@ const PeginRequestSchema = new Schema({
 });
 
 // Compile model from schema
-export const SbtcEventModel = mongoose.model("SbtcEvent", SbtcEventSchema);
-export const PeginRequestModel = mongoose.model("PeginRequest", PeginRequestSchema);
+export const SbtcEventTestnetModel = mongTestnet.model("SbtcEvent", SbtcEventSchema);
+export const SbtcEventMainnetModel = mongMainnet.model("SbtcEvent", SbtcEventSchema);
+export const PeginRequestTestnetModel = mongTestnet.model("PeginRequest", PeginRequestSchema);
+export const PeginRequestMainnetModel = mongMainnet.model("PeginRequest", PeginRequestSchema);
 
-export async function findAll(event: any) {
-	console.log('findSbtcEventById:SbtcEventId:');
-	const filter = {};
-	const all = await SbtcEventModel.find(filter);
-	return all;
+export async function countSbtcEvents () {
+	if (getConfig().network === 'testnet') {
+		return await SbtcEventTestnetModel.countDocuments()
+	} else {
+		return await SbtcEventMainnetModel.countDocuments();
+	}
+}
+
+export async function saveNewSbtcEvent (newEvent:any) {
+	const model = (getConfig().network === 'testnet') ? new SbtcEventTestnetModel(newEvent) : new SbtcEventMainnetModel(newEvent);
+	const result = await model.save();
+	return result;
+}
+
+export async function findSbtcEventsByFilter(filter:any|undefined) {
+	if (getConfig().network === 'testnet') {
+		return await SbtcEventTestnetModel.find(filter);
+	} else {
+		return await SbtcEventMainnetModel.find(filter);
+	}
+}
+
+export async function saveNewPeginRequest (newEvent:any) {
+	const model = (getConfig().network === 'testnet') ? new PeginRequestTestnetModel(newEvent) : new PeginRequestMainnetModel(newEvent);
+	const result = await model.save();
+	return result;
+}
+
+export async function findPeginRequestsByFilter(filter:any|undefined):Promise<Array<PeginRequestI>> {
+	if (getConfig().network === 'testnet') {
+		return await PeginRequestTestnetModel.find(filter);
+	} else {
+		return await PeginRequestMainnetModel.find(filter);
+	}
 }
 

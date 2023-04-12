@@ -1,10 +1,10 @@
-import { network } from './config.js';
+import { getConfig } from './config.js';
 import * as  btc from '@scure/btc-signer';
 
 const btcPrecision = 100000000
 
 export function getNet() {
-  return  (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+  return  (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 }
 
 export function satsToBitcoin(amountSats:number) {

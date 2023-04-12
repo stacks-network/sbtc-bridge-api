@@ -6,13 +6,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"IStringToStringDictionary": {
-				"properties": {},
-				"type": "object",
-				"additionalProperties": {
-					"type": "string"
-				}
-			},
 			"FeeEstimateResponse": {
 				"properties": {
 					"feeInfo": {
@@ -57,8 +50,83 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AddressValidationI": {
+				"properties": {
+					"witness_program": {
+						"type": "string"
+					},
+					"witness_version": {
+						"type": "number",
+						"format": "double"
+					},
+					"iswitness": {
+						"type": "boolean"
+					},
+					"isscript": {
+						"type": "boolean"
+					},
+					"scriptPubKey": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"isvalid": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"witness_program",
+					"witness_version",
+					"iswitness",
+					"isscript",
+					"scriptPubKey",
+					"address",
+					"isvalid"
+				],
+				"type": "object"
+			},
 			"SbtcContractDataI": {
 				"properties": {
+					"addressValidation": {
+						"$ref": "#/components/schemas/AddressValidationI"
+					},
+					"burnHeight": {
+						"type": "number",
+						"format": "double"
+					},
+					"name": {
+						"type": "string"
+					},
+					"decimals": {
+						"type": "number",
+						"format": "double"
+					},
+					"totalSupply": {
+						"type": "number",
+						"format": "double"
+					},
+					"threshold": {
+						"type": "number",
+						"format": "double"
+					},
+					"tokenUri": {
+						"type": "string"
+					},
+					"tradingHalted": {
+						"type": "boolean"
+					},
+					"numParties": {
+						"type": "number",
+						"format": "double"
+					},
+					"numKeys": {
+						"type": "number",
+						"format": "double"
+					},
+					"sbtcWalletAddress": {
+						"type": "string"
+					},
 					"coordinator": {
 						"properties": {
 							"key": {
@@ -73,54 +141,38 @@
 							"addr"
 						],
 						"type": "object"
-					},
-					"sbtcWalletAddress": {
-						"type": "string"
-					},
-					"numKeys": {
-						"type": "number",
-						"format": "double"
-					},
-					"numParties": {
-						"type": "number",
-						"format": "double"
-					},
-					"tradingHalted": {
-						"type": "boolean"
-					},
-					"tokenUri": {
-						"type": "string"
-					},
-					"threshold": {
-						"type": "number",
-						"format": "double"
-					},
-					"totalSupply": {
-						"type": "number",
-						"format": "double"
-					},
-					"decimals": {
-						"type": "number",
-						"format": "double"
-					},
-					"name": {
-						"type": "string"
 					}
 				},
 				"required": [
-					"coordinator",
-					"sbtcWalletAddress",
-					"numKeys",
-					"numParties",
-					"tradingHalted",
-					"tokenUri",
-					"threshold",
-					"totalSupply",
+					"addressValidation",
+					"burnHeight",
+					"name",
 					"decimals",
-					"name"
+					"totalSupply",
+					"threshold",
+					"tokenUri",
+					"tradingHalted",
+					"numParties",
+					"numKeys",
+					"sbtcWalletAddress",
+					"coordinator"
 				],
+				"type": "object"
+			},
+			"IStringToStringDictionary": {
+				"properties": {},
 				"type": "object",
-				"additionalProperties": false
+				"additionalProperties": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "number",
+							"format": "double"
+						}
+					]
+				}
 			}
 		},
 		"securitySchemes": {}
@@ -136,53 +188,6 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/bridge-api/v1/config": {
-			"get": {
-				"operationId": "GetAllParam",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IStringToStringDictionary"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/v1/config/{param}": {
-			"get": {
-				"operationId": "GetParam",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "param",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
 		"/bridge-api/v1/btc/tx/{txid}": {
 			"get": {
 				"operationId": "FetchRawTransaction",
@@ -291,6 +296,23 @@
 		"/bridge-api/v1/btc/blocks/count": {
 			"get": {
 				"operationId": "GetCount",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bridge-api/v1/payments/scan": {
+			"get": {
+				"operationId": "ScanPeginRequests",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -464,6 +486,61 @@
 				},
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/bridge-api/v1/config": {
+			"get": {
+				"operationId": "GetAllParam",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/IStringToStringDictionary"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bridge-api/v1/config/{param}": {
+			"get": {
+				"operationId": "GetParam",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"anyOf": [
+										{
+											"type": "string"
+										},
+										{
+											"type": "number",
+											"format": "double"
+										}
+									]
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "param",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		}
 	},

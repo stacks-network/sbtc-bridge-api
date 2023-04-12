@@ -1,10 +1,10 @@
-import { Get, Post, Route } from "tsoa";
+import { Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTx, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
-import { btcNode, btcRpcUser, btcRpcPwd, walletPath } from '../lib/config.js';
+import { getConfig } from '../lib/config.js';
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -25,7 +25,7 @@ export async function handleError (response:any, message:string) {
   }
 }
 
-export const BASE_URL = `http://${btcRpcUser}:${btcRpcPwd}@${btcNode}${walletPath}`;
+export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode}${getConfig().walletPath}`;
 
 export const OPTIONS = {
   method: "POST",

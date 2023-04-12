@@ -2,7 +2,7 @@ import { serializeCV, type ClarityValue } from "micro-stacks/clarity";
 import { sha256 } from "@noble/hashes/sha256";
 import { bytesToHex, concatByteArrays } from "micro-stacks/common";
 import { tupleCV, bufferCV, uintCV, stringAsciiCV } from "micro-stacks/clarity";
-import { publicAppName, publicAppVersion, network } from './config.js';
+import { getConfig } from './config.js';
 import { recoverSignature, verifyMessageSignature, makeStructuredDataHash } from "micro-stacks/connect";
 import { hexToBytes } from "micro-stacks/common";
 import { recoverPublicKey, Signature } from '@noble/secp256k1';
@@ -27,15 +27,15 @@ export type Message = {
 };
 
 export const domain = {
-	name: publicAppName,
-	version: publicAppVersion,
-	'chain-id': network === "mainnet" ? ChainID.Mainnet : ChainID.Testnet,
+	name: getConfig().publicAppName,
+	version: getConfig().publicAppVersion,
+	'chain-id': getConfig().network === "mainnet" ? ChainID.Mainnet : ChainID.Testnet,
 };
 
 export const domainCV = tupleCV({
-	name: stringAsciiCV(publicAppName!),
-	version: stringAsciiCV(publicAppVersion!),
-	'chain-id': uintCV(network === "mainnet" ? ChainID.Mainnet : ChainID.Testnet),
+	name: stringAsciiCV(getConfig().publicAppName!),
+	version: stringAsciiCV(getConfig().publicAppVersion!),
+	'chain-id': uintCV(getConfig().network === "mainnet" ? ChainID.Mainnet : ChainID.Testnet),
 })
 
 export function verifySignedMessage(message:Message, pubKey:string) {
@@ -93,7 +93,7 @@ export function getDataToSign(amount:number, sbtcWalletAddress:string):Buffer {
 	//console.log('getDataToSign:sbtcWalletAddress ', sbtcWalletAddress);
 	const amtBuf = Buffer.alloc(9);
 	amtBuf.writeUInt32LE(amount, 0);
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const script = btc.OutScript.encode(btc.Address(net).decode(sbtcWalletAddress))
 	//console.log('decodePegOutOutputs ', util.inspect(Buffer.from(script).toString('hex'), false, null, true /* enable colors */));
 	const scriptBuf = Buffer.from(script);

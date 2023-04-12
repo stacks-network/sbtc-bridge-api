@@ -8,7 +8,7 @@ import { bitcoinToSats } from '../utils.js';
 import { getDataToSign, getStacksAddressFromSignature } from '../structured-data.js';
 import * as  btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
-import { network } from '../config.js';
+import { getConfig } from '../config.js';
 import { hashMessage } from '@stacks/encryption';
 import { getNet } from '../utils.js'
 
@@ -101,7 +101,7 @@ export function parseOutputs(outputs:Array<any>) {
   //console.log('parseOutputs : magic : ' + magic.toString('hex'));
   //console.log('parseOutputs : data : ', util.inspect(d1, false, null, true /* enable colors */));
 
-  const magicExpected = (network === 'testnet') ? MAGIC_BYTES_TESTNET : MAGIC_BYTES_MAINNET;
+  const magicExpected = (getConfig().network === 'testnet') ? MAGIC_BYTES_TESTNET : MAGIC_BYTES_MAINNET;
   if (magic.toString('hex') !== magicExpected) 
     throw new Error('Wrong magic : expected: ' +  magicExpected + '  receved: ' + magic.toString('hex'))
   const opcode = d1.subarray(2,3).toString('hex');
@@ -124,7 +124,7 @@ export function parseOutputs(outputs:Array<any>) {
     const dataToSign = getDataToSign(parsed.amountSats, parsed.sbtcWallet);
     const msgHash = hashMessage(dataToSign.toString('hex'));
     const stxAddress = getStacksAddressFromSignature(msgHash, parsed.signature, parsed.compression);
-    parsed.stxAddress = (network === 'testnet') ? stxAddress.tp2pkh : stxAddress.mp2pkh;
+    parsed.stxAddress = (getConfig().network === 'testnet') ? stxAddress.tp2pkh : stxAddress.mp2pkh;
   } else { 
     throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + opcode)
   }

@@ -10,15 +10,15 @@ services:
     volumes:
       - ./volumes/data/db:/data/db
     ports:
-      - 27020:27017
+      - 27017:27017
     command: mongod --bind_ip_all --logpath=/dev/null
   bridge_api:
     image: mijoco/bridge_api
     container_name: "bridge_api"
     environment:
-      - BTC_RPC_USER=${BTC_RPC_USER}
-      - BTC_RPC_PWD=${BTC_RPC_PWD}
-      - BTC_NODE=${BTC_NODE}
+      - btcRpcUser=${BTC_RPC_USER}
+      - btcRpcPwd=${BTC_RPC_PWD}
+      - btcNode=${BTC_NODE}
     ports:
       - "3010:3010"
     links:

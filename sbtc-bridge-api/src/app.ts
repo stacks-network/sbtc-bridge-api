@@ -1,5 +1,4 @@
-import { dumpConfig, sbtcContractId, host, port, walletPath, btcNode } from './lib/config.js';
-
+import { setConfigOnStart, setConfig, getConfig } from './lib/config.js';
 import { swagger } from './lib/swagger.js'
 import express, { Application } from "express";
 import morgan from "morgan";
@@ -13,6 +12,13 @@ app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.static("public"));
 app.use(cors());
+setConfigOnStart();
+app.use((req, res, next) => {
+  console.log(`req.url: ${req.url}`);
+  setConfig(req.url);
+  next();
+});
+
 
 app.use(
   "/bridge-api/docs",
@@ -27,13 +33,15 @@ app.use(
 
 app.use(Router);
 
-app.listen(port, () => {
-  dumpConfig();
-  console.log(`Express is listening at http://localhost:${port} \n\nsBTC Wallet: ${sbtcContractId}`);
-  console.log(`\n\nBitcoin connection at ${btcNode} \nBitcoin Wallet Path: ${walletPath}`);
-  
+app.listen(getConfig().port, () => {
+
+  console.log(`Express is listening at http://localhost:${getConfig().port} \n\nsBTC Wallet: ${getConfig().sbtcContractId}`);
+  console.log('\n\nStartup Environment: ', process.env.NODE_ENV);
+  console.log(`\n\nBitcoin connection at ${getConfig().btcNode} \nBitcoin Wallet Path: ${getConfig().walletPath}`);
+  console.log('\n\nConfig: ', getConfig());
+
   return;
 });
 
 sbtcEventJob.start();
-console.log(`Running on ${host}:${port}\n\n`);
+console.log(`Running on ${getConfig().host}:${getConfig().port}\n\n`);
