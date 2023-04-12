@@ -140,6 +140,6 @@ export class BlocksController {
 
 export class DefaultController {
     public getFeeEstimate(): string {
-      return "Welcome to SBTC Bridge API...";
+      return "Welcome to sBTC Bridge API...";
     }
 }

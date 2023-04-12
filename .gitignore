@@ -13,7 +13,3 @@ vite.config.ts.timestamp-*
 build/
 /volumes
 /dist
-
-### VS Code ###
-.vscode/
-

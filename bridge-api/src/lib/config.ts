@@ -15,7 +15,7 @@ const TESTNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'SBTC Bridge Testnet API',
+  publicAppName: 'sBTC Bridge Testnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -34,7 +34,7 @@ const MAINNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'SBTC Bridge Mainnet API',
+  publicAppName: 'sBTC Bridge Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -53,7 +53,7 @@ const DEVNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'SBTC Bridge Devnet API',
+  publicAppName: 'sBTC Bridge Devnet API',
   publicAppVersion: '1.0.0',
 }
 
