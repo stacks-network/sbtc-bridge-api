@@ -24,20 +24,24 @@ export async function findAllInitialPeginRequests() {
 	const requests:Array<PeginRequestI> = await findPeginRequestsByFilter(filter);
   for (const peginRequest of requests) {
     const address = peginRequest.timeBasedPegin.address;
-    const txs:Array<any> = await fetchAddressTransactions(address);
-    for (const tx of txs) {
-      for (const vout of tx.vout) {
-        if (vout.scriptpubkey === peginRequest.timeBasedPegin.script) {
-          console.log('findAllInitialPeginRequests: tx: ', tx);
-          peginRequest.btcTxid = tx.txid;
-          peginRequest.vout = vout;
-          peginRequest.status = 2;
-          const result = await saveNewPeginRequest(peginRequest);
-          console.log('findAllInitialPeginRequests: result: ', result);
-          console.log('findAllInitialPeginRequests: txid: ', tx.txid);
-          console.log('findAllInitialPeginRequests: vout: ', vout);
-        }
-      }      
+    try {
+      const txs:Array<any> = await fetchAddressTransactions(address);
+      for (const tx of txs) {
+        for (const vout of tx.vout) {
+          if (vout.scriptpubkey === peginRequest.timeBasedPegin.script) {
+            console.log('findAllInitialPeginRequests: tx: ', tx);
+            peginRequest.btcTxid = tx.txid;
+            peginRequest.vout = vout;
+            peginRequest.status = 2;
+            const result = await saveNewPeginRequest(peginRequest);
+            console.log('findAllInitialPeginRequests: result: ', result);
+            console.log('findAllInitialPeginRequests: txid: ', tx.txid);
+            console.log('findAllInitialPeginRequests: vout: ', vout);
+          }
+        }      
+      }
+    } catch(err) {
+      console.log('findAllInitialPeginRequests: processing: ' + address, err);
     }
   }
 	return requests;

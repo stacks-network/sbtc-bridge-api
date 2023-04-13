@@ -35,7 +35,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     const result = await response.json();
     res = result.result;
   } catch (err) {}
-  console.log('fetchRawTx: res1: ', res);
+  //console.log('fetchRawTx: res1: ', res);
   if (!res) {
     res = await fetchTransaction(txid);
     res.hex = await fetchTransactionHex(txid);

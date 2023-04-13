@@ -19,36 +19,51 @@ export async function fetchUtxoSet(address:string) {
  */
 
 export async function fetchTransactionHex(txid:string) {
-  //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true
-  //https://mempool.space/api/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521/hex
-  const url = getConfig().mempoolUrl + '/tx/' + txid + '/hex';
-  const response = await fetch(url);
-  const hex = await response.text();
-  return hex;
+  try {
+    //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true
+    //https://mempool.space/api/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521/hex
+    const url = getConfig().mempoolUrl + '/tx/' + txid + '/hex';
+    const response = await fetch(url);
+    const hex = await response.text();
+    return hex;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
 }
 
 export async function fetchTransaction(txid:string) {
-  const url = getConfig().mempoolUrl + '/tx/' + txid;
-  const response = await fetch(url);
-  if (response.status !== 200) throw new Error('Unable to fetch transaction for: ' + txid);
-  const tx = await response.json();
-  return tx;
+  try {
+    const url = getConfig().mempoolUrl + '/tx/' + txid;
+    const response = await fetch(url);
+    if (response.status !== 200) throw new Error('Unable to fetch transaction for: ' + txid);
+    const tx = await response.json();
+    return tx;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
 }
 
 export async function fetchAddressTransactions(address:string) {
   const url = getConfig().mempoolUrl + '/address/' + address + '/txs';
   const response = await fetch(url);
-  if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
+  //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
   const result = await response.json();
   return result;
 }
 
 export async function fetchUTXOs(address:string) {
-  const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
-  const response = await fetch(url);
-  if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
-  const result = await response.json();
-  return result;
+  try {
+    const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
+    const response = await fetch(url);
+    if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
+    const result = await response.json();
+    return result;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
 }
 
 export async function readTx(txid:string) {
@@ -66,7 +81,7 @@ export async function readTx(txid:string) {
 
 export async function sendRawTx(hex:string) {
   const url = getConfig().mempoolUrl + '/tx';
-  console.log('sendRawTx:mempoolUrl: ', url)
+  //console.log('sendRawTx:mempoolUrl: ', url)
   const response = await fetch(url, {
     method: 'POST',
     //headers: { 'Content-Type': 'application/json' },
