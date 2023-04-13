@@ -28,7 +28,7 @@ export async function findAllInitialPeginRequests() {
       const txs:Array<any> = await fetchAddressTransactions(address);
       for (const tx of txs) {
         for (const vout of tx.vout) {
-          if (vout.scriptpubkey === peginRequest.timeBasedPegin.script) {
+          if (peginRequest.tries < 5 && vout.scriptpubkey === peginRequest.timeBasedPegin.script) {
             console.log('findAllInitialPeginRequests: tx: ', tx);
             peginRequest.btcTxid = tx.txid;
             peginRequest.vout = vout;
@@ -37,8 +37,11 @@ export async function findAllInitialPeginRequests() {
             console.log('findAllInitialPeginRequests: result: ', result);
             console.log('findAllInitialPeginRequests: txid: ', tx.txid);
             console.log('findAllInitialPeginRequests: vout: ', vout);
+          } else {
+            peginRequest.tries += 1;
+            const result = await saveNewPeginRequest(peginRequest);
           }
-        }      
+        }   
       }
     } catch(err) {
       console.log('findAllInitialPeginRequests: processing: ' + address, err);

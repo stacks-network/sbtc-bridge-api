@@ -45,6 +45,7 @@ const PeginRequestSchema = new Schema({
 	btcTxid: String,
 	updated: Number,
 	status: Number,
+	tries: Number,
 	fromBtcAddress: String,
 	stacksAddress: String,
 	sbtcWalletAddress: String,
