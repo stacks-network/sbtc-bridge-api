@@ -3,19 +3,37 @@ import { saveAllSbtcEvents } from '../lib/sbtc_rpc.js';
 import { findAllInitialPeginRequests } from '../lib/payments_rpc.js';
 
 
-export const sbtcEventJob = cron.schedule('*/15 * * * *', (fireDate) => {
-  console.log('Running: sbtcEventJob at: ' + fireDate);
+export const sbtcEventJobTestnet = cron.schedule('*/15 * * * *', (fireDate) => {
+  console.log('Running: sbtcEventJobTestnet at: ' + fireDate);
   try {
-    saveAllSbtcEvents();
+    saveAllSbtcEvents('testnet');
   } catch (err) {
     console.log('Error running: saveAllSbtcEvents: ', err);
   }
 });
 
-export const peginRequestJob = cron.schedule('*/7 * * * *', (fireDate) => {
-  console.log('Running: peginRequestJob at: ' + fireDate);
+export const sbtcEventJobMainnet = cron.schedule('*/15 * * * *', (fireDate) => {
+  console.log('Running: sbtcEventJobMainnet at: ' + fireDate);
   try {
-    const pegins = findAllInitialPeginRequests();
+    saveAllSbtcEvents('mainnet');
+  } catch (err) {
+    console.log('Error running: saveAllSbtcEvents: ', err);
+  }
+});
+
+export const peginRequestJobTestnet = cron.schedule('*/12 * * * *', (fireDate) => {
+  console.log('Running: peginRequestJobTestnet at: ' + fireDate);
+  try {
+    findAllInitialPeginRequests('testnet');
+  } catch (err) {
+    console.log('Error running: findAllInitialPeginRequests: ', err);
+  }
+});
+
+export const peginRequestJobMainnet = cron.schedule('*/17 * * * *', (fireDate) => {
+  console.log('Running: peginRequestJobMainnet at: ' + fireDate);
+  try {
+    findAllInitialPeginRequests('mainnet');
   } catch (err) {
     console.log('Error running: findAllInitialPeginRequests: ', err);
   }

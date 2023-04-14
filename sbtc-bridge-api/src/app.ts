@@ -4,7 +4,10 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import Router from "./routes/index.js";
 import { serve, setup } from 'swagger-ui-express';
-import { sbtcEventJob } from './controllers/JobScheduler.js';
+import { sbtcEventJobMainnet } from './controllers/JobScheduler.js';
+import { sbtcEventJobTestnet } from './controllers/JobScheduler.js';
+import { peginRequestJobTestnet } from './controllers/JobScheduler.js';
+import { peginRequestJobMainnet } from './controllers/JobScheduler.js';
 import cors from "cors";
 
 const app = express();
@@ -44,5 +47,8 @@ app.listen(getConfig().port, () => {
   return;
 });
 
-sbtcEventJob.start();
+sbtcEventJobMainnet.start();
+sbtcEventJobTestnet.start();
+peginRequestJobTestnet.start();
+peginRequestJobMainnet.start();
 console.log(`Running on ${getConfig().host}:${getConfig().port}\n\n`);

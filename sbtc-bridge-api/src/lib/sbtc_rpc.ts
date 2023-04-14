@@ -92,14 +92,14 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
   }
 }
 
-export async function indexSbtcEvent(txid:string) {
+export async function indexSbtcEvent(net:string, txid:string) {
   try {
     const contractId = getConfig().sbtcContractId;
     const url = getConfig().stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
     const response = await fetch(url);
     const result:any = await response.json();
     //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
-    return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
+    return await indexEvents(net, result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
 
     /**
     const events = result.events.filter((o:any) => o.event_type === 'smart_contract_log');
@@ -113,12 +113,12 @@ export async function indexSbtcEvent(txid:string) {
   }
 }
 
-export async function saveAllSbtcEvents() {
+export async function saveAllSbtcEvents(net:string) {
   try {
-    let offset = await countSbtcEvents();
+    let offset = await countSbtcEvents(net);
     let events:Array<any>;
     do {
-      events = await saveSbtcEvents(offset);
+      events = await saveSbtcEvents(net, offset);
       offset += limit;
     } while (events.length === limit);
   } catch (err) {
@@ -127,7 +127,7 @@ export async function saveAllSbtcEvents() {
   }
 }
 
-export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
+export async function saveSbtcEvents(net:string, offset:number):Promise<Array<any>> {
   try {
     const sbtcEvents:Array<any> = []
     const contractId = getConfig().sbtcContractId;
@@ -135,14 +135,14 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
     const response = await fetch(url);
     const result:any = await response.json();
     //console.log('Sbtc Events: : offset=' + offset + ' limit=' + limit + ' results=' + result.results.length);
-    return await indexEvents(result.results);
+    return await indexEvents(net, result.results);
   } catch (err) {
     console.log('err - saveSbtcEvents2: ', util.inspect(err, false, null, true /* enable colors */));
     return [];
   }
 }
 
-async function indexEvents(sbtcEvents:Array<any>) {
+async function indexEvents(net:string, sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
@@ -156,7 +156,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
         bitcoinTxid: edata.value,
         pegData,
       };
-      const result = await saveNewSbtcEvent(newEvent);
+      const result = await saveNewSbtcEvent(net, newEvent);
       console.log('saveSbtcEvents: saved one: ' + newEvent.pegData.pegType + ' : ' + newEvent.pegData.opType + ' : ' + newEvent.pegData.stxAddress);
       
     } catch (err:any) {

@@ -1,6 +1,7 @@
 import { fetchAddressTransactions } from './bitcoin/mempool_api.js';
 import { findPeginRequestsByFilter, saveNewPeginRequest } from './data/db_models.js';
 import type { PeginRequestI } from '../types/pegin_request.js';
+import { getConfig } from './config.js';
 
 export async function savePaymentRequest(peginRequest:PeginRequestI) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;
@@ -11,17 +12,17 @@ export async function savePaymentRequest(peginRequest:PeginRequestI) {
 }
 
 export async function findPeginRequests():Promise<Array<any>> {
-  return findPeginRequestsByFilter({});
+  return findPeginRequestsByFilter(getConfig().network, {});
 }
 
 export async function findPeginRequestsByStxAddress(stxAddress:string):Promise<Array<any>> {
 	const filter = { stxAddress: stxAddress };
-  return findPeginRequestsByFilter(filter);
+  return findPeginRequestsByFilter(getConfig().network, filter);
 }
 
-export async function findAllInitialPeginRequests() {
+export async function findAllInitialPeginRequests(net:string) {
 	const filter = { status: 1 };
-	const requests:Array<PeginRequestI> = await findPeginRequestsByFilter(filter);
+	const requests:Array<PeginRequestI> = await findPeginRequestsByFilter(net, filter);
   for (const peginRequest of requests) {
     const address = peginRequest.timeBasedPegin.address;
     try {

@@ -71,16 +71,16 @@ export const SbtcEventMainnetModel = mongMainnet.model("SbtcEvent", SbtcEventSch
 export const PeginRequestTestnetModel = mongTestnet.model("PeginRequest", PeginRequestSchema);
 export const PeginRequestMainnetModel = mongMainnet.model("PeginRequest", PeginRequestSchema);
 
-export async function countSbtcEvents () {
-	if (getConfig().network === 'testnet') {
+export async function countSbtcEvents (net:string) {
+	if (net === 'testnet') {
 		return await SbtcEventTestnetModel.countDocuments()
 	} else {
 		return await SbtcEventMainnetModel.countDocuments();
 	}
 }
 
-export async function saveNewSbtcEvent (newEvent:any) {
-	const model = (getConfig().network === 'testnet') ? new SbtcEventTestnetModel(newEvent) : new SbtcEventMainnetModel(newEvent);
+export async function saveNewSbtcEvent (net:string, newEvent:any) {
+	const model = (net === 'testnet') ? new SbtcEventTestnetModel(newEvent) : new SbtcEventMainnetModel(newEvent);
 	const result = await model.save();
 	return result;
 }
@@ -99,8 +99,8 @@ export async function saveNewPeginRequest (newEvent:any) {
 	return result;
 }
 
-export async function findPeginRequestsByFilter(filter:any|undefined):Promise<Array<PeginRequestI>> {
-	if (getConfig().network === 'testnet') {
+export async function findPeginRequestsByFilter(network: string, filter:any|undefined):Promise<Array<PeginRequestI>> {
+	if (network === 'testnet') {
 		return await PeginRequestTestnetModel.find(filter);
 	} else {
 		return await PeginRequestMainnetModel.find(filter);

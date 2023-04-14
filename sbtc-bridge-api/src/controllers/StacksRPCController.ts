@@ -5,6 +5,7 @@ import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
 import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
+import { getConfig } from '../lib/config.js';
 
 export interface BalanceI {
   balance: number;
@@ -25,7 +26,8 @@ export class PaymentsController {
 
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
-    return await findAllInitialPeginRequests();
+    await findAllInitialPeginRequests('mainnet');
+    return await findAllInitialPeginRequests('testnet');
   }
 }
 
@@ -34,17 +36,17 @@ export class PaymentsController {
 export class SbtcWalletController {
   @Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {
-    return await saveAllSbtcEvents();
+    return await saveAllSbtcEvents(getConfig().network);
   }
 
   @Get("/events/index/stacks/:txid")
   public async indexSbtcEvent(txid:string): Promise<any> {
-    return await indexSbtcEvent(txid);
+    return await indexSbtcEvent(getConfig().network, txid);
   }
 
   @Get("/events/save/:page")
   public async saveSbtcEvents(page:number): Promise<any> {
-    return await saveSbtcEvents(page);
+    return await saveSbtcEvents(getConfig().network, page);
   }
 
   @Get("/events/:page")
