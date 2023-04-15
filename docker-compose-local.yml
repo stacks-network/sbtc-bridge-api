@@ -11,7 +11,7 @@ services:
       - ./volumes/data/db:/data/db
     ports:
       - 27017:27017
-    command: mongod --bind_ip_all --logpath=/dev/null
+    command: mongod --bind_ip=mongodb --logpath=/dev/null
   bridge_api:
     build:
       context: ./sbtc-bridge-api

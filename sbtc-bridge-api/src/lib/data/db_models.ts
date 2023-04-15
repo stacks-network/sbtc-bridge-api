@@ -45,6 +45,9 @@ const PeginRequestSchema = new Schema({
 	btcTxid: String,
 	updated: Number,
 	status: Number,
+	amount: Number,
+	mode: String,
+	requestType: String,
 	tries: Number,
 	fromBtcAddress: String,
 	stacksAddress: String,
@@ -64,46 +67,47 @@ const PeginRequestSchema = new Schema({
 		value: Number,
 	}
 });
+PeginRequestSchema.index({ amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1}, { unique: true });
 
 // Compile model from schema
-export const SbtcEventTestnetModel = mongTestnet.model("SbtcEvent", SbtcEventSchema);
-export const SbtcEventMainnetModel = mongMainnet.model("SbtcEvent", SbtcEventSchema);
-export const PeginRequestTestnetModel = mongTestnet.model("PeginRequest", PeginRequestSchema);
-export const PeginRequestMainnetModel = mongMainnet.model("PeginRequest", PeginRequestSchema);
+export const SbtcEventTM = mongTestnet.model("SbtcEventTM", SbtcEventSchema);
+export const SbtcEventMM = mongMainnet.model("SbtcEventMM", SbtcEventSchema);
+export const PeginRequestTM = mongTestnet.model("PeginRequestTM", PeginRequestSchema);
+export const PeginRequestMM = mongMainnet.model("PeginRequestMM", PeginRequestSchema);
 
 export async function countSbtcEvents (net:string) {
 	if (net === 'testnet') {
-		return await SbtcEventTestnetModel.countDocuments()
+		return await SbtcEventTM.countDocuments()
 	} else {
-		return await SbtcEventMainnetModel.countDocuments();
+		return await SbtcEventMM.countDocuments();
 	}
 }
 
 export async function saveNewSbtcEvent (net:string, newEvent:any) {
-	const model = (net === 'testnet') ? new SbtcEventTestnetModel(newEvent) : new SbtcEventMainnetModel(newEvent);
+	const model = (net === 'testnet') ? new SbtcEventTM(newEvent) : new SbtcEventMM(newEvent);
 	const result = await model.save();
 	return result;
 }
 
 export async function findSbtcEventsByFilter(filter:any|undefined) {
 	if (getConfig().network === 'testnet') {
-		return await SbtcEventTestnetModel.find(filter);
+		return await SbtcEventTM.find(filter);
 	} else {
-		return await SbtcEventMainnetModel.find(filter);
+		return await SbtcEventMM.find(filter);
 	}
 }
 
 export async function saveNewPeginRequest (newEvent:any) {
-	const model = (getConfig().network === 'testnet') ? new PeginRequestTestnetModel(newEvent) : new PeginRequestMainnetModel(newEvent);
+	const model = (getConfig().network === 'testnet') ? new PeginRequestTM(newEvent) : new PeginRequestMM(newEvent);
 	const result = await model.save();
 	return result;
 }
 
 export async function findPeginRequestsByFilter(network: string, filter:any|undefined):Promise<Array<PeginRequestI>> {
 	if (network === 'testnet') {
-		return await PeginRequestTestnetModel.find(filter);
+		return await PeginRequestTM.find(filter);
 	} else {
-		return await PeginRequestMainnetModel.find(filter);
+		return await PeginRequestMM.find(filter);
 	}
 }
 

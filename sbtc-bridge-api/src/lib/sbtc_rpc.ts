@@ -94,19 +94,11 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
 
 export async function indexSbtcEvent(net:string, txid:string) {
   try {
-    const contractId = getConfig().sbtcContractId;
     const url = getConfig().stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
     const response = await fetch(url);
     const result:any = await response.json();
     //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
     return await indexEvents(net, result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
-
-    /**
-    const events = result.events.filter((o:any) => o.event_type === 'smart_contract_log');
-    const edata = cvToJSON(deserializeCV(events[0].contract_log.value.hex));
-    const pegData = await fetchPegTxData(edata.value, true);
-    console.log('Sbtc Events: : pegData=', pegData);
-    */
   } catch (err) {
     console.log('err indexSbtcEvent: ', util.inspect(err, false, null, true /* enable colors */));
     return [];
