@@ -1,0 +1,8 @@
+name: sbtc-bridge-api-chart
+description: A generated Helm Chart for sbtc-bridge-api-chart from Skippbox Kompose
+version: 0.0.1
+apiVersion: v1
+keywords:
+  - sbtc-bridge-api-chart
+sources:
+home:

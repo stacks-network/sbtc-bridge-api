@@ -11,13 +11,13 @@ pwd
 cp .env.local .env
 
 if [ -z "${SERVICE}" ]; then
-  docker-compose down
+  docker-compose -f docker-compose-local.yml down
   #docker rm $SERVICE
-  #docker-compose rm -sf stxeco_api stxeco_express stxeco_mongodb
-  docker-compose build
-  docker-compose up -d --remove-orphans
+  #docker-compose -f docker-compose-local.yml rm -sf stxeco_api stxeco_express stxeco_mongodb
+  docker-compose -f docker-compose-local.yml build
+  docker-compose -f docker-compose-local.yml up -d --remove-orphans
 else
-  docker-compose up --detach --build $SERVICE
+  docker-compose -f docker-compose-local.yml up --detach --build $SERVICE
 fi
 
 exit 0;

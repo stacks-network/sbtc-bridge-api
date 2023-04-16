@@ -13,6 +13,8 @@ services:
       - 27017:27017
     command: mongod --bind_ip=mongodb --logpath=/dev/null
   bridge_api:
+    build:
+      context: ./sbtc-bridge-api
     image: mijoco/bridge_api
     container_name: "bridge_api"
     environment:
