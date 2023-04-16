@@ -28,7 +28,6 @@ spec:
       containers:
         - args:
             - mongod
-            - --bind_ip=mongodb
             - --logpath=/dev/null
           env:
             - name: MONGO_DATA_DIR
