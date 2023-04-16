@@ -1,6 +1,6 @@
 import { Get, Route } from "tsoa";
 import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePaymentRequest, findAllInitialPeginRequests, findPeginRequestsByStxAddress } from '../lib/payments_rpc.js';
+import { savePaymentRequest, findAllInitialPeginRequests, findPeginRequestsByStxAddress } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';

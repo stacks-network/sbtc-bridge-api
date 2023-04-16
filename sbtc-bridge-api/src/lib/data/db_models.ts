@@ -55,7 +55,7 @@ const PeginRequestSchema = new Schema({
 	timeBasedPegin: {
 		paymentType: String,
 		address: String,
-		script:  { type : String , unique : true, required : true },
+		script: String,
 		redeemScript: String,
 		witnessScript: String,
 	},
@@ -67,7 +67,7 @@ const PeginRequestSchema = new Schema({
 		value: Number,
 	}
 });
-PeginRequestSchema.index({ amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1}, { unique: true });
+PeginRequestSchema.index({ status: 1, amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1 }, { unique: true });
 
 // Compile model from schema
 export const SbtcEventTM = mongTestnet.model("SbtcEventTM", SbtcEventSchema);
@@ -97,7 +97,7 @@ export async function findSbtcEventsByFilter(filter:any|undefined) {
 	}
 }
 
-export async function saveNewPeginRequest (newEvent:any) {
+export async function saveNewPeginRequest (newEvent:PeginRequestI) {
 	const model = (getConfig().network === 'testnet') ? new PeginRequestTM(newEvent) : new PeginRequestMM(newEvent);
 	const result = await model.save();
 	return result;
