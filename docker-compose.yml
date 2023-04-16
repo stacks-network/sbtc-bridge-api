@@ -12,27 +12,12 @@ services:
     ports:
       - 27017:27017
     command: mongod --bind_ip=mongodb --logpath=/dev/null
-  sbtc-bridge-api-mainnet:
+  sbtc-bridge-api:
     build:
       context: ./sbtc-bridge-api
     image: us-central1-docker.pkg.dev/core-eng/core-eng-repo/sbtc-bridge-api:latest
-    container_name: "sbtc-bridge-api-mainnet"
+    container_name: "sbtc-bridge-api"
     environment:
-      - NODE_ENV=prod-mainnet
-      - PORT=80
-    ports:
-      - "80:80"
-    labels:
-      kompose.service.type: nodeport
-    links:
-      - mongodb
-  sbtc-bridge-api-testnet:
-    build:
-      context: ./sbtc-bridge-api
-    image: us-central1-docker.pkg.dev/core-eng/core-eng-repo/sbtc-bridge-api:latest
-    container_name: "sbtc-bridge-api-testnet"
-    environment:
-      - NODE_ENV=prod-testnet
       - PORT=80
     ports:
       - "80:80"
