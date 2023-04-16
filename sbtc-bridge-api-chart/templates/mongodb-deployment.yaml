@@ -28,7 +28,7 @@ spec:
       containers:
         - args:
             - mongod
-            - --bindIp=[127.0.0.1,${MONGO_DOCKER_IP}]
+            - --bind_ip=mongodb
             - --logpath=/dev/null
           env:
             - name: MONGO_DATA_DIR

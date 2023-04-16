@@ -7,15 +7,15 @@ metadata:
     kompose.version: 1.28.0 (HEAD)
   creationTimestamp: null
   labels:
-    io.kompose.service: sbtc-bridge-api-testnet
-  name: sbtc-bridge-api-testnet
+    io.kompose.service: sbtc-bridge-api
+  name: sbtc-bridge-api
 spec:
   ports:
     - name: "80"
       port: 80
       targetPort: 80
   selector:
-    io.kompose.service: sbtc-bridge-api-testnet
+    io.kompose.service: sbtc-bridge-api
   type: NodePort
 status:
   loadBalancer: {}

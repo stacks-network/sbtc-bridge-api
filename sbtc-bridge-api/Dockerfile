@@ -2,12 +2,9 @@ FROM node:19-alpine
 
 # Set the environment variables
 ENV PORT 3010
-#ENV PORT 8080
-ENV NODE_ENV production
 
 # Create app directory
-#WORKDIR /usr/src/app
-WORKDIR /workspace
+WORKDIR /app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
@@ -15,13 +12,10 @@ WORKDIR /workspace
 COPY package*.json ./
 
 RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
 
 # Bundle app source
 COPY . .
 
 EXPOSE $PORT
 
-#CMD [ "node", "server.js" ]
 CMD npm run start
