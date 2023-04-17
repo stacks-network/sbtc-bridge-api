@@ -5,7 +5,8 @@
   "main": "dist/src/app.js",
   "type": "module",
   "scripts": {
-    "start": "tsc && node dist/src/app.js",
+    "build": "tsc",
+    "start": "node dist/src/app.js",
     "start-dev": "NODE_ENV=development tsc && NODE_ENV=development node dist/src/app.js",
     "start-stag": "NODE_ENV=staging tsc && NODE_ENV=staging node dist/src/app.js",
     "start-prod": "NODE_ENV=production tsc && NODE_ENV=production node dist/src/app.js",

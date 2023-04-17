@@ -1,5 +1,7 @@
 import { env } from "process";
 
+const PORT = parseInt(env.PORT || '3010');
+
 const TESTNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
@@ -8,12 +10,12 @@ const TESTNET_CONFIG = {
   dbNameTestnet: '/sbtc-testnet',
   dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
-  port: 3010,
+  port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.testnet.hiro.so',
-  stacksExplorerUrl: 'https://explorer.stacks.co',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -29,12 +31,12 @@ const MAINNET_CONFIG = {
   dbNameTestnet: '/sbtc-testnet',
   dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
-  port: 3010,
+  port: PORT,
   network: 'mainnet',
   walletPath: '',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.hiro.so',
-  stacksExplorerUrl: 'https://explorer.stacks.co',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',

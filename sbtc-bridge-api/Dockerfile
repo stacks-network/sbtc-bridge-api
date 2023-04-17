@@ -15,6 +15,7 @@ RUN npm install
 
 # Bundle app source
 COPY . .
+RUN npm run build
 
 EXPOSE $PORT
 
