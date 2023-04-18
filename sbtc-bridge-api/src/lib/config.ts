@@ -48,7 +48,7 @@ const MAINNET_CONFIG = {
 
 const DEVNET_CONFIG = {
   mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
-  mongoDbName: 'sbtc-bridge-dnet',
+  mongoDbName: 'sbtc-bridge-tnet',
   mongoUser: '',
   mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
@@ -93,7 +93,6 @@ const LINODE_CONFIG = {
 let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
 
 export function setConfigOnStart() {
-  console.log('Env: ')
 	if (isDev()) CONFIG = DEVNET_CONFIG;
 	else if (isLinode()) CONFIG = LINODE_CONFIG;
 	else if (isTMTestnet()) CONFIG = TESTNET_CONFIG;

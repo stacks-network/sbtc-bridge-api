@@ -26,7 +26,7 @@ export const revealCheckJob = cron.schedule('*/23 * * * *', (fireDate) => {
   try {
     checkReveal();
   } catch (err) {
-    console.log('Error running: findAllInitialPeginRequests: ', err);
+    console.log('Error running: revealCheckJob: ', err);
   }
 });
 

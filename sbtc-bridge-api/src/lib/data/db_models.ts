@@ -11,7 +11,6 @@ export async function connect() {
 	
 	// The MongoClient is the object that references the connection to our
 	// datastore (Atlas, for example)
-	console.log('Mongo: uri: ' + uri);
 	const client = new MongoClient(uri, {
 		serverApi: {
 		  version: ServerApiVersion.v1,
@@ -36,7 +35,9 @@ export async function connect() {
 	// operations on them.
 	const database = client.db(dbName);
 	sbtcContractEvent = database.collection('sbtcContractEvent');
+	await sbtcContractEvent.createIndex({'bitcoinTxid': 1}, { unique: true })
 	peginRequest = database.collection('peginRequest');
+	await peginRequest.createIndex({status: 1, amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1}, { unique: true })
 }
 
 // Compile model from schema
