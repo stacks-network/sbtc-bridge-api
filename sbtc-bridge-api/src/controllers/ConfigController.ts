@@ -19,6 +19,7 @@ export class ConfigController {
       if (key === param) myval = value;
     }
     if (param && param.indexOf('btc') > -1) return '*****'
+    if (param && param.indexOf('mongo') > -1) return '*****'
     return myval;
   }
 }

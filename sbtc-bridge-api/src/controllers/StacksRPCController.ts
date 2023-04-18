@@ -26,8 +26,7 @@ export class PaymentsController {
 
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
-    await findAllInitialPeginRequests('mainnet');
-    return await findAllInitialPeginRequests('testnet');
+    return await findAllInitialPeginRequests();
   }
 }
 
@@ -36,17 +35,17 @@ export class PaymentsController {
 export class SbtcWalletController {
   @Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {
-    return await saveAllSbtcEvents(getConfig().network);
+    return await saveAllSbtcEvents();
   }
 
   @Get("/events/index/stacks/:txid")
   public async indexSbtcEvent(txid:string): Promise<any> {
-    return await indexSbtcEvent(getConfig().network, txid);
+    return await indexSbtcEvent(txid);
   }
 
   @Get("/events/save/:page")
   public async saveSbtcEvents(page:number): Promise<any> {
-    return await saveSbtcEvents(getConfig().network, page);
+    return await saveSbtcEvents(page);
   }
 
   @Get("/events/:page")
