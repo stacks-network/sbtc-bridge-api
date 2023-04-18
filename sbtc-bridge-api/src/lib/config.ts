@@ -3,12 +3,13 @@ import { env } from "process";
 const PORT = parseInt(env.PORT || '3010');
 
 const TESTNET_CONFIG = {
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-tnet',
+  mongoUser: '',
+  mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
-  mongoUrl: 'mongodb://mongodb.sbtc.svc.cluster.local:27017',
-  dbNameTestnet: '/sbtc-testnet',
-  dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
   port: PORT,
   network: 'testnet',
@@ -24,12 +25,13 @@ const TESTNET_CONFIG = {
 }
 
 const MAINNET_CONFIG = {
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-mnet',
+  mongoUser: '',
+  mongoPwd: '',
   btcNode: 'bitcoind.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
-  mongoUrl: 'mongodb://mongodb.sbtc.svc.cluster.local:27017',
-  dbNameTestnet: '/sbtc-testnet',
-  dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
   port: PORT,
   network: 'mainnet',
@@ -45,12 +47,13 @@ const MAINNET_CONFIG = {
 }
 
 const DEVNET_CONFIG = {
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-dnet',
+  mongoUser: '',
+  mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
-  mongoUrl: 'mongodb://mongodb:27017',
-  dbNameTestnet: '/sbtc',
-  dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/watcher-22',
@@ -66,12 +69,13 @@ const DEVNET_CONFIG = {
 }
 
 const LINODE_CONFIG = {
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-tnet',
+  mongoUser: '',
+  mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
-  mongoUrl: 'mongodb://mongodb:27017',
-  dbNameTestnet: '/sbtc',
-  dbNameMainnet: '/sbtc-mainnet',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
@@ -86,9 +90,10 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { btcNode: string; btcRpcUser: string; btcRpcPwd: string; mongoUrl: string; dbNameTestnet: string; dbNameMainnet: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
+let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
 
 export function setConfigOnStart() {
+  console.log('Env: ')
 	if (isDev()) CONFIG = DEVNET_CONFIG;
 	else if (isLinode()) CONFIG = LINODE_CONFIG;
 	else if (isTMTestnet()) CONFIG = TESTNET_CONFIG;
@@ -102,6 +107,8 @@ function setOverrides() {
     if (process.env.btcNode) CONFIG.btcNode = process.env.btcNode;
     if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
     if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
+    if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
+    if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
   }
 }
 

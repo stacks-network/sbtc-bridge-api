@@ -1,19 +1,6 @@
 version: "3.9"
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: "mongodb"
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    volumes:
-      - ./volumes/data/db:/data/db
-    ports:
-      - 27017:27017
-  # --bind_id breaks k8s
-  #    command: mongod --bind_ip=mongodb --logpath=/dev/null
-    command: mongod --logpath=/dev/null
   sbtc-bridge-api:
     build:
       context: ./sbtc-bridge-api
@@ -25,5 +12,3 @@ services:
       - "80:80"
     labels:
       kompose.service.type: nodeport
-    links:
-      - mongodb

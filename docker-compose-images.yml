@@ -1,17 +1,6 @@
 version: "3.9"
 
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: "bridge_db"
-    environment:
-      - MONGO_DATA_DIR=/data/db
-      - MONGO_LOG_DIR=/dev/null
-    volumes:
-      - ./volumes/data/db:/data/db
-    ports:
-      - 27017:27017
-    command: mongod --bind_ip=mongodb --logpath=/dev/null
   bridge_api:
     image: mijoco/bridge_api
     container_name: "bridge_api"
@@ -20,7 +9,7 @@ services:
       - btcRpcUser=${BTC_RPC_USER}
       - btcRpcPwd=${BTC_RPC_PWD}
       - btcNode=${BTC_NODE}
+      - mongoUser=${MONGO_SBTC_USER}
+      - mongoPwd=${MONGO_SBTC_PWD}
     ports:
       - "3010:3010"
-    links:
-      - mongodb
