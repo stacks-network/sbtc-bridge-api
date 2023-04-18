@@ -1,4 +1,4 @@
-import { setConfigOnStart, setConfig, getConfig } from './lib/config.js';
+import { setConfigOnStart, getConfig } from './lib/config.js';
 import { swagger } from './lib/swagger.js'
 import express, { Application } from "express";
 import morgan from "morgan";
@@ -14,11 +14,6 @@ app.use(morgan("tiny"));
 app.use(express.static("public"));
 app.use(cors());
 setConfigOnStart();
-app.use((req, res, next) => {
-  console.log(`req.url: ${req.url}`);
-  setConfig(req.url);
-  next();
-});
 
 
 app.use(

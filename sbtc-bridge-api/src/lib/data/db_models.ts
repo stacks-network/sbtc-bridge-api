@@ -25,15 +25,10 @@ export async function connect() {
 	await client.connect();
 	await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
-	// Provide the name of the database and collection you want to use.
-	// If the database and/or collection do not exist, the driver and Atlas
-	// will create them automatically when you first write data.
-	const dbName = getConfig().mongoDbName;
 	
 	// Create references to the database and collection in order to run
 	// operations on them.
-	const database = client.db(dbName);
+	const database = client.db(getConfig().mongoDbName);
 	sbtcContractEvent = database.collection('sbtcContractEvent');
 	await sbtcContractEvent.createIndex({'bitcoinTxid': 1}, { unique: true })
 	peginRequest = database.collection('peginRequest');
@@ -51,7 +46,7 @@ export async function saveNewSbtcEvent (newEvent:any) {
 }
 
 export async function findSbtcEventsByFilter(filter:any|undefined) {
-	return await sbtcContractEvent.find(filter);
+	return await sbtcContractEvent.find(filter).toArray();
 }
 
 export async function saveNewPeginRequest (newEvent:PeginRequestI) {
@@ -60,7 +55,7 @@ export async function saveNewPeginRequest (newEvent:PeginRequestI) {
 }
 
 export async function findPeginRequestsByFilter(filter:any|undefined):Promise<any> {
-	const result = await peginRequest.find(filter);
+	const result = await peginRequest.find(filter).toArray();
 	return result;
 }
 

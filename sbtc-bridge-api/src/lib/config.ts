@@ -131,6 +131,7 @@ function isTMTestnet() {
   return ((!isLinode() || isDev()) && (environ === 'staging' || environ === 'stag'))
 }
 
+/**
 export function setConfig(search:string) {
 	if (!search) setConfigOnStart();
 	else if (search.indexOf('net=testnet') > -1) {
@@ -143,6 +144,7 @@ export function setConfig(search:string) {
 	else CONFIG = MAINNET_CONFIG
   setOverrides();
 }
+ */
 
 export function getConfig() {
   if (!CONFIG) setConfigOnStart();

@@ -57,19 +57,23 @@ async function matchTransactionToPegin(txs:Array<any>, peginRequest:PeginRequest
 export async function findAllInitialPeginRequests() {
   let matchCount = 0;
 	const filter = { status: 1 };
-	const requests:Array<PeginRequestI> = await findPeginRequestsByFilter(filter);
-  if (!requests || requests.length === 0) return;
-  for (const peginRequest of requests) {
-    const address = peginRequest.timeBasedPegin.address;
-    try {
-      const txs:Array<any> = await fetchAddressTransactions(address);
-      if (txs && txs.length > 0) {
-        matchCount += await matchTransactionToPegin(txs, peginRequest);
+  try {
+    const requests:any = await findPeginRequestsByFilter(filter);
+    if (!requests || requests.length === 0) return;
+      for (const peginRequest of requests) {
+      const address = peginRequest.timeBasedPegin.address;
+      try {
+        const txs:Array<any> = await fetchAddressTransactions(address);
+        if (txs && txs.length > 0) {
+          matchCount += await matchTransactionToPegin(txs, peginRequest);
+        }
+      } catch(err:any) {
+        console.log('findAllInitialPeginRequests: processing: ' + err.message);
       }
-    } catch(err) {
-      console.log('findAllInitialPeginRequests: processing: ' + address, err);
     }
-  }
-	return matchCount;
+  } catch (err: any) {
+    console.log('findAllInitialPeginRequests: requests: ', err)
+  } 
+	return { matched: matchCount };
 }
 
