@@ -2,11 +2,15 @@ import { Get, Route } from "tsoa";
 import { getConfig } from '../lib/config.js';
 
 export interface IStringToStringDictionary { [key: string]: string|number|undefined; }
-@Route("/bridge-api/v1/config")
+@Route("/bridge-api/:network/v1/config")
 export class ConfigController {
   @Get("/")
   public getAllParam(): IStringToStringDictionary {
     const config = getConfig();
+    config.mongoDbUrl = '*****'
+    config.mongoDbName = '*****'
+    config.mongoPwd = '*****'
+    config.mongoUser = '*****'
     config.btcRpcPwd = '*****'
     config.btcRpcUser = '*****'
     return config

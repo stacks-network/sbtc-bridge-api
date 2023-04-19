@@ -3,8 +3,9 @@ import { env } from "process";
 const PORT = parseInt(env.PORT || '3010');
 
 const TESTNET_CONFIG = {
-  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
-  mongoDbName: 'sbtc-bridge-tnet',
+  environment: 'staging',
+  mongoDbUrl: '',
+  mongoDbName: '',
   mongoUser: '',
   mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
@@ -25,8 +26,9 @@ const TESTNET_CONFIG = {
 }
 
 const MAINNET_CONFIG = {
-  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
-  mongoDbName: 'sbtc-bridge-mnet',
+  environment: 'production',
+  mongoDbUrl: '',
+  mongoDbName: '',
   mongoUser: '',
   mongoPwd: '',
   btcNode: 'bitcoind.stacks.co',
@@ -47,8 +49,9 @@ const MAINNET_CONFIG = {
 }
 
 const DEVNET_CONFIG = {
-  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
-  mongoDbName: 'sbtc-bridge-tnet',
+  environment: 'devnet',
+  mongoDbUrl: '',
+  mongoDbName: '',
   mongoUser: '',
   mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
@@ -59,8 +62,8 @@ const DEVNET_CONFIG = {
   walletPath: '/wallet/watcher-22',
   network: 'testnet',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
-  stacksApi: 'https://stacks-node-api.testnet.stacks.co',
-  stacksExplorerUrl: 'https://explorer.stacks.co',
+  stacksApi: 'https://api.testnet.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -69,8 +72,9 @@ const DEVNET_CONFIG = {
 }
 
 const LINODE_CONFIG = {
-  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
-  mongoDbName: 'sbtc-bridge-tnet',
+  environment: 'staging',
+  mongoDbUrl: '',
+  mongoDbName: '',
   mongoUser: '',
   mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
@@ -81,8 +85,8 @@ const LINODE_CONFIG = {
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
-  stacksApi: 'https://stacks-node-api.testnet.stacks.co',
-  stacksExplorerUrl: 'https://explorer.stacks.co',
+  stacksApi: 'https://api.testnet.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -106,9 +110,11 @@ function setOverrides() {
     if (process.env.btcNode) CONFIG.btcNode = process.env.btcNode;
     if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
     if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
-    if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
-    if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
   }
+  if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
+  if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
+  if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
+  if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
 }
 
 function isDev() {
