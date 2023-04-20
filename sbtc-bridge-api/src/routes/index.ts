@@ -16,7 +16,7 @@ router.get('/', (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/blocks/count", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/blocks/count", async (req, res, next) => {
   try {
     const controller = new BlocksController();
     const response = await controller.getCount();
@@ -26,7 +26,7 @@ router.get("/bridge-api/v1/btc/blocks/count", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/blocks/info", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/blocks/info", async (req, res, next) => {
   try {
     const controller = new BlocksController();
     const response = await controller.getInfo();
@@ -36,7 +36,7 @@ router.get("/bridge-api/v1/btc/blocks/info", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/blocks/fee-estimate", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/blocks/fee-estimate", async (req, res, next) => {
   try {
     const controller = new BlocksController();
     const response = await controller.getFeeEstimate();
@@ -46,7 +46,7 @@ router.get("/bridge-api/v1/btc/blocks/fee-estimate", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/wallet/validate/:address", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/wallet/validate/:address", async (req, res, next) => {
   try {
     const controller = new WalletController();
     const response = await controller.validateAddress(req.params.address);
@@ -56,7 +56,7 @@ router.get("/bridge-api/v1/btc/wallet/validate/:address", async (req, res, next)
   }
 });
 
-router.post("/bridge-api/v1/btc/wallet/walletprocesspsbt", async (req, res, next) => {
+router.post("/bridge-api/:network/v1/btc/wallet/walletprocesspsbt", async (req, res, next) => {
   try {
     console.log('/btc/tx/sendrawtx', req.body);
     const tx = req.body;
@@ -68,7 +68,7 @@ router.post("/bridge-api/v1/btc/wallet/walletprocesspsbt", async (req, res, next
   }
 });
 
-router.get("/bridge-api/v1/btc/wallet/address/:address/txs", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/wallet/address/:address/txs", async (req, res, next) => {
   try {
     const controller = new WalletController();
     const response = await controller.fetchAddressTransactions(req.params.address);
@@ -78,7 +78,7 @@ router.get("/bridge-api/v1/btc/wallet/address/:address/txs", async (req, res, ne
   }
 });
 
-router.get("/bridge-api/v1/btc/wallet/address/:address/utxos", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/wallet/address/:address/utxos", async (req, res, next) => {
   try {
     const controller = new WalletController();
     const response = await controller.fetchUtxoSet(req.params.address, (req.query.verbose) ? true : false);
@@ -88,7 +88,7 @@ router.get("/bridge-api/v1/btc/wallet/address/:address/utxos", async (req, res, 
   }
 });
 
-router.get("/bridge-api/v1/btc/wallet/loadwallet/:name", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/wallet/loadwallet/:name", async (req, res, next) => {
   try {
     const controller = new WalletController();
     const response = await controller.loadWallet(req.params.name);
@@ -97,7 +97,7 @@ router.get("/bridge-api/v1/btc/wallet/loadwallet/:name", async (req, res, next) 
     next(error)
   }
 });
-router.get("/bridge-api/v1/btc/wallet/listwallets", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/wallet/listwallets", async (req, res, next) => {
   try {
     const controller = new WalletController();
     const response = await controller.listWallets();
@@ -107,7 +107,7 @@ router.get("/bridge-api/v1/btc/wallet/listwallets", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/tx/:txid", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/tx/:txid", async (req, res, next) => {
   try {
     const controller = new TransactionController();
     const response = await controller.fetchRawTransaction(req.params.txid);
@@ -117,7 +117,7 @@ router.get("/bridge-api/v1/btc/tx/:txid", async (req, res, next) => {
   }
 });
 
-router.post("/bridge-api/v1/btc/tx/sendrawtx", async (req, res, next) => {
+router.post("/bridge-api/:network/v1/btc/tx/sendrawtx", async (req, res, next) => {
   try {
     console.log('/btc/tx/sendrawtx', req.body);
     const tx = req.body;
@@ -130,7 +130,7 @@ router.post("/bridge-api/v1/btc/tx/sendrawtx", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/address/:address/balance", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.fetchUserSbtcBalance(req.params.address);
@@ -140,7 +140,7 @@ router.get("/bridge-api/v1/sbtc/address/:address/balance", async (req, res, next
   }
 });
  
-router.get("/bridge-api/v1/sbtc/events/save", (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/events/save", (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     controller.saveAllSbtcEvents();
@@ -151,7 +151,7 @@ router.get("/bridge-api/v1/sbtc/events/save", (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/sbtc/events/index/stacks/:txid", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/events/index/stacks/:txid", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.indexSbtcEvent(req.params.txid);
@@ -162,7 +162,7 @@ router.get("/bridge-api/v1/sbtc/events/index/stacks/:txid", async (req, res, nex
   }
 });
 
-router.get("/bridge-api/v1/sbtc/events/save/:page", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/events/save/:page", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.saveSbtcEvents(Number(req.params.page));
@@ -172,7 +172,7 @@ router.get("/bridge-api/v1/sbtc/events/save/:page", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/sbtc/events/:page", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/events/:page", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.findSbtcEvents(Number(req.params.page));
@@ -182,7 +182,7 @@ router.get("/bridge-api/v1/sbtc/events/:page", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/sbtc/data", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/data", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.fetchSbtcContractData();
@@ -192,7 +192,7 @@ router.get("/bridge-api/v1/sbtc/data", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/sbtc/wallet-address", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/sbtc/wallet-address", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();
     const response = await controller.fetchSbtcWalletAddress();
@@ -202,7 +202,7 @@ router.get("/bridge-api/v1/sbtc/wallet-address", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/payments/address/:stxAddress", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/payments/address/:stxAddress", async (req, res, next) => {
   try {
     const controller = new PaymentsController();
     const response = await controller.findPaymentRequests(req.params.stxAddress);
@@ -212,7 +212,7 @@ router.get("/bridge-api/v1/btc/payments/address/:stxAddress", async (req, res, n
   }
 });
 
-router.post("/bridge-api/v1/btc/payments/request", async (req, res, next) => {
+router.post("/bridge-api/:network/v1/btc/payments/request", async (req, res, next) => {
   try {
     console.log('/btc/payments/request', req.body);
     const peginRequest:PeginRequestI = req.body;
@@ -224,7 +224,7 @@ router.post("/bridge-api/v1/btc/payments/request", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/btc/payments/scan", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/btc/payments/scan", async (req, res, next) => {
   try {
     const controller = new PaymentsController();
     const response = await controller.scanPeginRequests();
@@ -236,7 +236,7 @@ router.get("/bridge-api/v1/btc/payments/scan", async (req, res, next) => {
 
 
 
-router.get("/bridge-api/v1/config", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/config", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getAllParam();
@@ -246,7 +246,7 @@ router.get("/bridge-api/v1/config", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/v1/config/:param", async (req, res, next) => {
+router.get("/bridge-api/:network/v1/config/:param", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getParam(req.params.param);

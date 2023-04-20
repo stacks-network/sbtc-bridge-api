@@ -11,7 +11,7 @@ export interface BalanceI {
   balance: number;
 }
 
-@Route("/bridge-api/v1/payments")
+@Route("/bridge-api/:network/v1/payments")
 export class PaymentsController {
   
   public async findPaymentRequests(stxAddress:string): Promise<any> {
@@ -31,7 +31,7 @@ export class PaymentsController {
 }
 
 
-@Route("/bridge-api/v1/sbtc")
+@Route("/bridge-api/:network/v1/sbtc")
 export class SbtcWalletController {
   @Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {

@@ -32,7 +32,7 @@ export const OPTIONS = {
   headers: { 'content-type': 'text/plain' },
   body: '' 
 };
-@Route("/bridge-api/v1/btc/tx")
+@Route("/bridge-api/:network/v1/btc/tx")
 export class TransactionController {
   @Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
@@ -50,7 +50,7 @@ export class TransactionController {
   }
 }
  
-@Route("/bridge-api/v1/btc/wallet")
+@Route("/bridge-api/:network/v1/btc/wallet")
 export class WalletController {
   
   public async validateAddress(address:string): Promise<any> {
@@ -116,7 +116,7 @@ export class WalletController {
 
 
 
-@Route("/bridge-api/v1/btc/blocks")
+@Route("/bridge-api/:network/v1/btc/blocks")
 export class BlocksController {
 
   @Get("/fee-estimate")

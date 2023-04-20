@@ -136,7 +136,7 @@ export const swagger = {
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/bridge-api/v1/config": {
+		"/bridge-api/{network}/v1/config": {
 			"get": {
 				"operationId": "GetAllParam",
 				"responses": {
@@ -155,7 +155,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/config/{param}": {
+		"/bridge-api/{network}/v1/config/{param}": {
 			"get": {
 				"operationId": "GetParam",
 				"responses": {
@@ -183,7 +183,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/btc/tx/{txid}": {
+		"/bridge-api/{network}/v1/btc/tx/{txid}": {
 			"get": {
 				"operationId": "FetchRawTransaction",
 				"responses": {
@@ -209,7 +209,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/address/{address}/utxos": {
+		"/bridge-api/{network}/v1/btc/wallet/address/{address}/utxos": {
 			"get": {
 				"operationId": "FetchUtxoSet",
 				"responses": {
@@ -235,7 +235,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/loadwallet/{name}": {
+		"/bridge-api/{network}/v1/btc/wallet/loadwallet/{name}": {
 			"get": {
 				"operationId": "LoadWallet",
 				"responses": {
@@ -261,7 +261,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/listwallets": {
+		"/bridge-api/{network}/v1/btc/wallet/listwallets": {
 			"get": {
 				"operationId": "ListWallets",
 				"responses": {
@@ -278,7 +278,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/fee-estimate": {
+		"/bridge-api/{network}/v1/btc/blocks/fee-estimate": {
 			"get": {
 				"operationId": "GetFeeEstimate",
 				"responses": {
@@ -297,7 +297,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/info": {
+		"/bridge-api/{network}/v1/btc/blocks/info": {
 			"get": {
 				"operationId": "GetInfo",
 				"responses": {
@@ -314,7 +314,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/count": {
+		"/bridge-api/{network}/v1/btc/blocks/count": {
 			"get": {
 				"operationId": "GetCount",
 				"responses": {
@@ -331,7 +331,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events": {
+		"/bridge-api/{network}/v1/sbtc/events": {
 			"get": {
 				"operationId": "FetchAllSbtcEvents",
 				"responses": {
@@ -348,7 +348,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/{page}": {
+		"/bridge-api/{network}/v1/sbtc/events/{page}": {
 			"get": {
 				"operationId": "FetchSbtcEvents",
 				"responses": {
@@ -375,7 +375,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/address/{address}/balance": {
+		"/bridge-api/{network}/v1/sbtc/address/{address}/balance": {
 			"get": {
 				"operationId": "FetchUserSbtcBalance",
 				"responses": {
@@ -403,7 +403,7 @@ export const swagger = {
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/data": {
+		"/bridge-api/{network}/v1/sbtc/data": {
 			"get": {
 				"operationId": "FetchSbtcContractData",
 				"responses": {
@@ -422,7 +422,7 @@ export const swagger = {
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/wallet-address": {
+		"/bridge-api/{network}/v1/sbtc/wallet-address": {
 			"get": {
 				"operationId": "FetchSbtcWalletAddress",
 				"responses": {
