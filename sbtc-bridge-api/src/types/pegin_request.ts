@@ -1,24 +1,33 @@
 export type PeginRequestI = {
+  _id?:string;
   status: number;
   tries: number;
+	updated?: number;
   amount: number;
   mode: string,
   requestType:string;
-	updated?: number;
+  wallet?: string,
   btcTxid?: string;
   fromBtcAddress: string;
   stacksAddress: string;
   sbtcWalletAddress: string;
-  timeBasedPegin: PeginScriptI
+  commitTxScript: PeginScriptI
   vout?: VoutI
 }
 export type PeginScriptI = {
-    paymentType: string;
-    address: string;
-    script: string;
-    redeemScript: string;
-    witnessScript: string;
+  address?: string;
+  script: string;
+  paymentType: string;
+  redeemScript?: string;
+  witnessScript?: string;
+  wsh?:string;
+  leaves?:[any];
+  tapInternalKey?:Uint8Array;
+  tapLeafScript?:[any];
+  tapMerkleRoot?:Uint8Array;
+  tweakedPubkey?:Uint8Array;
 }
+
 export type VoutI = {
   scriptpubkey: string;
   scriptpubkey_asm: string;

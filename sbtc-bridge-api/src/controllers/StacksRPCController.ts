@@ -1,32 +1,37 @@
 import { Get, Route } from "tsoa";
 import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePaymentRequest, findAllInitialPeginRequests, findPeginRequestsByStxAddress } from '../lib/bitcoin/rpc_commit.js';
+import { savePeginCommit, scanPeginCommitTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
 import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
-import { getConfig } from '../lib/config.js';
+import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
 
 export interface BalanceI {
   balance: number;
 }
 
-@Route("/bridge-api/:network/v1/payments")
+@Route("/bridge-api/:network/v1/sbtc/pegins")
 export class PaymentsController {
   
-  public async findPaymentRequests(stxAddress:string): Promise<any> {
-    const result = await findPeginRequestsByStxAddress(stxAddress);
+  public async findPeginRequestsByStacksAddress(stacksAddress:string): Promise<any> {
+    const result = await findPeginRequestsByFilter({ stacksAddress });
     return result;
   }
 
-  public async savePaymentRequest(peginRequest:PeginRequestI): Promise<any> {
-    const result = await savePaymentRequest(peginRequest);
+  public async findPeginRequestById(_id:string): Promise<any> {
+    const result = await findPeginRequestById(_id);
+    return result;
+  }
+
+  public async savePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+    const result = await savePeginCommit(peginRequest);
     return result;
   }
 
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
-    return await findAllInitialPeginRequests();
+    return await scanPeginCommitTransactions();
   }
 }
 

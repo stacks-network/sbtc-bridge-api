@@ -59,7 +59,7 @@ const DEVNET_CONFIG = {
   btcRpcPwd: 'blockstacksystem',
   host: 'http://localhost',
   port: 3010,
-  walletPath: '/wallet/watcher-22',
+  walletPath: '/wallet/descwallet',
   network: 'testnet',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.testnet.hiro.so',

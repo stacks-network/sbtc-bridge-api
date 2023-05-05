@@ -121,7 +121,6 @@ export async function saveAllSbtcEvents() {
 
 export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
   try {
-    const sbtcEvents:Array<any> = []
     const contractId = getConfig().sbtcContractId;
     const url = getConfig().stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + offset;
     const response = await fetch(url);
