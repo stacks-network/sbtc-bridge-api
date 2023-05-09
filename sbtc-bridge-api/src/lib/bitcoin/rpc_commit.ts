@@ -21,7 +21,8 @@ async function matchTransactionToPegin(txs:Array<any>, peginRequest:PeginRequest
   for (const tx of txs) {
     //console.log('scanPeginCommitTransactions: tx: ', tx);
     for (const vout of tx.vout) {
-      if (peginRequest.tries < 15) {
+      console.log('matchTransactionToPegin: matching: ' + peginRequest.amount + ' to ' + vout.value)
+      if (peginRequest.amount === vout.value && peginRequest.tries < 15) {
         if (peginRequest.mode.indexOf('op_drop') > -1 && vout.scriptpubkey === peginRequest.commitTxScript?.script) {
           const up = {
             tries:  peginRequest.tries++,
