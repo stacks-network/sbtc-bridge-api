@@ -9,10 +9,20 @@ export type PeginRequestI = {
   wallet?: string,
   btcTxid?: string;
   fromBtcAddress: string;
+  revealPub: string;
+  reclaimPub: string;
   stacksAddress: string;
   sbtcWalletAddress: string;
-  commitTxScript: PeginScriptI
-  vout?: VoutI
+  commitTxScript: PeginScriptI;
+  vout?: VoutI;
+  reveal?: {
+    btcTxid: string;
+    vout: VoutI;
+  },
+  reclaim?: {
+    btcTxid: string;
+    vout: VoutI;
+  }
 }
 export type PeginScriptI = {
   address?: string;

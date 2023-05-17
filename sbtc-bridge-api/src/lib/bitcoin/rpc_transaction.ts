@@ -33,7 +33,11 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     res.hex = await fetchTransactionHex(txid);
   }
   if (res && verbose) {
-    res.block = await getBlock(res.blockhash, 1)
+    try {
+      res.block = await getBlock(res.blockhash, 1)
+    } catch (err) {
+      console.log('Unable to get block info')
+    }
   }
   return res;
 }
@@ -78,13 +82,13 @@ export function parseOutputs(output0:any, sbtcWalletAddress:string, amountSats: 
     parsed.stxAddress = c32address(addr0, addr1);
     parsed.cname = d1.subarray(index + 22, index + 56).toString('utf8');
     parsed.amountSats = amountSats;
-    parsed.revealFee = d1.subarray(index + 56, index + 84).readUInt32LE();
+    parsed.revealFee = d1.subarray(index + 56, index + 84).readUInt32BE();
     //TODO MJC: better way to do this ?
     if (parsed.cname.startsWith('\x00\x00\x00\x00\x00')) parsed.cname = undefined;
   } else if (opcode.toUpperCase() === '3E') {
     parsed.pegType = 'pegout';
     parsed.dustAmount = bitcoinToSats(output0.value);
-    parsed.amountSats = d1.subarray(index + 1, index + 10).readUInt32LE();
+    parsed.amountSats = d1.subarray(index + 1, index + 10).readUInt32BE();
     parsed.signature = d1.subarray(index + 10, index + 75).toString('hex');
     parsed.compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
     const dataToSign = getDataToSign(parsed.amountSats, parsed.sbtcWallet);

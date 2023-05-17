@@ -188,7 +188,7 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/bridge-api/v1/btc/tx/{txid}": {
+		"/bridge-api/{network}/v1/btc/tx/{txid}": {
 			"get": {
 				"operationId": "FetchRawTransaction",
 				"responses": {
@@ -214,7 +214,33 @@
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/loadwallet/{name}": {
+		"/bridge-api/{network}/v1/btc/tx/{txid}/hex": {
+			"get": {
+				"operationId": "FetchTransactionHex",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txid",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/wallet/loadwallet/{name}": {
 			"get": {
 				"operationId": "LoadWallet",
 				"responses": {
@@ -240,7 +266,7 @@
 				]
 			}
 		},
-		"/bridge-api/v1/btc/wallet/listwallets": {
+		"/bridge-api/{network}/v1/btc/wallet/listwallets": {
 			"get": {
 				"operationId": "ListWallets",
 				"responses": {
@@ -257,7 +283,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/fee-estimate": {
+		"/bridge-api/{network}/v1/btc/blocks/fee-estimate": {
 			"get": {
 				"operationId": "GetFeeEstimate",
 				"responses": {
@@ -276,7 +302,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/info": {
+		"/bridge-api/{network}/v1/btc/blocks/info": {
 			"get": {
 				"operationId": "GetInfo",
 				"responses": {
@@ -293,7 +319,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/btc/blocks/count": {
+		"/bridge-api/{network}/v1/btc/blocks/count": {
 			"get": {
 				"operationId": "GetCount",
 				"responses": {
@@ -310,7 +336,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/payments/scan": {
+		"/bridge-api/{network}/v1/sbtc/pegins/scan": {
 			"get": {
 				"operationId": "ScanPeginRequests",
 				"responses": {
@@ -327,7 +353,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save": {
+		"/bridge-api/{network}/v1/sbtc/events/save": {
 			"get": {
 				"operationId": "SaveAllSbtcEvents",
 				"responses": {
@@ -344,7 +370,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/events/index/stacks/{txid}": {
+		"/bridge-api/{network}/v1/sbtc/events/index/stacks/{txid}": {
 			"get": {
 				"operationId": "IndexSbtcEvent",
 				"responses": {
@@ -370,7 +396,7 @@
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/events/save/{page}": {
+		"/bridge-api/{network}/v1/sbtc/events/save/{page}": {
 			"get": {
 				"operationId": "SaveSbtcEvents",
 				"responses": {
@@ -397,7 +423,7 @@
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/events/{page}": {
+		"/bridge-api/{network}/v1/sbtc/events/{page}": {
 			"get": {
 				"operationId": "FindSbtcEvents",
 				"responses": {
@@ -424,7 +450,7 @@
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/address/{address}/balance": {
+		"/bridge-api/{network}/v1/sbtc/address/{address}/balance": {
 			"get": {
 				"operationId": "FetchUserSbtcBalance",
 				"responses": {
@@ -452,7 +478,7 @@
 				]
 			}
 		},
-		"/bridge-api/v1/sbtc/data": {
+		"/bridge-api/{network}/v1/sbtc/data": {
 			"get": {
 				"operationId": "FetchSbtcContractData",
 				"responses": {
@@ -471,7 +497,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/sbtc/wallet-address": {
+		"/bridge-api/{network}/v1/sbtc/wallet-address": {
 			"get": {
 				"operationId": "FetchSbtcWalletAddress",
 				"responses": {
@@ -488,7 +514,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/config": {
+		"/bridge-api/{network}/v1/config": {
 			"get": {
 				"operationId": "GetAllParam",
 				"responses": {
@@ -507,7 +533,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/v1/config/{param}": {
+		"/bridge-api/{network}/v1/config/{param}": {
 			"get": {
 				"operationId": "GetParam",
 				"responses": {

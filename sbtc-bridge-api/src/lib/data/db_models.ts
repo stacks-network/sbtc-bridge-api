@@ -47,7 +47,7 @@ export async function saveNewSbtcEvent (newEvent:any) {
 }
 
 export async function findSbtcEventsByFilter(filter:any|undefined) {
-	return await sbtcContractEvent.find(filter).toArray();
+	return await sbtcContractEvent.find(filter).sort({'pegData.burnBlockHeight': -1}).toArray();
 }
 
 export async function saveNewPeginRequest (pegin:any) {
@@ -65,7 +65,7 @@ export async function updatePeginRequest (pegger:any, changes: any) {
 }
 
 export async function findPeginRequestsByFilter(filter:any|undefined):Promise<any> {
-	const result = await peginRequest.find(filter).toArray();
+	const result = await peginRequest.find(filter).sort({'updated': -1}).toArray();
 	return result;
 }
 

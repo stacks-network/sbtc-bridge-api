@@ -83,12 +83,12 @@ export class WalletController {
       // carry on
     }
     try {
-      console.log('fetchUtxoSet1:', result)
+      //console.log('fetchUtxoSet1:', result)
       const utxos = await fetchUTXOs(address);
-      console.log('fetchUtxoSet2:', utxos)
+      //console.log('fetchUtxoSet2:', utxos)
       for (let utxo of utxos) {
         const tx = await fetchRawTx(utxo.txid, verbose);
-        console.log('fetchUtxoSet3:', tx)
+        //console.log('fetchUtxoSet3:', tx)
         utxo.tx = tx;
       }
       result.utxos = utxos

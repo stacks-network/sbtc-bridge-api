@@ -1,6 +1,6 @@
 import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
-import { SbtcWalletController, PaymentsController } from "../controllers/StacksRPCController.js";
+import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
 
@@ -212,13 +212,9 @@ router.get("/bridge-api/:network/v1/sbtc/wallet-address", async (req, res, next)
   }
 });
 
-<<<<<<< HEAD
 router.get("/bridge-api/:network/v1/sbtc/pegins/search/:stxAddress", async (req, res, next) => {
-=======
-router.get("/bridge-api/:network/v1/btc/payments/address/:stxAddress", async (req, res, next) => {
->>>>>>> main
   try {
-    const controller = new PaymentsController();
+    const controller = new DepositsController();
     const response = await controller.findPeginRequestsByStacksAddress(req.params.stxAddress);
     return res.send(response);
   } catch (error) { // manually catching
@@ -226,15 +222,21 @@ router.get("/bridge-api/:network/v1/btc/payments/address/:stxAddress", async (re
   }
 });
 
-<<<<<<< HEAD
+router.get("/bridge-api/:network/v1/sbtc/pegins", async (req, res, next) => {
+  try {
+    const controller = new DepositsController();
+    const response = await controller.findPeginRequests();
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
 router.post("/bridge-api/:network/v1/sbtc/pegins", async (req, res, next) => {
-=======
-router.post("/bridge-api/:network/v1/btc/payments/request", async (req, res, next) => {
->>>>>>> main
   try {
     console.log('/sbtc/pegins', req.body);
     const peginRequest:PeginRequestI = req.body;
-    const controller = new PaymentsController();
+    const controller = new DepositsController();
     const response = await controller.savePeginCommit(peginRequest);
     return res.send(response);
   } catch (error) {
@@ -242,13 +244,9 @@ router.post("/bridge-api/:network/v1/btc/payments/request", async (req, res, nex
   }
 });
 
-<<<<<<< HEAD
 router.get("/bridge-api/:network/v1/sbtc/pegin-scan", async (req, res, next) => {
-=======
-router.get("/bridge-api/:network/v1/btc/payments/scan", async (req, res, next) => {
->>>>>>> main
   try {
-    const controller = new PaymentsController();
+    const controller = new DepositsController();
     const response = await controller.scanPeginRequests();
     return res.send(response);
   } catch (error) {
@@ -258,7 +256,7 @@ router.get("/bridge-api/:network/v1/btc/payments/scan", async (req, res, next) =
 
 router.get("/bridge-api/:network/v1/sbtc/pegins/:_id", async (req, res, next) => {
   try {
-    const controller = new PaymentsController();
+    const controller = new DepositsController();
     const response = await controller.findPeginRequestById(req.params._id);
     return res.send(response);
   } catch (error) { // manually catching
@@ -267,10 +265,6 @@ router.get("/bridge-api/:network/v1/sbtc/pegins/:_id", async (req, res, next) =>
 });
 
 
-<<<<<<< HEAD
-
-=======
->>>>>>> main
 router.get("/bridge-api/:network/v1/config", async (req, res, next) => {
   try {
     const controller = new ConfigController();

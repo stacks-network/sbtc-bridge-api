@@ -1,6 +1,6 @@
 import { Get, Route } from "tsoa";
 import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePeginCommit, scanPeginCommitTransactions } from '../lib/bitcoin/rpc_commit.js';
+import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
@@ -12,8 +12,13 @@ export interface BalanceI {
 }
 
 @Route("/bridge-api/:network/v1/sbtc/pegins")
-export class PaymentsController {
+export class DepositsController {
   
+  public async findPeginRequests(): Promise<any> {
+    const result = await findPeginRequestsByFilter(undefined);
+    return result;
+  }
+
   public async findPeginRequestsByStacksAddress(stacksAddress:string): Promise<any> {
     const result = await findPeginRequestsByFilter({ stacksAddress });
     return result;
@@ -31,6 +36,7 @@ export class PaymentsController {
 
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
+    await scanPeginRRTransactions();
     return await scanPeginCommitTransactions();
   }
 }
