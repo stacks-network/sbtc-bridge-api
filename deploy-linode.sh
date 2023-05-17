@@ -24,12 +24,13 @@ ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
   pwd
   #git pull
   # cp .env.production .env
-  cat .env
-  docker login
-  . ~/.profile
-  docker pull mijoco/bridge_api
+
+  cat .env;
+  docker login;
+  docker pull mijoco/bridge_api;
 
   docker rm -f bridge_api_staging
+  source /home/bob/.profile;
   docker run -d -t -i --name bridge_api_staging -p 3010:3010 \
   -e TARGET_ENV='linode-staging' \
   -e btcRpcUser=${BTC_RPC_USER} \
@@ -41,7 +42,8 @@ ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
   -e mongoPwd=${MONGO_SBTC_PWD} \
   mijoco/bridge_api
 
-  docker rm -f bridge_api_production
+docker rm -f bridge_api_production
+  source /home/bob/.profile;
   docker run -d -t -i --name bridge_api_production -p 3020:3010 \
   -e TARGET_ENV='production' \
   -e btcRpcUser=${BTC_RPC_USER} \

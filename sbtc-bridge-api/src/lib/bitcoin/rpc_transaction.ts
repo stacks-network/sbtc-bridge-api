@@ -1,21 +1,13 @@
 import fetch from 'node-fetch';
 import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController.js'
 import { c32address } from 'c32check';
-import util from 'util'
 import { getBlock } from './rpc_blockchain.js';
 import { fetchTransaction, fetchTransactionHex } from './mempool_api.js';
 import { bitcoinToSats } from '../utils.js';
 import { getDataToSign, getStacksAddressFromSignature } from '../structured-data.js';
-import * as  btc from '@scure/btc-signer';
-import { hex } from '@scure/base';
 import { getConfig } from '../config.js';
 import { hashMessage } from '@stacks/encryption';
-import { getNet } from '../utils.js'
-
-export const MAGIC_BYTES_TESTNET = '5432';
-export const MAGIC_BYTES_MAINNET = '5832';
-export const PEGIN_OPCODE = '3C';
-export const PEGOUT_OPCODE = '3E'; // >
+import { getSbtcWallet, getPegInAmountSats, getWitnessData } from '../utils.js'
 
 export async function sendRawTxRpc(hex:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}]}`;
@@ -41,7 +33,11 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     res.hex = await fetchTransactionHex(txid);
   }
   if (res && verbose) {
-    res.block = await getBlock(res.blockhash, 1)
+    try {
+      res.block = await getBlock(res.blockhash, 1)
+    } catch (err) {
+      console.log('Unable to get block info')
+    }
   }
   return res;
 }
@@ -49,7 +45,9 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
 export async function fetchPegTxData(txid:string, verbose:boolean) {
   const res = await fetchRawTx(txid, true);
   //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
-  const parsed = parseOutputs(res.vout);
+  const sbtcWalletAddress = getSbtcWallet(res.vout);
+  const pegInAmountSats = getPegInAmountSats(res.vout);
+  const parsed = parseOutputs(res.vout[0], sbtcWalletAddress, pegInAmountSats);
   parsed.burnBlockHeight = res.block.height;
   return parsed;
 }
@@ -64,63 +62,35 @@ type parsedDataType = {
   amountSats: number;
   dustAmount: number;
   burnBlockHeight: number;
+  revealFee: number;
 };
 
-function setSbtcWallet(outputs:Array<any>, parsed:parsedDataType) {
-  if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
-    parsed.sbtcWallet = outputs[1].scriptPubKey.address;
-  } else {
-    const scriptHex = outputs[0].scriptPubKey.asm.split(' ')[6];
-    const encscript = btc.OutScript.decode(hex.decode(scriptHex));
-    parsed.sbtcWallet = btc.Address(getNet()).encode(encscript);  }
-}
-
-function setPegInAmountSats(outputs:Array<any>, parsed:parsedDataType) {
-  if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
-    parsed.amountSats = bitcoinToSats(outputs[1].value);
-  } else {
-    parsed.amountSats = bitcoinToSats(outputs[0].value);
-  }
-}
-
-export function parseOutputs(outputs:Array<any>) {
+export function parseOutputs(output0:any, sbtcWalletAddress:string, amountSats: number) {
   const parsed = {
     pegType: 'pegin',
     compression: 0,
+    sbtcWallet: sbtcWalletAddress,
   } as parsedDataType;
-  let d1;
-  if (outputs[0].scriptPubKey.type.toLowerCase() === 'nonstandard') {
-    d1 = Buffer.from(outputs[0].scriptPubKey.asm.split(' ')[1], 'hex');
-    parsed.opType = 'drop';
-  } else {
-    d1 = Buffer.from(outputs[0].scriptPubKey.asm.split(' ')[1], 'hex');
-    parsed.opType = 'return';
-  }
-  const magic = d1.subarray(0,2);
-  //console.log('parseOutputs : d1 : ' + d1.toString('hex') + ' : ' + parsed.opType);
-  //console.log('parseOutputs : magic : ' + magic.toString('hex'));
-  //console.log('parseOutputs : data : ', util.inspect(d1, false, null, true /* enable colors */));
-
-  const magicExpected = (getConfig().network === 'testnet') ? MAGIC_BYTES_TESTNET : MAGIC_BYTES_MAINNET;
-  if (magic.toString('hex') !== magicExpected) 
-    throw new Error('Wrong magic : expected: ' +  magicExpected + '  receved: ' + magic.toString('hex'))
-  const opcode = d1.subarray(2,3).toString('hex');
+  let witnessData = getWitnessData(output0);
+  const d1 = witnessData.d1;
+  const opcode = witnessData.opcode;
+  const index = (witnessData.magic) ? 2 : 0;
 
   if (opcode.toUpperCase() === '3C') {
-    const addr0 = parseInt(d1.subarray(3,4).toString('hex'), 16);
-    const addr1 = d1.subarray(4,24).toString('hex');
+    const addr0 = parseInt(d1.subarray(index + 1, index + 2).toString('hex'), 16);
+    const addr1 = d1.subarray(index + 2, index + 22).toString('hex');
     parsed.stxAddress = c32address(addr0, addr1);
-    parsed.cname = d1.subarray(24).toString('utf8');
+    parsed.cname = d1.subarray(index + 22, index + 56).toString('utf8');
+    parsed.amountSats = amountSats;
+    parsed.revealFee = d1.subarray(index + 56, index + 84).readUInt32BE();
+    //TODO MJC: better way to do this ?
     if (parsed.cname.startsWith('\x00\x00\x00\x00\x00')) parsed.cname = undefined;
-    setSbtcWallet(outputs, parsed);
-    setPegInAmountSats(outputs, parsed);
   } else if (opcode.toUpperCase() === '3E') {
     parsed.pegType = 'pegout';
-    parsed.dustAmount = bitcoinToSats(outputs[0].value);
-    parsed.amountSats = d1.subarray(3,12).readUInt32LE();
-    parsed.signature = d1.subarray(12, 77).toString('hex');
-    parsed.compression = (outputs[0].scriptPubKey.type === 'nulldata') ? 0 : 1;
-    setSbtcWallet(outputs, parsed)
+    parsed.dustAmount = bitcoinToSats(output0.value);
+    parsed.amountSats = d1.subarray(index + 1, index + 10).readUInt32BE();
+    parsed.signature = d1.subarray(index + 10, index + 75).toString('hex');
+    parsed.compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
     const dataToSign = getDataToSign(parsed.amountSats, parsed.sbtcWallet);
     const msgHash = hashMessage(dataToSign.toString('hex'));
     const stxAddress = getStacksAddressFromSignature(msgHash, parsed.signature, parsed.compression);

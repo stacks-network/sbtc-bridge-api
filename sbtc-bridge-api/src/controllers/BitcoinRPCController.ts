@@ -5,6 +5,7 @@ import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.
 import { fetchUTXOs, sendRawTx, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { getConfig } from '../lib/config.js';
+import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -37,6 +38,10 @@ export class TransactionController {
   @Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
+  }
+  @Get("/:txid/hex")
+  public async fetchTransactionHex(txid:string): Promise<any> {
+    return await fetchTransactionHex(txid);
   }
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string): Promise<any> {
@@ -78,12 +83,12 @@ export class WalletController {
       // carry on
     }
     try {
-      console.log('fetchUtxoSet1:', result)
+      //console.log('fetchUtxoSet1:', result)
       const utxos = await fetchUTXOs(address);
-      console.log('fetchUtxoSet2:', utxos)
+      //console.log('fetchUtxoSet2:', utxos)
       for (let utxo of utxos) {
         const tx = await fetchRawTx(utxo.txid, verbose);
-        console.log('fetchUtxoSet3:', tx)
+        //console.log('fetchUtxoSet3:', tx)
         utxo.tx = tx;
       }
       result.utxos = utxos

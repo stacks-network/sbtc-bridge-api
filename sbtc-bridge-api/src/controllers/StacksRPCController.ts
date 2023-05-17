@@ -1,32 +1,43 @@
 import { Get, Route } from "tsoa";
 import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePaymentRequest, findAllInitialPeginRequests, findPeginRequestsByStxAddress } from '../lib/bitcoin/rpc_commit.js';
+import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
 import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
-import { getConfig } from '../lib/config.js';
+import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
 
 export interface BalanceI {
   balance: number;
 }
 
-@Route("/bridge-api/:network/v1/payments")
-export class PaymentsController {
+@Route("/bridge-api/:network/v1/sbtc/pegins")
+export class DepositsController {
   
-  public async findPaymentRequests(stxAddress:string): Promise<any> {
-    const result = await findPeginRequestsByStxAddress(stxAddress);
+  public async findPeginRequests(): Promise<any> {
+    const result = await findPeginRequestsByFilter(undefined);
     return result;
   }
 
-  public async savePaymentRequest(peginRequest:PeginRequestI): Promise<any> {
-    const result = await savePaymentRequest(peginRequest);
+  public async findPeginRequestsByStacksAddress(stacksAddress:string): Promise<any> {
+    const result = await findPeginRequestsByFilter({ stacksAddress });
+    return result;
+  }
+
+  public async findPeginRequestById(_id:string): Promise<any> {
+    const result = await findPeginRequestById(_id);
+    return result;
+  }
+
+  public async savePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+    const result = await savePeginCommit(peginRequest);
     return result;
   }
 
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
-    return await findAllInitialPeginRequests();
+    await scanPeginRRTransactions();
+    return await scanPeginCommitTransactions();
   }
 }
 
