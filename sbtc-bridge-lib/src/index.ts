@@ -1,10 +1,17 @@
 export {
     MAGIC_BYTES_TESTNET,
+    MAGIC_BYTES_MAINNET,
+    PEGIN_OPCODE,
+    PEGOUT_OPCODE,
     parseDepositPayload,
     buildDepositPayload,
     buildWithdrawalPayload,
+    parseWithdrawalPayload,
     amountToUint8,
     uint8ToAmount,
+    getDataToSign,
+    getStacksSimpleHashOfDataToSign,
+    getStacksAddressFromSignature,
     parseSbtcWalletAddress,
     parseOutputs,
     readDepositValue

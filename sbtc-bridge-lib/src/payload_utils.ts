@@ -9,6 +9,7 @@ import type { withdrawalPayloadType, depositPayloadType } from './types/sbtc_typ
 import { hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
+import { recoverSignature, verifyMessageSignature, makeStructuredDataHash } from "micro-stacks/connect";
 
 const concat = P.concatBytes;
 
@@ -39,32 +40,32 @@ export function parseDepositPayload(d1:Uint8Array, amountSats: number):depositPa
 }
 
 function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPayloadType {
-    console.log('payload rev: ', hex.encode(d1))
+    //console.log('payload rev: ', hex.encode(d1))
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
+	if (opcode !== '3C') throw new Error('Wrong opcode for deposit: should be 3C was ' + opcode)
 	const prinType = parseInt(hex.encode(d1.subarray(1,2)), 16);
 	const addr0 = parseInt(hex.encode(d1.subarray(2,3)), 16);
 	const addr1 = hex.encode(d1.subarray(3,23));
 	const stacksAddress = c32address(addr0, addr1);
 	const lengthOfCname = parseInt(hex.encode(d1.subarray(23,24)), 8);
-    console.log('payload lengthOfCname: ', lengthOfCname)
+    //console.log('payload lengthOfCname: ', lengthOfCname)
 	let cname;
 	if (lengthOfCname > 0) {
 	  cname = new TextDecoder().decode(d1.subarray(24, 24 + lengthOfCname));
-	  console.log('payload cname: ', cname)
+	  //console.log('payload cname: ', cname)
 	}
 
 	let current = 24 + lengthOfCname;
 	let memo;
 	const lengthOfMemo = parseInt(hex.encode(d1.subarray(current, current + 1)), 8);
-    console.log('payload lengthOfMemo: ', lengthOfMemo)
+    //console.log('payload lengthOfMemo: ', lengthOfMemo)
 	if (lengthOfMemo > 0) {
 		memo = new TextDecoder().decode(d1.subarray(current + 1, lengthOfMemo + current + 1));
 	}
 	current = current + 1 + lengthOfMemo;
-	const rev = hex.decode(hex.encode(d1.subarray(current)));
-    console.log('payload rev: ', hex.encode(rev))
+	const rev = d1.subarray(current);
 	const revealFee = uint8ToAmount(rev);
-    console.log('payload rev: ', revealFee)
+    //console.log('payload rev: ', revealFee)
 
 	if (opcode.toUpperCase() !== PEGIN_OPCODE) 
 	  throw new Error('Wrong OPCODE : expected: ' +  PEGIN_OPCODE + '  received: ' + opcode)
@@ -91,7 +92,8 @@ export function amountToUint8(amt:number, size:number):Uint8Array {
 }
 
 export function uint8ToAmount(buf:Uint8Array):number {
-	const view = new DataView(buf.buffer);
+	const hmmm = hex.decode(hex.encode(buf)) // needed to make work ?
+	const view = new DataView(hmmm.buffer);
 	const amt = view.getUint32(0);
 	return amt;
 }
@@ -105,17 +107,21 @@ export function parseWithdrawalPayload(network:string, d1:Uint8Array, sbtcWallet
 }
 
 function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, sbtcWallet:string, compression:number):withdrawalPayloadType {
-	const opcode = hex.encode(d1.subarray(0,1));
+	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
+	if (opcode !== '3E') throw new Error('Wrong opcode for withdraw: should be 3E was ' + opcode)
+    //console.log('parseWithdrawalPayloadNoMagic opcode: ', opcode)
 	const amountSats = uint8ToAmount(d1.subarray(1, 10));
-	const signature = hex.encode(d1.subarray(10, 75));
-	const dataToSign = getDataToSign(network, amountSats, sbtcWallet);
-	const msgHash = hashMessage(hex.encode(dataToSign));
-	const stxAddresses = getStacksAddressFromSignature(msgHash, signature, compression);
+    //console.log('parseWithdrawalPayloadNoMagic amountSats: ', amountSats)
+	const signature = hex.decode(hex.encode(d1.subarray(10, 75)));
+    //console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
+	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, sbtcWallet);
+    //console.log('parseWithdrawalPayloadNoMagic msgHash: ', msgHash)
+	const stxAddresses = getStacksAddressFromSignature(hex.decode(msgHash), signature, compression);
 	const stacksAddress = (network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
 	return {
 		opcode,
 		stacksAddress,
-		signature,
+		signature: hex.encode(signature),
 		amountSats,
 		compression
 	};
@@ -156,13 +162,14 @@ export function buildDepositPayload(net:any, revealFee:number, address:string, o
 	return buf1;
 }
 
-export function buildWithdrawalPayload(net:any, amount:number, sigOrPrin:string, opDrop:boolean):Uint8Array {
+export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Array, opDrop:boolean):Uint8Array {
 	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
-	const view2 = amountToUint8(amount, 9);
-	const sigBuf = hex.decode(sigOrPrin);
-	let data = concat(opCodeBuf, view2, sigBuf)
-	if (!opDrop) data = concat(magicBuf, opCodeBuf, view2, sigBuf);
+	const amountBuf = amountToUint8(amount, 9);
+    //console.log('parseWithdrawalPayloadNoMagic amountBuf: ', hex.encode(amountBuf))
+    //console.log('parseWithdrawalPayloadNoMagic amount: ', uint8ToAmount(amountBuf))
+	let data = concat(opCodeBuf, amountBuf, signature)
+	if (!opDrop) data = concat(magicBuf, opCodeBuf, amountBuf, signature);
 	return data;
 }
 
@@ -208,7 +215,7 @@ export function parseOutputs(network:string, output0:any, sbtcWalletAddress:stri
 		sbtcWallet: sbtcWalletAddress,
 		payload: innerPayload
 	};
-  }
+}
   
 export function getDataToSign(network:string, amount:number, sbtcWalletAddress:string):Uint8Array {
 	const amtBuf = amountToUint8(amount, 9);
@@ -218,18 +225,39 @@ export function getDataToSign(network:string, amount:number, sbtcWalletAddress:s
 	return data;
 }
 
+export function getStacksSimpleHashOfDataToSign(network:string, amount:number, sbtcWalletAddress:string):string {
+	const dataToSign = getDataToSign(network, amount, sbtcWalletAddress);
+	const msgHash = hashMessage(hex.encode(dataToSign));
+	return hex.encode(msgHash);
+}
+
 export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string, compression:number) {
-	const sig = secp.Signature.fromCompact(signature);
-	//const s1 = new secp.Signature(sig.r, sig.s)
-	let pubkey1:secp.ProjectivePoint = sig.recoverPublicKey(messageHash);
-	const pubkey = hex.decode(pubkey1.toHex());
-	//const pubkey0 = getPublicKeyFromSignature({ hash: hex.(msgUint8), signature: sig.signature, recoveryBytes: sig.recoveryBytes });	
+	//console.log('getStacksAddressFromSignature: messageHash: ' + hex.encode(messageHash))
+	//console.log('getStacksAddressFromSignature: signature: ' + signature)
+	let pubkey;
+	try {
+		// works for Hiro sig but not unit test sig ?
+		const sigM = recoverSignature({ signature: signature, mode: 'rsv' }); // vrs to rsv
+		let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
+		sig = sig.addRecoveryBit(1);
+		const pubkeyM = sig.recoverPublicKey(messageHash);
+		pubkey = hex.decode(pubkeyM.toHex());
+	} catch (err) {
+		const sig = secp.Signature.fromCompact(signature);
+		let s1 = new secp.Signature(sig.r, sig.s, 1)
+		s1 = s1.addRecoveryBit(1);
+		const pubkey1:secp.ProjectivePoint = s1.recoverPublicKey(messageHash);
+		pubkey = hex.decode(pubkey1.toHex());
+		//const pubkey0 = getPublicKeyFromSignature({ hash: hex.(msgUint8), signature: s1.signature, recoveryBytes: s1.recoveryBytes });	
+	}
+
 	const addresses = {
 		tp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2PKH),
 		tp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2SH),
 		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
+	//console.log('getStacksAddressFromSignature: addresses: ', addresses)
 	return addresses;
 }
 
