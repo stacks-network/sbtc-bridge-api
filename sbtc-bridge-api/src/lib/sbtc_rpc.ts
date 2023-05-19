@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
-import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
+import type { payloadType, SbtcContractDataI } from 'sbtc-bridge-lib/src/index';
 
 const limit = 10;
 
@@ -137,18 +137,18 @@ async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
-      const pegData = await fetchPegTxData(edata.value, true);
-      console.log('indexEvents ', util.inspect(pegData, false, null, true /* enable colors */));
+      const payloadData:payloadType = await fetchPegTxData(edata.value, true);
+      console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
 
       let newEvent = {
         contractId: event.contract_log.contract_id,
         eventIndex: event.event_index,
-        txid: event.tx_id,
+        txid: event.tx_id, 
         bitcoinTxid: edata.value,
-        pegData,
+        payloadData,
       };
       const result = await saveNewSbtcEvent(newEvent);
-      console.log('saveSbtcEvents: saved one: ' + newEvent.pegData.pegType + ' : ' + newEvent.pegData.opType + ' : ' + newEvent.pegData.stxAddress);
+      console.log('saveSbtcEvents: saved one: ' + result, newEvent.payloadData);
       
     } catch (err:any) {
       console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));

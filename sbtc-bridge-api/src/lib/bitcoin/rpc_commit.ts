@@ -1,6 +1,6 @@
 import { fetchAddressTransactions } from './mempool_api.js';
 import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
-import type { PeginRequestI } from '../../types/pegin_request.js';
+import type { PeginRequestI } from 'sbtc-bridge-lib/src/index' 
 
 export async function savePeginCommit(peginRequest:PeginRequestI) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;
@@ -20,9 +20,9 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
     //console.log('scanPeginCommitTransactions: tx: ', tx);
     for (const vout of tx.vout) {
       console.log('matchCommitmentIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
-      if (peginRequest.commitTxScript.address === vout.scriptpubkey_address) {
+      if (peginRequest.commitTxScript?.address === vout.scriptpubkey_address) {
         const up = {
-          tries:  peginRequest.tries++,
+          tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
           btcTxid: tx.txid,
           status: 2,
           vout: vout
@@ -31,7 +31,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
         console.log('scanPeginCommitTransactions: changes: ', up);
         matchCount++;
     } else {
-        await updatePeginRequest(peginRequest, { tries:  (peginRequest.tries + 1) });
+        await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
         console.log('scanPeginCommitTransactions: saveNewPeginRequest: ', peginRequest);
       }
     }
@@ -55,7 +55,7 @@ async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI
       if (peginRequest.fromBtcAddress === vout.scriptpubkey_address) {
         // reveal path spent
         const up = {
-          tries:  peginRequest.tries++,
+          tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
           status: 3,
           reclaim: {
             btcTxid: tx.txid,
@@ -68,7 +68,7 @@ async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI
       } else if (peginRequest.sbtcWalletAddress === vout.scriptpubkey_address) {
         // reclaim path spent
         const up = {
-          tries:  peginRequest.tries++,
+          tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
           status: 3,
           reveal: {
             btcTxid: tx.txid,
@@ -79,7 +79,7 @@ async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI
         console.log('matchRevealOrReclaimIn: changes: ', up);
         matchCount++;
       } else {
-        await updatePeginRequest(peginRequest, { tries:  (peginRequest.tries + 1) });
+        await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
         console.log('matchRevealOrReclaimIn: saveNewPeginRequest: ', peginRequest);
       }
     }   

@@ -4,8 +4,8 @@ import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions }
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import type { PeginRequestI } from '../types/pegin_request.js';
-import type { SbtcContractDataI } from '../types/sbtc_contract_data.js';
 import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
+import type { SbtcContractDataI } from 'sbtc-bridge-lib/src/index';
 
 export interface BalanceI {
   balance: number;

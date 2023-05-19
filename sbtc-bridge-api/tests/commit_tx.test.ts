@@ -1,5 +1,4 @@
 import { getConfig } from '../src/lib/config'
-import { parseOutputs } from '../src/lib/bitcoin/rpc_transaction'
 import util from 'util'
 import { fetchMocker } from './setup';
 

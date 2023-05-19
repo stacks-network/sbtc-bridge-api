@@ -3,11 +3,9 @@ import { sha256 } from "@noble/hashes/sha256";
 import { bytesToHex, concatByteArrays } from "micro-stacks/common";
 import { tupleCV, bufferCV, uintCV, stringAsciiCV } from "micro-stacks/clarity";
 import { getConfig } from './config.js';
-import { recoverSignature, verifyMessageSignature, makeStructuredDataHash } from "micro-stacks/connect";
+import { verifyMessageSignature } from "micro-stacks/connect";
 import { hexToBytes } from "micro-stacks/common";
-import { recoverPublicKey, Signature } from '@noble/secp256k1';
-import { publicKeyToStxAddress, StacksNetworkVersion } from 'micro-stacks/crypto';
-import * as  btc from '@scure/btc-signer';
+import type { Message } from 'sbtc-bridge-lib/src/index' 
 
 const prefix = Uint8Array.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]); // SIP018
 
@@ -19,11 +17,6 @@ const enum ChainID {
 export type SignatureData = {
 	signature: Uint8Array,
 	public_key: Uint8Array,
-};
-
-export type Message = {
-	script: Uint8Array,
-	signature?: Uint8Array | string
 };
 
 export const domain = {
@@ -68,37 +61,3 @@ export function verifyStructuredDataSignature(message: Message, public_key: Uint
 	});
 }
 
-export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string, compression:number) {
-	const sig = recoverSignature({ signature: signature, mode: 'rsv' });
-	//console.log('getStacksAddressFromSignature:sig ', signature);
-	//console.log('getStacksAddressFromSignature:sig ', sig);
-	const s1 = new Signature(sig.signature.r, sig.signature.s)
-	//console.log('getStacksAddressFromSignature:s1 ', s1);
-	let pubkey:Uint8Array|string = recoverPublicKey(messageHash, s1, compression, true);
-	pubkey = bytesToHex(pubkey);
-	//const pubkey0 = getPublicKeyFromSignature({ hash: Buffer.from(msgUint8), signature: sig.signature, recoveryBytes: sig.recoveryBytes });	
-	const addresses = {
-		tp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2PKH),
-		tp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.testnetP2SH),
-		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
-		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
-	}
-	//console.log('getStacksAddressFromSignature:pubkey ', addresses);
-	//console.log('getStacksAddressFromSignature:pubkey ', pubkey);
-	return addresses;
-}
-
-export function getDataToSign(amount:number, sbtcWalletAddress:string):Buffer {
-	//console.log('getDataToSign:amount ', amount);
-	//console.log('getDataToSign:sbtcWalletAddress ', sbtcWalletAddress);
-	const amtBuf = Buffer.alloc(9);
-	amtBuf.writeUInt32LE(amount, 0);
-	const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const script = btc.OutScript.encode(btc.Address(net).decode(sbtcWalletAddress))
-	//console.log('decodePegOutOutputs ', util.inspect(Buffer.from(script).toString('hex'), false, null, true /* enable colors */));
-	const scriptBuf = Buffer.from(script);
-	//console.log('getDataToSign:amtBuf ', amtBuf.toString('hex'));
-	//console.log('getDataToSign:scriptBuf ', scriptBuf.toString('hex'));
-	const data = Buffer.concat([amtBuf, scriptBuf]);
-	return data;
-}

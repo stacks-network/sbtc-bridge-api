@@ -1,3 +1,5 @@
+import type { VoutI, PeginScriptI } from 'sbtc-bridge-lib/src/index' 
+
 export type PeginRequestI = {
   _id?:string;
   status: number;
@@ -23,25 +25,4 @@ export type PeginRequestI = {
     btcTxid: string;
     vout: VoutI;
   }
-}
-export type PeginScriptI = {
-  address?: string;
-  script: string;
-  paymentType: string;
-  redeemScript?: string;
-  witnessScript?: string;
-  wsh?:string;
-  leaves?:[any];
-  tapInternalKey?:Uint8Array;
-  tapLeafScript?:[any];
-  tapMerkleRoot?:Uint8Array;
-  tweakedPubkey?:Uint8Array;
-}
-
-export type VoutI = {
-  scriptpubkey: string;
-  scriptpubkey_asm: string;
-  scriptpubkey_type: string;
-  scriptpubkey_address: string;
-  value: number;
 }

@@ -133,7 +133,15 @@
 								"type": "string"
 							},
 							"addr": {
-								"type": "string"
+								"properties": {
+									"value": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"value"
+								],
+								"type": "object"
 							}
 						},
 						"required": [
@@ -144,18 +152,7 @@
 					}
 				},
 				"required": [
-					"addressValidation",
-					"burnHeight",
-					"name",
-					"decimals",
-					"totalSupply",
-					"threshold",
-					"tokenUri",
-					"tradingHalted",
-					"numParties",
-					"numKeys",
-					"sbtcWalletAddress",
-					"coordinator"
+					"sbtcWalletAddress"
 				],
 				"type": "object"
 			},
