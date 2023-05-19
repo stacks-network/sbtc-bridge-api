@@ -56,7 +56,7 @@ const DEVNET_CONFIG = {
   mongoPwd: '',
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
-  btcRpcPwd: 'blockstacksystem',
+  btcRpcPwd: 'blockstacksystem', 
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
