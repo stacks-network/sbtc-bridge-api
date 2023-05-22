@@ -11,7 +11,7 @@ export const MAGIC_BYTES_MAINNET = '5832';
 export const PEGIN_OPCODE = '3C';
 export const PEGOUT_OPCODE = '3E';
 
-const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
+export const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 
 const priv = secp.utils.randomPrivateKey()
 type KeySet = {

@@ -31,3 +31,5 @@ printf "Finished....\n"
 printf "\n-----------------------------------------------------------------------------------------------------\n";
 
 exit 0;
+
+# docker run  -t -i --name bridge_api -p 3010:3010   -e TARGET_ENV='development'   -e btcRpcUser=${BTC_RPC_USER}   -e btcRpcPwd=${BTC_RPC_PWD}   -e btcNode=${BTC_NODE}   -e mongoDbUrl=${MONGO_SBTC_URL}   -e mongoDbName=${MONGO_SBTC_DBNAME}   -e mongoUser=${MONGO_SBTC_USER}   -e mongoPwd=${MONGO_SBTC_PWD}   mijoco/bridge_api
