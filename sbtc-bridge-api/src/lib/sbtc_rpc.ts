@@ -10,7 +10,7 @@ import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
-import type { payloadType, SbtcContractDataI } from 'sbtc-bridge-lib/src/index';
+import type { payloadType, SbtcContractDataI } from 'sbtc-bridge-lib';
 
 const limit = 10;
 

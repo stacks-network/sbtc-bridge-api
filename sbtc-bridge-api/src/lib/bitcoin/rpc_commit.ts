@@ -1,6 +1,6 @@
 import { fetchAddressTransactions } from './mempool_api.js';
 import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
-import type { PeginRequestI } from 'sbtc-bridge-lib/src/index' 
+import type { PeginRequestI } from 'sbtc-bridge-lib' 
 
 export async function savePeginCommit(peginRequest:PeginRequestI) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;

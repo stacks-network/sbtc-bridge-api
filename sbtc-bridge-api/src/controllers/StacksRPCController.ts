@@ -3,9 +3,8 @@ import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, sa
 import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
-import type { PeginRequestI } from '../types/pegin_request.js';
 import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
-import type { SbtcContractDataI } from 'sbtc-bridge-lib/src/index';
+import type { PeginRequestI, SbtcContractDataI } from 'sbtc-bridge-lib';
 
 export interface BalanceI {
   balance: number;

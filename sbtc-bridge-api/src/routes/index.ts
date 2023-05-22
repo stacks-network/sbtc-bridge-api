@@ -2,7 +2,7 @@ import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
-import type { PeginRequestI } from '../types/pegin_request.js';
+import type { PeginRequestI } from 'sbtc-bridge-lib';
 
 const router = express.Router();
 

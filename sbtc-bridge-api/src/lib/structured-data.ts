@@ -5,7 +5,7 @@ import { tupleCV, bufferCV, uintCV, stringAsciiCV } from "micro-stacks/clarity";
 import { getConfig } from './config.js';
 import { verifyMessageSignature } from "micro-stacks/connect";
 import { hexToBytes } from "micro-stacks/common";
-import type { Message } from 'sbtc-bridge-lib/src/index' 
+import type { Message } from 'sbtc-bridge-lib' 
 
 const prefix = Uint8Array.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]); // SIP018
 
