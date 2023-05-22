@@ -112,7 +112,7 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, sbtcWallet
     //console.log('parseWithdrawalPayloadNoMagic opcode: ', opcode)
 	const amountSats = uint8ToAmount(d1.subarray(1, 10));
     //console.log('parseWithdrawalPayloadNoMagic amountSats: ', amountSats)
-	const signature = hex.decode(hex.encode(d1.subarray(10, 75)));
+	const signature = (hex.encode(d1.subarray(10, 75)));
     //console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
 	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, sbtcWallet);
     //console.log('parseWithdrawalPayloadNoMagic msgHash: ', msgHash)
@@ -121,7 +121,7 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, sbtcWallet
 	return {
 		opcode,
 		stacksAddress,
-		signature: hex.encode(signature),
+		signature: (signature),
 		amountSats,
 		compression
 	};
