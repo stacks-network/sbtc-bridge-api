@@ -43,7 +43,7 @@ export type PeginRequestI = {
   mode: string,
   requestType:string;
   wallet?: string,
-  btcTxid?: string;
+  btcTxId?: string;
   senderAddress?: string;
   fromBtcAddress: string;
   revealPub: string;

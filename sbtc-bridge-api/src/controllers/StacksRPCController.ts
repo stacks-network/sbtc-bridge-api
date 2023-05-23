@@ -14,7 +14,7 @@ export interface BalanceI {
 export class DepositsController {
   
   public async findPeginRequests(): Promise<any> {
-    const result = await findPeginRequestsByFilter(undefined);
+    const result = await findPeginRequestsByFilter({ status: {$gt: -1}});
     return result;
   }
 

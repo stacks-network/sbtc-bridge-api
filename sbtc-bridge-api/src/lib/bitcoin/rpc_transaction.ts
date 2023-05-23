@@ -3,7 +3,7 @@ import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController.js'
 import { getBlock } from './rpc_blockchain.js';
 import { fetchTransaction, fetchTransactionHex } from './mempool_api.js';
 import { getConfig } from '../config.js';
-import { readDepositValue, parseSbtcWalletAddress, parseOutputs } from 'sbtc-bridge-lib' 
+import { readDepositValue, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
 import type { payloadType } from 'sbtc-bridge-lib';
 
 export async function sendRawTxRpc(hex:string) {

@@ -1,11 +1,11 @@
 import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
-import { addressFromPubkey } from './wallet_utils';
+import { addressFromPubkey } from './wallet_utils.js';
 import { c32address, c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
-import { bitcoinToSats } from './formatting'
-import type { withdrawalPayloadType, depositPayloadType } from './types/sbtc_types'
+import { bitcoinToSats } from './formatting.js'
+import type { withdrawalPayloadType, depositPayloadType } from './types/sbtc_types.js'
 import { hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';

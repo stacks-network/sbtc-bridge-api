@@ -111,10 +111,15 @@ function setOverrides() {
     if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
     if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
   }
-  if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
-  if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
-  if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
-  if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
+  if (isDev()) {
+    CONFIG.mongoUser = 'dockerdev1';
+    CONFIG.mongoPwd = '';
+    CONFIG.mongoDbUrl = '';
+    CONFIG.mongoDbName = 'sbtc-bridge-db';
+    CONFIG.btcNode = '127.0.0.1:18332';
+    CONFIG.btcRpcUser = 'bob';
+    CONFIG.btcRpcPwd = '';
+  }
 }
 
 function isDev() {

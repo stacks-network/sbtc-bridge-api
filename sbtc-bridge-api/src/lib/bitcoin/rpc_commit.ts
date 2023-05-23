@@ -23,7 +23,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
       if (peginRequest.commitTxScript?.address === vout.scriptpubkey_address) {
         const up = {
           tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
-          btcTxid: tx.txid,
+          btcTxId: tx.txid,
           status: 2,
           vout: vout
         }
@@ -47,46 +47,51 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
  * @returns 
  */
 async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI):Promise<number> {
-  let matchCount = 0;
+  let matchedTx;
   for (const tx of txs) {
-    console.log('scanPeginCommitTransactions: tx: ', tx);
-    for (const vout of tx.vout) {
-      console.log('matchRevealOrReclaimIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
-      if (peginRequest.fromBtcAddress === vout.scriptpubkey_address) {
-        // reveal path spent
-        const up = {
-          tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
-          status: 3,
-          reclaim: {
-            btcTxid: tx.txid,
-            vout: vout
-          }
-        }
-        await updatePeginRequest(peginRequest, up);
-        console.log('matchRevealOrReclaimIn: changes: ', up);
-        matchCount++;
-      } else if (peginRequest.sbtcWalletAddress === vout.scriptpubkey_address) {
-        // reclaim path spent
-        const up = {
-          tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
-          status: 3,
-          reveal: {
-            btcTxid: tx.txid,
-            vout: vout
-          }
-        }
-        await updatePeginRequest(peginRequest, up);
-        console.log('matchRevealOrReclaimIn: changes: ', up);
-        matchCount++;
-      } else {
-        await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
-        console.log('matchRevealOrReclaimIn: saveNewPeginRequest: ', peginRequest);
-      }
-    }   
+    if (tx.txid !== peginRequest.btcTxId) { // filter out the commitment tx
+      matchedTx = await inspecTx(tx, peginRequest)
+    }
   }
-  return matchCount;
+  return matchedTx;
 }
 
+async function inspecTx(tx:any, peginRequest:PeginRequestI) {
+  let matchedTx = 0;
+  console.log('scanPeginCommitTransactions: tx: ', tx);
+  for (const vout of tx.vout) {
+    console.log('matchRevealOrReclaimIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
+    if (peginRequest.fromBtcAddress === vout.scriptpubkey_address) {
+      // reveal path spent
+      const up = {
+        tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
+        status: 3,
+        reclaim: {
+          btcTxId: tx.txid,
+          vout: vout
+        }
+      }
+      await updatePeginRequest(peginRequest, up);
+      console.log('matchRevealOrReclaimIn: changes: ', up);
+    } else if (peginRequest.sbtcWalletAddress === vout.scriptpubkey_address) {
+      // reclaim path spent
+      const up = {
+        tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
+        status: 3,
+        reveal: {
+          btcTxId: tx.txid,
+          vout: vout
+        }
+      }
+      await updatePeginRequest(peginRequest, up);
+      console.log('matchRevealOrReclaimIn: changes: ', up);
+    } else {
+      await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
+      console.log('matchRevealOrReclaimIn: saveNewPeginRequest: ', peginRequest);
+    }
+  }
+  return matchedTx;
+}
 export async function scanPeginCommitTransactions() {
   let matchCount = 0;
 	const filter = { status: 1 };
@@ -117,20 +122,21 @@ export async function scanPeginRRTransactions() {
 	const filter = { status: 2 };
   try {
     const requests:any = await findPeginRequestsByFilter(filter);
-    console.log('scanPeginRRTransactions: processing: ' + requests);
+    console.log('scanPeginRRTransactions: processing1: ' + requests);
     if (!requests || requests.length === 0) return;
     for (const peginRequest of requests) {
-      console.log('scanPeginRRTransactions: processing: ', peginRequest);
-      if (peginRequest.commitTxScript.vout) {
-        const address = peginRequest.commitTxScript.vout.scriptpubkey_address;
+      console.log('scanPeginRRTransactions: processing2: ', peginRequest);
+      if (peginRequest.vout) {
+        const address = peginRequest.vout.scriptpubkey_address;
+        if (address !== peginRequest.commitTxScript.address) throw new Error('The vout address does not match the address the user spent the commit to?')
         try {
           const txs:Array<any> = await fetchAddressTransactions(address);
           if (txs && txs.length > 0) {
-            console.log('scanPeginRRTransactions: processing: ' + txs.length + ' from ' + address);
+            console.log('scanPeginRRTransactions: processing3: ' + txs.length + ' from ' + address);
             matchCount += await matchRevealOrReclaimIn(txs, peginRequest);
           }
         } catch(err:any) {
-          console.log('scanPeginRRTransactions: processing: ' + err.message);
+          console.log('scanPeginRRTransactions: processing4: ' + err.message);
         }
       }
     }
