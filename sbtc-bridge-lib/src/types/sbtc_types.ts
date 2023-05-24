@@ -43,7 +43,7 @@ export type PeginRequestI = {
   mode: string,
   requestType:string;
   wallet?: string,
-  btcTxId?: string;
+  btcTxid?: string;
   senderAddress?: string;
   fromBtcAddress: string;
   revealPub: string;
@@ -139,7 +139,7 @@ export type UTXO = {
 export type payloadType = {
   sbtcWallet:string;
   burnBlockHeight?:number;
-  payload:withdrawalPayloadType|depositPayloadType;
+  payload?:withdrawalPayloadType|depositPayloadType;
 }
 export type withdrawalPayloadType = {
   opcode: string;

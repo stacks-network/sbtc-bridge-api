@@ -1,7 +1,6 @@
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
 import { getConfig } from '../config.js';
-import { PeginRequestI } from "sbtc-bridge-lib";
 
 let sbtcContractEvent:Collection;
 let peginRequest:Collection;

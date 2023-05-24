@@ -203,17 +203,20 @@ export function parseOutputs(network:string, output0:any, sbtcWalletAddress:stri
 	witnessData.txType = output0.scriptPubKey.type;
 
 	let innerPayload:withdrawalPayloadType|depositPayloadType;
-	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1, amountSats);
-	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		const compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
-		innerPayload = parseWithdrawalPayload(network, d1, sbtcWalletAddress, compression)
-	} else {
-	  throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + witnessData.opcode)
+	try {
+		if (witnessData.opcode === '3C') {
+			innerPayload = parseDepositPayload(d1, amountSats);
+		} else if (witnessData.opcode.toUpperCase() === '3E') {
+			const compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
+			innerPayload = parseWithdrawalPayload(network, d1, sbtcWalletAddress, compression)
+		} else {
+		  throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + witnessData.opcode)
+		}
+	} catch (err:any) {
+		console.log('parseOutputs: Error: ' + err.message);
 	}
 	return {
-		sbtcWallet: sbtcWalletAddress,
-		payload: innerPayload
+		sbtcWallet: sbtcWalletAddress
 	};
 }
   

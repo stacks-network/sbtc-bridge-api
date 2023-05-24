@@ -62,7 +62,7 @@ export const commit1:PeginRequestI = {
     tweakedPubkey: '8228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011'
   },
   updated: 1684244026379,
-  btcTxId: 'bd38134b03a8b2072fba68ad013e2065df67b10f99fbbf3dea8c366b1c43b123',
+  btcTxid: 'bd38134b03a8b2072fba68ad013e2065df67b10f99fbbf3dea8c366b1c43b123',
   vout: {
     scriptpubkey: '51208228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011',
     scriptpubkey_asm: 'OP_PUSHNUM_1 OP_PUSHBYTES_32 8228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011',

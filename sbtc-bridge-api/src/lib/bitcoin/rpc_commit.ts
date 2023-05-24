@@ -23,7 +23,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
       if (peginRequest.commitTxScript?.address === vout.scriptpubkey_address) {
         const up = {
           tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
-          btcTxId: tx.txid,
+          btcTxid: tx.txid,
           status: 2,
           vout: vout
         }
@@ -49,7 +49,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
 async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI):Promise<number> {
   let matchedTx;
   for (const tx of txs) {
-    if (tx.txid !== peginRequest.btcTxId) { // filter out the commitment tx
+    if (tx.txid !== peginRequest.btcTxid) { // filter out the commitment tx
       matchedTx = await inspecTx(tx, peginRequest)
     }
   }
@@ -67,7 +67,7 @@ async function inspecTx(tx:any, peginRequest:PeginRequestI) {
         tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
         status: 3,
         reclaim: {
-          btcTxId: tx.txid,
+          btcTxid: tx.txid,
           vout: vout
         }
       }
@@ -79,7 +79,7 @@ async function inspecTx(tx:any, peginRequest:PeginRequestI) {
         tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
         status: 3,
         reveal: {
-          btcTxId: tx.txid,
+          btcTxid: tx.txid,
           vout: vout
         }
       }
