@@ -107,14 +107,23 @@ export function setConfigOnStart() {
 function setOverrides() {
   if (isDev() || isLinode()) {
     // Not Trust Machines Kit - so override the btc connection params with platform values;
+    if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
+    if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
+    if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
+    if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
     if (process.env.btcNode) CONFIG.btcNode = process.env.btcNode;
     if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
     if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
   }
-  if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
-  if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
-  if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
-  if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
+  if (isDev()) {
+    //CONFIG.mongoUser = '';
+    //CONFIG.mongoPwd = '';
+    //CONFIG.mongoDbUrl = '';
+    //CONFIG.mongoDbName = '';
+    //CONFIG.btcNode = '';
+    //CONFIG.btcRpcUser = '';
+    //CONFIG.btcRpcPwd = '';
+  }
 }
 
 function isDev() {

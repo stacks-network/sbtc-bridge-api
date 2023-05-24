@@ -139,7 +139,7 @@ export type UTXO = {
 export type payloadType = {
   sbtcWallet:string;
   burnBlockHeight?:number;
-  payload:withdrawalPayloadType|depositPayloadType;
+  payload?:withdrawalPayloadType|depositPayloadType;
 }
 export type withdrawalPayloadType = {
   opcode: string;

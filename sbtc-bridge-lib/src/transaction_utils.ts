@@ -2,14 +2,9 @@ import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import * as P from 'micro-packed';
-import { buildDepositPayload } from './payload_utils'
+import { buildDepositPayload } from './payload_utils.js'
 
 const concat = P.concatBytes;
-
-export const MAGIC_BYTES_TESTNET = '5432';
-export const MAGIC_BYTES_MAINNET = '5832';
-export const PEGIN_OPCODE = '3C';
-export const PEGOUT_OPCODE = '3E';
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 

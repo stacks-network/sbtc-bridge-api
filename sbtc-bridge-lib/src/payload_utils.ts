@@ -1,11 +1,11 @@
 import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
-import { addressFromPubkey } from './wallet_utils';
+import { addressFromPubkey } from './wallet_utils.js';
 import { c32address, c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
-import { bitcoinToSats } from './formatting'
-import type { withdrawalPayloadType, depositPayloadType } from './types/sbtc_types'
+import { bitcoinToSats } from './formatting.js'
+import type { withdrawalPayloadType, depositPayloadType } from './types/sbtc_types.js'
 import { hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
@@ -203,17 +203,20 @@ export function parseOutputs(network:string, output0:any, sbtcWalletAddress:stri
 	witnessData.txType = output0.scriptPubKey.type;
 
 	let innerPayload:withdrawalPayloadType|depositPayloadType;
-	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1, amountSats);
-	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		const compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
-		innerPayload = parseWithdrawalPayload(network, d1, sbtcWalletAddress, compression)
-	} else {
-	  throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + witnessData.opcode)
+	try {
+		if (witnessData.opcode === '3C') {
+			innerPayload = parseDepositPayload(d1, amountSats);
+		} else if (witnessData.opcode.toUpperCase() === '3E') {
+			const compression = (output0.scriptPubKey.type === 'nulldata') ? 0 : 1;
+			innerPayload = parseWithdrawalPayload(network, d1, sbtcWalletAddress, compression)
+		} else {
+		  throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + witnessData.opcode)
+		}
+	} catch (err:any) {
+		console.log('parseOutputs: Error: ' + err.message);
 	}
 	return {
-		sbtcWallet: sbtcWalletAddress,
-		payload: innerPayload
+		sbtcWallet: sbtcWalletAddress
 	};
 }
   

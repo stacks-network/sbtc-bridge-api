@@ -1,11 +1,13 @@
 {
   "name": "sbtc-bridge-lib",
-  "version": "1.0.1",
+  "version": "1.0.11",
   "description": "Library for sBTC Bridge web client and API apps ",
-  "main": "index.ts",
-  "type": "module",
+  "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "type": "module",
+  "prepublish": "tsc",
   "scripts": {
+    "build": "tsc",
     "test": "vitest",
     "watch": "vitest watch"
   },

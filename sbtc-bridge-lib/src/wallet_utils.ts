@@ -2,7 +2,7 @@ import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { schnorr } from '@noble/curves/secp256k1';
-import type { CommitKeysI } from './types/sbtc_types';
+import type { CommitKeysI } from './types/sbtc_types.js';
 
 const priv = secp.utils.randomPrivateKey()
 type KeySet = {

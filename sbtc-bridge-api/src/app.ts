@@ -7,7 +7,7 @@ import { serve, setup } from 'swagger-ui-express';
 import { sbtcEventJob, peginRequestJob, revealCheckJob } from './controllers/JobScheduler.js';
 import cors from "cors";
 import { connect } from './lib/data/db_models.js'
-import { MAGIC_BYTES_TESTNET } from 'sbtc-bridge-lib/src/index' 
+import { MAGIC_BYTES_TESTNET } from 'sbtc-bridge-lib' 
 
 const app = express();
 app.use(express.json());

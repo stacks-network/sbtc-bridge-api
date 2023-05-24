@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
-		"target": "es2020",
-		"module": "es2020",
-		"moduleResolution": "node",
+    "target": "ES2015",
+    "module": "ES2020",
+    "strict": true,
+    "moduleResolution": "nodenext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "outDir": "./dist"
   },
   "include": [
-    "src/**/*"
+    "./src"
   ]
 }
