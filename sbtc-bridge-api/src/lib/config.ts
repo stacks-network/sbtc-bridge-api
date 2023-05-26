@@ -128,9 +128,6 @@ function setOverrides() {
     CONFIG.btcSchnorrReveal = process.env.BTC_SCHNORR_KEY_REVEAL as string;
     CONFIG.btcSchnorrReclaim = process.env.BTC_SCHNORR_KEY_RECLAIM as string;
   }
-  if (isDev()) {
-    //CONFIG.btcNode = '127.0.0.1:18332';
-  }
 }
 
 function isDev() {
