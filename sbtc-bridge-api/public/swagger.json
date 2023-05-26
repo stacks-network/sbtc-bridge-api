@@ -6,6 +6,29 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"KeySet": {
+				"properties": {
+					"deposits": {
+						"properties": {
+							"reclaimPubKey": {
+								"type": "string"
+							},
+							"revealPubKey": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"reclaimPubKey",
+							"revealPubKey"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"deposits"
+				],
+				"type": "object"
+			},
 			"FeeEstimateResponse": {
 				"properties": {
 					"feeInfo": {
@@ -185,6 +208,25 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
+		"/bridge-api/{network}/v1/btc/tx/keys": {
+			"get": {
+				"operationId": "GetKeys",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/KeySet"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/bridge-api/{network}/v1/btc/tx/{txid}": {
 			"get": {
 				"operationId": "FetchRawTransaction",

@@ -2,7 +2,7 @@ import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
-import type { PeginRequestI } from 'sbtc-bridge-lib';
+import type { PeginRequestI, WrappedPSBT } from 'sbtc-bridge-lib';
 
 const router = express.Router();
 
@@ -58,7 +58,6 @@ router.get("/bridge-api/:network/v1/btc/wallet/validate/:address", async (req, r
 
 router.post("/bridge-api/:network/v1/btc/wallet/walletprocesspsbt", async (req, res, next) => {
   try {
-    console.log('/btc/tx/sendrawtx', req.body);
     const tx = req.body;
     const controller = new WalletController();
     const response = await controller.processPsbt(tx.hex);
@@ -104,6 +103,40 @@ router.get("/bridge-api/:network/v1/btc/wallet/listwallets", async (req, res, ne
     return res.send(response);
   } catch (error) {
     next(error)
+  }
+});
+
+router.get("/bridge-api/:network/v1/btc/tx/keys", async (req, res, next) => {
+  try {
+    const controller = new TransactionController();
+    const response = await controller.getKeys();
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
+router.post("/bridge-api/:network/v1/btc/tx/sign", async (req, res, next) => {
+  try {
+    const wrappedPsbt:WrappedPSBT = req.body;
+    console.log('wrappedPsbt 0: ', req.body);
+    const controller = new TransactionController();
+    const response = await controller.sign(wrappedPsbt);
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
+  }
+});
+
+router.post("/bridge-api/:network/v1/btc/tx/signAndBroadcast", async (req, res, next) => {
+  try {
+    const wrappedPsbt:WrappedPSBT = req.body;
+    console.log('wrappedPsbt: ', wrappedPsbt);
+    const controller = new TransactionController();
+    const response = await controller.signAndBroadcast(wrappedPsbt);
+    return res.send(response);
+  } catch (error) { // manually catching
+    next(error) // passing to default middleware error handler
   }
 });
 

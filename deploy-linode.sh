@@ -33,6 +33,8 @@ ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
   source /home/bob/.profile;
   docker run -d -t -i --name bridge_api_staging -p 3010:3010 \
   -e TARGET_ENV='linode-staging' \
+  -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
+  -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \
   -e btcRpcUser=${BTC_RPC_USER} \
   -e btcRpcPwd=${BTC_RPC_PWD} \
   -e btcNode=${BTC_NODE} \
@@ -46,6 +48,8 @@ docker rm -f bridge_api_production
   source /home/bob/.profile;
   docker run -d -t -i --name bridge_api_production -p 3020:3010 \
   -e TARGET_ENV='production' \
+  -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
+  -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \
   -e btcRpcUser=${BTC_RPC_USER} \
   -e btcRpcPwd=${BTC_RPC_PWD} \
   -e btcNode=${BTC_NODE} \

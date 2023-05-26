@@ -1,4 +1,7 @@
 import { env } from "process";
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const PORT = parseInt(env.PORT || '3010');
 
@@ -11,6 +14,8 @@ const TESTNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: PORT,
   network: 'testnet',
@@ -34,6 +39,8 @@ const MAINNET_CONFIG = {
   btcNode: 'bitcoind.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: PORT,
   network: 'mainnet',
@@ -57,6 +64,8 @@ const DEVNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem', 
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
@@ -80,6 +89,8 @@ const LINODE_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
@@ -94,7 +105,7 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
+let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; btcSchnorrReveal: string; btcSchnorrReclaim: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
@@ -107,22 +118,18 @@ export function setConfigOnStart() {
 function setOverrides() {
   if (isDev() || isLinode()) {
     // Not Trust Machines Kit - so override the btc connection params with platform values;
-    if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
-    if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
-    if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
-    if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
-    if (process.env.btcNode) CONFIG.btcNode = process.env.btcNode;
-    if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
-    if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
+    CONFIG.mongoDbUrl = process.env.MONGO_SBTC_URL as string;
+    CONFIG.mongoDbName = process.env.MONGO_SBTC_DBNAME as string;
+    CONFIG.mongoUser = process.env.MONGO_SBTC_USER as string;
+    CONFIG.mongoPwd = process.env.MONGO_SBTC_PWD as string;
+    CONFIG.btcNode = process.env.BTC_NODE as string;
+    CONFIG.btcRpcUser = process.env.BTC_RPC_USER as string;
+    CONFIG.btcRpcPwd = process.env.BTC_RPC_PWD as string;
+    CONFIG.btcSchnorrReveal = process.env.BTC_SCHNORR_KEY_REVEAL as string;
+    CONFIG.btcSchnorrReclaim = process.env.BTC_SCHNORR_KEY_RECLAIM as string;
   }
   if (isDev()) {
-    //CONFIG.mongoUser = '';
-    //CONFIG.mongoPwd = '';
-    //CONFIG.mongoDbUrl = '';
-    //CONFIG.mongoDbName = '';
-    //CONFIG.btcNode = '';
-    //CONFIG.btcRpcUser = '';
-    //CONFIG.btcRpcPwd = '';
+    CONFIG.btcNode = '127.0.0.1:18332';
   }
 }
 
