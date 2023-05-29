@@ -44,7 +44,6 @@
     "@typescript-eslint/eslint-plugin": "^5.52.0",
     "@typescript-eslint/parser": "^5.52.0",
     "concurrently": "^7.6.0",
-    "dotenv": "^16.0.3",
     "eslint": "^8.34.0",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
@@ -54,7 +53,7 @@
   },
   "dependencies": {
     "@noble/curves": "^1.0.0",
-    "@noble/secp256k1": "^1.7.1",
+		"@noble/secp256k1": "^2.0.0",
     "@scure/base": "^1.1.1",
     "@scure/bip32": "^1.1.0",
     "@scure/btc-signer": "^0.5.0",

@@ -1,7 +1,4 @@
 import { env } from "process";
-import dotenv from 'dotenv'
-
-dotenv.config()
 
 const PORT = parseInt(env.PORT || '3010');
 
@@ -44,7 +41,7 @@ const MAINNET_CONFIG = {
   host: 'http://localhost',
   port: PORT,
   network: 'mainnet',
-  walletPath: '',
+  walletPath: '/wallet/descwallet',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -116,17 +113,31 @@ export function setConfigOnStart() {
 }
 
 function setOverrides() {
+  //console.log('process.env: ', process.env)
   if (isDev() || isLinode()) {
+    console.log('================================================ >>' + process.env.TARGET_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
-    CONFIG.mongoDbUrl = process.env.MONGO_SBTC_URL as string;
-    CONFIG.mongoDbName = process.env.MONGO_SBTC_DBNAME as string;
-    CONFIG.mongoUser = process.env.MONGO_SBTC_USER as string;
-    CONFIG.mongoPwd = process.env.MONGO_SBTC_PWD as string;
-    CONFIG.btcNode = process.env.BTC_NODE as string;
-    CONFIG.btcRpcUser = process.env.BTC_RPC_USER as string;
-    CONFIG.btcRpcPwd = process.env.BTC_RPC_PWD as string;
-    CONFIG.btcSchnorrReveal = process.env.BTC_SCHNORR_KEY_REVEAL as string;
-    CONFIG.btcSchnorrReclaim = process.env.BTC_SCHNORR_KEY_RECLAIM as string;
+    CONFIG.mongoDbUrl = process.env.mongoDbUrl;
+    CONFIG.mongoDbName = process.env.mongoDbName;
+    CONFIG.mongoUser = process.env.mongoUser;
+    CONFIG.mongoPwd = process.env.mongoPwd;
+    CONFIG.btcNode = process.env.btcNode;
+    CONFIG.btcRpcUser = process.env.btcRpcUser;
+    CONFIG.btcRpcPwd = process.env.btcRpcPwd;
+    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal;
+    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim;
+  }
+  if (isDev()) {
+    CONFIG.btcNode = 'host.docker.internal:18332'
+  }
+  if (isLinode()) {
+    console.log('linode env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
+    console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
+    console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
+    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))
+    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
+    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(0,2))
+    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
   }
 }
 
