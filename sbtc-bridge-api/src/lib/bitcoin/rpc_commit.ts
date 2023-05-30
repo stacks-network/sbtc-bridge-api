@@ -19,11 +19,13 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
   for (const tx of txs) {
     //console.log('scanPeginCommitTransactions: tx: ', tx);
     for (const vout of tx.vout) {
+      const senderAddress = tx.vin[0]?.prevout?.scriptpubkey_address || undefined;
       console.log('matchCommitmentIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
       if (peginRequest.commitTxScript?.address === vout.scriptpubkey_address) {
         const up = {
           tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
           btcTxid: tx.txid,
+          senderAddress,
           status: 2,
           vout: vout
         }

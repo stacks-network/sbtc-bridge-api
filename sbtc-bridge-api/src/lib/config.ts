@@ -11,6 +11,8 @@ const TESTNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: PORT,
   network: 'testnet',
@@ -34,10 +36,12 @@ const MAINNET_CONFIG = {
   btcNode: 'bitcoind.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: PORT,
   network: 'mainnet',
-  walletPath: '',
+  walletPath: '/wallet/descwallet',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -57,6 +61,8 @@ const DEVNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem', 
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
@@ -80,6 +86,8 @@ const LINODE_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
@@ -94,7 +102,7 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
+let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; btcSchnorrReveal: string; btcSchnorrReclaim: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
@@ -105,24 +113,31 @@ export function setConfigOnStart() {
 }
 
 function setOverrides() {
+  //console.log('process.env: ', process.env)
   if (isDev() || isLinode()) {
+    console.log('================================================ >>' + process.env.TARGET_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
-    if (process.env.mongoDbUrl) CONFIG.mongoDbUrl = process.env.mongoDbUrl;
-    if (process.env.mongoDbName) CONFIG.mongoDbName = process.env.mongoDbName;
-    if (process.env.mongoUser) CONFIG.mongoUser = process.env.mongoUser;
-    if (process.env.mongoPwd) CONFIG.mongoPwd = process.env.mongoPwd;
-    if (process.env.btcNode) CONFIG.btcNode = process.env.btcNode;
-    if (process.env.btcRpcUser) CONFIG.btcRpcUser = process.env.btcRpcUser;
-    if (process.env.btcRpcPwd) CONFIG.btcRpcPwd = process.env.btcRpcPwd;
+    CONFIG.mongoDbUrl = process.env.mongoDbUrl;
+    CONFIG.mongoDbName = process.env.mongoDbName;
+    CONFIG.mongoUser = process.env.mongoUser;
+    CONFIG.mongoPwd = process.env.mongoPwd;
+    CONFIG.btcNode = process.env.btcNode;
+    CONFIG.btcRpcUser = process.env.btcRpcUser;
+    CONFIG.btcRpcPwd = process.env.btcRpcPwd;
+    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal;
+    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim;
   }
   if (isDev()) {
-    //CONFIG.mongoUser = '';
-    //CONFIG.mongoPwd = '';
-    //CONFIG.mongoDbUrl = '';
-    //CONFIG.mongoDbName = '';
-    //CONFIG.btcNode = '';
-    //CONFIG.btcRpcUser = '';
-    //CONFIG.btcRpcPwd = '';
+    CONFIG.btcNode = 'host.docker.internal:18332'
+  }
+  if (isLinode()) {
+    console.log('linode env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
+    console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
+    console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
+    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))
+    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
+    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(0,2))
+    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
   }
 }
 

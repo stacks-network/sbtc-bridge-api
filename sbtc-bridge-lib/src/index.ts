@@ -14,7 +14,9 @@ import {
     getStacksAddressFromSignature,
     parseSbtcWalletAddress,
     parseOutputs,
-    readDepositValue
+    readDepositValue,
+    fromStorable,
+    toStorable
 } from './payload_utils.js'
 export {
     MAGIC_BYTES_TESTNET,
@@ -32,7 +34,9 @@ export {
     getStacksAddressFromSignature,
     parseSbtcWalletAddress,
     parseOutputs,
-    readDepositValue
+    readDepositValue,
+    fromStorable,
+    toStorable
 } 
 
 import {
@@ -68,7 +72,9 @@ import type {
     UTXO,
     payloadType,
     withdrawalPayloadType,
-    depositPayloadType
+    depositPayloadType,
+    KeySet,
+    WrappedPSBT
 } from './types/sbtc_types.js'
 export type {
     PeginRequestI, 
@@ -85,5 +91,7 @@ export type {
     UTXO,
     payloadType,
     withdrawalPayloadType,
-    depositPayloadType
+    depositPayloadType,
+    KeySet,
+    WrappedPSBT
 }

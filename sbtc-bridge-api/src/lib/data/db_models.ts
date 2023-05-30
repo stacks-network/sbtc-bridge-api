@@ -7,7 +7,7 @@ let peginRequest:Collection;
   
 export async function connect() {
 	const uri = `mongodb+srv://${getConfig().mongoUser}:${getConfig().mongoPwd}@${getConfig().mongoDbUrl}/?retryWrites=true&w=majority`;
-	console.log("Mongo: " + uri);
+	//console.log("Mongo: " + uri);
 
 	// The MongoClient is the object that references the connection to our
 	// datastore (Atlas, for example)

@@ -55,12 +55,13 @@ export function getTestAddresses (network:string):CommitKeysI {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	return {
 		fromBtcAddress: btc.getAddress('tr', hex.decode(testWallets[0].privateKey), net) as string,
-		reveal: btc.getAddress('tr', hex.decode(testWallets[0].privateKey), net) as string,
+		sbtcWalletAddress: sbtcWallets[0].sbtcAddress,
+		//reveal: btc.getAddress('tr', hex.decode(testWallets[0].privateKey), net) as string,
 		revealPub: hex.encode(schnorr.getPublicKey(testWallets[0].privateKey) as Uint8Array),
-		revealPrv: testWallets[0].privateKey,
-		reclaim: btc.getAddress('tr', hex.decode(testWallets[1].privateKey), net) as string,
+		//revealPrv: testWallets[0].privateKey,
+		//reclaim: btc.getAddress('tr', hex.decode(testWallets[1].privateKey), net) as string,
 		reclaimPub: hex.encode(schnorr.getPublicKey(testWallets[1].privateKey) as Uint8Array),
-		reclaimPrv: testWallets[1].privateKey,
+		//reclaimPrv: testWallets[1].privateKey,
 		stacksAddress: (network === 'testnet') ? 'ST1RBP62PR532FWVP7JRGC9SVFKKHD1JYK23KYNN0' : 'unsupported'
 	}
 }

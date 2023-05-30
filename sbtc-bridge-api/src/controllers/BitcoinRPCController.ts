@@ -4,8 +4,15 @@ import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, l
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTx, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
+import { findPeginRequestById } from "../lib/data/db_models.js";
 import { getConfig } from '../lib/config.js';
 import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
+import { schnorr } from '@noble/curves/secp256k1';
+import { hex, base64 } from '@scure/base';
+import type { Transaction } from '@scure/btc-signer'
+import type { KeySet, WrappedPSBT, PeginRequestI } from 'sbtc-bridge-lib'
+import * as btc from '@scure/btc-signer';
+import { toStorable } from 'sbtc-bridge-lib' 
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -35,21 +42,120 @@ export const OPTIONS = {
 };
 @Route("/bridge-api/:network/v1/btc/tx")
 export class TransactionController {
+
+  @Get("/keys")
+  public getKeys(): KeySet {
+    return {
+      deposits: {
+        revealPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReveal)),
+        reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim))
+      }
+    }
+  }
+  
+  public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
+    console.log('sign: ', wrappedPsbt);
+    const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId)
+
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+
+    const transaction:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+		const script = toStorable(pegin.commitTxScript)
+    
+    console.log('sign: script: ', script);
+
+    if (pegin.status !== 2 || !pegin.btcTxid || !script) throw new Error('Incorrect status to be revealed / reclaimed')
+    if (!pegin.commitTxScript) throw new Error('Incorrect data passed')
+    if (!pegin.commitTxScript.address) throw new Error('Incorrect data passed')
+    if (!script.tapMerkleRoot) throw new Error('Incorrect data passed')
+    if (!script.tapInternalKey) throw new Error('Incorrect data passed')
+
+    const sbtcWalletAddrScript = btc.Address(net).decode(pegin.sbtcWalletAddress)
+    if (sbtcWalletAddrScript.type !== 'tr') throw new Error('Taproot required')
+    const commitAddressScript = btc.Address(net).decode(pegin.commitTxScript.address);
+    if (commitAddressScript.type !== 'tr') throw new Error('Taproot required')
+    
+    console.log('sign: commitAddressScript: ', commitAddressScript);
+
+    const commitTx = await fetchRawTx(pegin.btcTxid, true)
+    const nextI:btc.TransactionInput = {
+      txid: hex.decode(pegin.btcTxid),
+      index: 0,
+      nonWitnessUtxo: (commitTx.hex),
+      tapLeafScript: script.tapLeafScript,
+      tapMerkleRoot: script.tapMerkleRoot as Uint8Array
+    }
+    console.log('nextI: ', nextI);
+    transaction.addInput(nextI);
+
+    let outAddr = pegin.sbtcWalletAddress;
+    if (wrappedPsbt.txtype === 'reclaim') outAddr = commitTx.vin[0]?.prevout?.scriptpubkey_address
+
+    const fee = 500 //transaction.fee;
+    console.log('sign: fee: ', fee);
+    const amount = pegin.amount - fee;
+    /**
+    if (this.addressInfo.utxos.length === -1) { // never
+      const feeUtxo = this.addInputForFee(tx);
+      amount = pegin.amount + feeUtxo?.value - this.fee;
+    }
+    */
+    transaction.addOutputAddress(outAddr, BigInt(amount), net);
+
+    try {
+      if (wrappedPsbt.txtype === 'reclaim') {
+        console.log('sign: btcSchnorrReclaim: ', getConfig().btcSchnorrReclaim);
+        transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
+        console.log('sign: btcSchnorrReclaim: signed');
+        transaction.finalize();
+        console.log('sign: btcSchnorrReclaim: finalised');
+      } else {
+        console.log('sign: btcSchnorrReveal: ', getConfig().btcSchnorrReveal);
+        transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
+        console.log('sign: btcSchnorrReveal: signed');
+        transaction.finalize();
+        console.log('sign: btcSchnorrReveal: finalised');
+      }
+    } catch (err:any) {
+      console.log('Error signing: ', err)
+    }
+    //const tx = btc.Transaction.fromRaw(hex.decode(wrappedPsbt.tx), { allowUnknowInput: true, allowUnknowOutput: true });
+		wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
+		console.log('b64: ', wrappedPsbt.signedPsbt)
+    const ttttt = btc.Transaction.fromPSBT(transaction.toPSBT());
+    wrappedPsbt.signedTransaction = hex.encode(ttttt.toBytes());
+		console.log('hex: ', wrappedPsbt.signedTransaction)
+    return wrappedPsbt;
+  }
+  
+  public async signAndBroadcast(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
+    wrappedPsbt = await this.sign(wrappedPsbt);
+    const signedTx = wrappedPsbt.signedTransaction;
+    console.log('signAndBroadcast: ', signedTx);
+    wrappedPsbt.broadcastResult = await this.sendRawTransaction(signedTx)
+    console.log('signAndBroadcast: wrappedPsbt: ', wrappedPsbt);
+    return wrappedPsbt;
+  }
+  
   @Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
   }
+
   @Get("/:txid/hex")
   public async fetchTransactionHex(txid:string): Promise<any> {
     return await fetchTransactionHex(txid);
   }
+
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string): Promise<any> {
       try {
         const resp = await sendRawTx(hex);
+        console.log('sendRawTransaction 1: ', resp);
         return resp;
       } catch (err) {
         const resp =  await sendRawTxRpc(hex);
+        console.log('sendRawTransaction 2: ', resp);
         return resp;
       }
   }
@@ -118,9 +224,6 @@ export class WalletController {
     return result;
   }
 }
-
-
-
 @Route("/bridge-api/:network/v1/btc/blocks")
 export class BlocksController {
 

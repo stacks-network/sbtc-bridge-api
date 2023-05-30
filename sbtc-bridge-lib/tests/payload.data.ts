@@ -9,6 +9,7 @@ export const commit1:PeginRequestI = {
   mode: 'op_drop',
   requestType: 'wrap',
   wallet: "p2tr(TAPROOT_UNSPENDABLE_KEY, [{ script: Script.encode([data, 'DROP', revealPubK, 'CHECKSIG']) }, { script: Script.encode([reclaimPubKey, 'CHECKSIG']) }], this.net, true)",
+  originator: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
   stacksAddress: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
   sbtcWalletAddress: 'tb1pf74xr0x574farj55t4hhfvv0vpc9mpgerasawmf5zk9suauckugqdppqe8',
   commitTxScript: {

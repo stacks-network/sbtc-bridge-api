@@ -23,7 +23,7 @@ the application.
 To run the docker containers locally;
 
 ```bash
-./build.sh
+build -t mijoco/bridge_api sbtc-bridge-api
 ```
 
 Note the build.sh tags and pushes the containers to mijoco docker hub. This will change for mainnet
@@ -32,8 +32,20 @@ deployment.
 Alternatively, no docker hub, use docker compose directly..
 
 ```bash
-docker-compose build
-docker-compose up -d
+docker rm -f bridge_api_staging
+  source /home/bob/.profile;
+  docker run -d -t -i --name bridge_api_staging -p 3010:3010 \
+  -e TARGET_ENV='linode-staging' \
+  -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
+  -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \
+  -e btcRpcUser=${BTC_RPC_USER} \
+  -e btcRpcPwd=${BTC_RPC_PWD} \
+  -e btcNode=${BTC_NODE} \
+  -e mongoDbUrl=${MONGO_SBTC_URL} \
+  -e mongoDbName=${MONGO_SBTC_DBNAME} \
+  -e mongoUser=${MONGO_SBTC_USER} \
+  -e mongoPwd=${MONGO_SBTC_PWD} \
+  mijoco/bridge_api
 ```
 
 ## Swagger API Docs
@@ -45,16 +57,10 @@ See https://testnet.stx.eco/bridge-api/docs/#/
 Deployment builds, tags and pushes the images and then uses ssh to log on to remote server
 and then pulls the images from docker hub;
 
-```bash
-docker-compose -f docker-compose.yml pull
-docker-compose -f docker-compose.yml up -d
-```
-
 This is automated using the deploy script;
 
 ```bash
-./deploy.sh // for testnet
-./deploy.sh prod // for mainnet
+./deploy-linode.sh
 ```
 
 Note: requires docker hub access and ssh key registered on server. This will change when deployment
@@ -68,6 +74,7 @@ The sBTC Wallet is a taproot wallet with addresses (most recent first);
 - tb1pf74xr0x574farj55t4hhfvv0vpc9mpgerasawmf5zk9suauckugqdppqe8
 
 ## Production Deployment
+
 Note: `docker-compose.yml` is used for production deployment.
 
 - Local build and push of docker images

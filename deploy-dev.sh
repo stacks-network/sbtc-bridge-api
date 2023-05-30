@@ -7,7 +7,7 @@ export DOCKER_CMD='docker'
 
 $DOCKER_CMD build -t mijoco/bridge_api sbtc-bridge-api
 $DOCKER_CMD tag mijoco/bridge_api mijoco/bridge_api
-#$DOCKER_CMD push mijoco/bridge_api:latest
+$DOCKER_CMD push mijoco/bridge_api:latest
 
 printf "\nConnecting to $SERVER.\n\n"
 
@@ -18,6 +18,9 @@ docker rm -f bridge_api
 #source ~/.profile;
 docker run -d -t -i --name bridge_api -p 3010:3010 \
   -e TARGET_ENV='development' \
+  -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
+  -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \
+  -e btcRpcUser=${BTC_RPC_USER} \
   -e btcRpcUser=${BTC_RPC_USER} \
   -e btcRpcPwd=${BTC_RPC_PWD} \
   -e btcNode=${BTC_NODE} \

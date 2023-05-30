@@ -71,9 +71,18 @@ export class SbtcWalletController {
   @Get("/data")
   public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
     const sbtcContractData:SbtcContractDataI = await fetchNoArgsReadOnly();
-    sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
-    const bc = await getBlockCount();
-    sbtcContractData.burnHeight = bc.count;
+    try {
+      sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
+    } catch (err) {
+      console.log(err)
+    }
+    try {
+      const bc = await getBlockCount();
+      sbtcContractData.burnHeight = bc.count;
+    } catch (err) {
+      console.log(err)
+      sbtcContractData.burnHeight = -1;
+    }
     return sbtcContractData;
   }
 

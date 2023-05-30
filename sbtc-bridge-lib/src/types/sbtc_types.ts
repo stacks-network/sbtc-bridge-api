@@ -36,6 +36,7 @@ export type SbtcBalance = {
 };
 export type PeginRequestI = {
   _id?:string;
+  originator: string;
   status: number;
   tries?: number;
 	updated?: number;
@@ -46,12 +47,18 @@ export type PeginRequestI = {
   btcTxid?: string;
   senderAddress?: string;
   fromBtcAddress: string;
-  revealPub: string;
-  reclaimPub: string;
+  reveal?: RevealOrReclaim;
+  reclaim?: RevealOrReclaim;
+  revealPub?: string;
+  reclaimPub?: string;
   stacksAddress: string;
   sbtcWalletAddress: string;
   commitTxScript?: PeginScriptI;
   vout?: VoutI;
+}
+export type RevealOrReclaim = {
+  btcTxid?: string;
+  signedPsbtHex?: string;
 }
 export type PeginScriptI = {
   address?: string;
@@ -85,12 +92,9 @@ export type PegInData = {
 
 export type CommitKeysI = {
   fromBtcAddress: string;
-  reveal: string;
+  sbtcWalletAddress: string;
   revealPub: string;
-  revealPrv?: string;
-  reclaim: string;
   reclaimPub: string;
-  reclaimPrv?: string;
   stacksAddress: string;
 };
 
@@ -160,3 +164,16 @@ export type depositPayloadType = {
   revealFee: number;
   amountSats: number;
 };
+export type KeySet = {
+  deposits: {
+    revealPubKey: string;
+    reclaimPubKey: string;
+  }
+}
+export type WrappedPSBT = {
+  depositId: string;
+  txtype: string;
+  broadcastResult?: any;
+  signedTransaction?: string;
+  signedPsbt?: string;
+}
