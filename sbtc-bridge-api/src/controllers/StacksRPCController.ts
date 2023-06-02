@@ -1,10 +1,10 @@
 import { Get, Route } from "tsoa";
-import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
+import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
 import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
-import type { PeginRequestI, SbtcContractDataI } from 'sbtc-bridge-lib';
+import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
 
 export interface BalanceI {
   balance: number;
@@ -66,6 +66,10 @@ export class SbtcWalletController {
   @Get("/address/:address/balance")
   public async fetchUserSbtcBalance(address:string): Promise<BalanceI> {
     return await fetchUserSbtcBalance(address);
+  }
+
+  public async fetchUserBalances(addresses:AddressObject): Promise<AddressObject> {
+    return await fetchUserBalances(addresses);
   }
 
   @Get("/data")

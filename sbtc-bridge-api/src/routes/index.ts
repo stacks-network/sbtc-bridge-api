@@ -2,7 +2,7 @@ import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
-import type { PeginRequestI, WrappedPSBT } from 'sbtc-bridge-lib';
+import type { PeginRequestI, WrappedPSBT, AddressObject } from 'sbtc-bridge-lib';
 
 const router = express.Router();
 
@@ -194,7 +194,20 @@ router.get("/bridge-api/:network/v1/sbtc/address/:address/balance", async (req, 
     const controller = new SbtcWalletController();
     const response = await controller.fetchUserSbtcBalance(req.params.address);
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+ 
+router.post("/bridge-api/:network/v1/sbtc/address/balances", async (req, res, next) => {
+  try {
+    console.log('/v1/sbtc/address/balances', req.body);
+    const addressObject:AddressObject = req.body;
+    const controller = new SbtcWalletController();
+    const response = await controller.fetchUserBalances(addressObject);
+    return res.send(response);
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }

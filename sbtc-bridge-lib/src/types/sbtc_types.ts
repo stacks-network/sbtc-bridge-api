@@ -25,8 +25,8 @@ export type AddressValidationI = {
   scriptPubKey: string;
   isscript: boolean;
   iswitness: boolean;
-  "witness_version": number;
-  "witness_program": string;
+  witness_version: number;
+  witness_program: string;
 }
 export type SbtcBalance = {
 	cardinal?: string;
@@ -98,7 +98,20 @@ export type CommitKeysI = {
   stacksAddress: string;
 };
 
-export type AddressDetails = {
+export type AddressObject = {
+  stxAddress: string;
+  sBTCBalance: number;
+  stxBalance: number;
+  stacksTokenInfo: AddressHiroObject;
+  cardinal: string;
+  cardinalInfo: AddressMempoolObject;
+  ordinal: string;
+  ordinalInfo: AddressMempoolObject;
+  btcPubkeySegwit0: string;
+  btcPubkeySegwit1: string;
+};
+
+export type AddressMempoolObject = {
   address: string;
   chain_stats: {
     funded_txo_count: number;
@@ -114,6 +127,21 @@ export type AddressDetails = {
     spent_txo_sum: number;
     tx_count: number;
   }
+}
+
+export type AddressHiroObject = {
+    stx: {
+      balance: number;
+      total_sent: number;
+      total_received: number;
+      lock_tx_id: string;
+      locked:number;
+      lock_height: number;
+      burnchain_lock_height: number;
+      burnchain_unlock_height: number;
+    },
+    fungible_tokens: any,
+    non_fungible_tokens: any
 }
 
 export type Message = {

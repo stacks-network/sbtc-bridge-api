@@ -63,7 +63,6 @@ import type {
     VoutI,
     PegInData,
     CommitKeysI,
-    AddressDetails,
     Message,
     SigData,
     SbtcContractDataI,
@@ -74,15 +73,18 @@ import type {
     withdrawalPayloadType,
     depositPayloadType,
     KeySet,
-    WrappedPSBT
+    WrappedPSBT,
+    AddressObject,
+    AddressMempoolObject,
+    AddressHiroObject
 } from './types/sbtc_types.js'
+
 export type {
     PeginRequestI, 
     PeginScriptI,
     VoutI,
     PegInData,
     CommitKeysI,
-    AddressDetails,
     Message,
     SigData,
     SbtcContractDataI,
@@ -93,5 +95,8 @@ export type {
     withdrawalPayloadType,
     depositPayloadType,
     KeySet,
-    WrappedPSBT
+    WrappedPSBT,
+    AddressObject,
+    AddressMempoolObject,
+    AddressHiroObject
 }

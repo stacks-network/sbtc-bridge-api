@@ -6,11 +6,12 @@ import { principalCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
 import { getConfig } from './config.js';
 import { fetchPegTxData } from './bitcoin/rpc_transaction.js';
+import { fetchAddress } from './bitcoin/mempool_api.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
-import type { payloadType, SbtcContractDataI } from 'sbtc-bridge-lib';
+import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 
 const limit = 10;
 
@@ -204,6 +205,36 @@ export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> 
   } catch (err) {
     return { balance: 0 };
   }
+}
+
+export async function fetchUserBalances(addrs:AddressObject):Promise<AddressObject> {
+  try {
+    const url = getConfig().stacksApi + '/extended/v1/address/' + addrs.stxAddress + '/balances';
+    const response = await fetch(url);
+    const result:any = await response.json();
+    addrs.stacksTokenInfo = result;
+  } catch(err) {
+    console.log('fetchUserBalances: stacksTokenInfo: ', err)
+  }
+  try {
+    const sBtcBalance = await fetchUserSbtcBalance(addrs.stxAddress);
+    addrs.sBTCBalance = sBtcBalance.balance
+  } catch(err) {
+    console.log('fetchUserBalances: sBtcBalance: ', err)
+  }
+  try {
+    const address:AddressMempoolObject = await fetchAddress(addrs.cardinal);
+    addrs.cardinalInfo = address
+  } catch(err) {
+    console.log('fetchUserBalances: cardinalInfo: ', err)
+  }
+  try {
+    const address:AddressMempoolObject = await fetchAddress(addrs.ordinal);
+    addrs.ordinalInfo = address
+  } catch(err) {
+    console.log('fetchUserBalances: ordinalInfo: ', err)
+  }
+  return addrs;
 }
 
 async function callContractReadOnly(data:any) {
