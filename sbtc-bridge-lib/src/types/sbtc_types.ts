@@ -7,7 +7,9 @@ export type SigData = {
 }
 export type SbtcContractDataI = {
   coordinator?: { addr: { value: string }, key:string };
+  contractOwner: string;
   sbtcWalletAddress: string;
+  sbtcWalletPublicKey: string;
   numKeys?: number;
   numParties?: number;
   tradingHalted?: boolean;
@@ -54,6 +56,7 @@ export type PeginRequestI = {
   stacksAddress: string;
   sbtcWalletAddress: string;
   commitTxScript?: PeginScriptI;
+  vout0?: VoutI;
   vout?: VoutI;
 }
 export type RevealOrReclaim = {
@@ -100,15 +103,15 @@ export type CommitKeysI = {
 
 export type AddressObject = {
   stxAddress: string;
+  cardinal: string;
+  ordinal: string;
   sBTCBalance: number;
   stxBalance: number;
-  stacksTokenInfo: AddressHiroObject;
-  cardinal: string;
-  cardinalInfo: AddressMempoolObject;
-  ordinal: string;
-  ordinalInfo: AddressMempoolObject;
-  btcPubkeySegwit0: string;
-  btcPubkeySegwit1: string;
+  stacksTokenInfo?: AddressHiroObject;
+  cardinalInfo?: AddressMempoolObject;
+  ordinalInfo?: AddressMempoolObject;
+  btcPubkeySegwit0?: string;
+  btcPubkeySegwit1?: string;
 };
 
 export type AddressMempoolObject = {

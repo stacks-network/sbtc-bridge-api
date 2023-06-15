@@ -19,6 +19,30 @@ export async function fetchUtxoSet(address:string) {
 }
  */
 
+export async function fetchMainnetTipHeight() {
+  try {
+    const url = 'https://mempool.space/api/blocks/tip/height';
+    const response = await fetch(url);
+    const hex = await response.text();
+    return hex;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
+}
+export async function fetchTestnetTipHeight(txid:string) {
+  try {
+    //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true
+    //https://mempool.space/api/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521/hex
+    const url = 'https://mempool.space/testnet/api/blocks/tip/height';
+    const response = await fetch(url);
+    const hex = await response.text();
+    return hex;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
+}
 export async function fetchTransactionHex(txid:string) {
   try {
     //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true

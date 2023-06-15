@@ -147,7 +147,13 @@
 						"type": "number",
 						"format": "double"
 					},
+					"sbtcWalletPublicKey": {
+						"type": "string"
+					},
 					"sbtcWalletAddress": {
+						"type": "string"
+					},
+					"contractOwner": {
 						"type": "string"
 					},
 					"coordinator": {
@@ -175,7 +181,9 @@
 					}
 				},
 				"required": [
-					"sbtcWalletAddress"
+					"sbtcWalletPublicKey",
+					"sbtcWalletAddress",
+					"contractOwner"
 				],
 				"type": "object"
 			},

@@ -12,14 +12,15 @@ import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
 import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
+import * as btc from '@scure/btc-signer';
 
 const limit = 10;
 
 const noArgMethods = [
   'get-coordinator-data',
-  'get-bitcoin-wallet-address',
+  'get-bitcoin-wallet-public-key',
   'get-num-keys',
-  'get-num-parties',
+  'get-num-signers',
   'get-threshold',
   'get-trading-halted',
   'get-token-uri',
@@ -61,13 +62,23 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
     case 'get-coordinator-data':
       result.coordinator = response.value.value;
       break;
-    case 'get-bitcoin-wallet-address':
-      result.sbtcWalletAddress = response.value.value;
+    case 'get-bitcoin-wallet-public-key':
+      //console.log('get-bitcoin-wallet-public-key: response: ', response)
+      try {
+        const fullPK = response.value.value.split('x')[1];
+        // converting to x-only..
+        result.sbtcWalletPublicKey = fullPK.substring(2);
+        const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+        const trObj = btc.p2tr(result.sbtcWalletPublicKey, undefined, net);
+        if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
+      } catch(err) {
+        console.log('get-bitcoin-wallet-public-key: err: ', err)
+      }
       break;
     case 'get-num-keys':
       result.numKeys = current.value;
       break;
-    case 'get-num-parties':
+    case 'get-num-signers':
       result.numParties = current.value;
       break;
     case 'get-threshold':
@@ -162,13 +173,24 @@ export async function findSbtcEvents(offset:number):Promise<any> {
   return findSbtcEventsByFilter({});
 }
 
+export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {
+  try {
+    const url = getConfig().stacksApi + '/v2/data_var/' + contractAddress + '/' + contractName + '/' + dataVarName;
+    const response = await fetch(url);
+    const result:any = await response.json();
+    return result;
+  } catch(err) {
+    console.log('fetchUserBalances: stacksTokenInfo: ', err);
+  }
+}
+
 export async function fetchSbtcWalletAddress() {
   try {
     const contractId = getConfig().sbtcContractId;
     const data = {
       contractAddress: contractId!.split('.')[0],
       contractName: contractId!.split('.')[1],
-      functionName: 'get-bitcoin-wallet-address',
+      functionName: 'get-bitcoin-wallet-public-key',
       functionArgs: [],
       network: getConfig().network
     }
@@ -237,7 +259,7 @@ export async function fetchUserBalances(addrs:AddressObject):Promise<AddressObje
   return addrs;
 }
 
-async function callContractReadOnly(data:any) {
+export async function callContractReadOnly(data:any) {
   const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
   let val;
   try {

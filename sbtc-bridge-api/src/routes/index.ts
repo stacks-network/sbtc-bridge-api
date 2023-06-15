@@ -2,6 +2,7 @@ import express from "express";
 import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
+import { SignersController } from "../controllers/SignersRPCController.js";
 import type { PeginRequestI, WrappedPSBT, AddressObject } from 'sbtc-bridge-lib';
 
 const router = express.Router();
@@ -331,6 +332,18 @@ router.get("/bridge-api/:network/v1/sbtc/pegins/:_id", async (req, res, next) =>
   try {
     const controller = new DepositsController();
     const response = await controller.findPeginRequestById(req.params._id);
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
+router.get("/bridge-api/:network/v1/signers/pox-info", async (req, res, next) => {
+  try {
+    console.log('signers/pox-info')
+    const controller = new SignersController();
+    const response = await controller.fetchPoxInfo();
     return res.send(response);
   } catch (error) { 
     console.log('Error in routes: ', error)

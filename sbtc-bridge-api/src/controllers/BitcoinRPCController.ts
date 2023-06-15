@@ -54,7 +54,7 @@ export class TransactionController {
   }
   
   public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
-    console.log('sign: ', wrappedPsbt);
+    //console.log('sign: ', wrappedPsbt);
     const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId)
 
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
@@ -62,7 +62,7 @@ export class TransactionController {
     const transaction:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
 		const script = toStorable(pegin.commitTxScript)
     
-    console.log('sign: script: ', script);
+    //console.log('sign: script: ', script);
 
     if (pegin.status !== 2 || !pegin.btcTxid || !script) throw new Error('Incorrect status to be revealed / reclaimed')
     if (!pegin.commitTxScript) throw new Error('Incorrect data passed')
@@ -75,7 +75,7 @@ export class TransactionController {
     const commitAddressScript = btc.Address(net).decode(pegin.commitTxScript.address);
     if (commitAddressScript.type !== 'tr') throw new Error('Taproot required')
     
-    console.log('sign: commitAddressScript: ', commitAddressScript);
+    //console.log('sign: commitAddressScript: ', commitAddressScript);
 
     const commitTx = await fetchRawTx(pegin.btcTxid, true)
     const nextI:btc.TransactionInput = {
@@ -85,14 +85,14 @@ export class TransactionController {
       tapLeafScript: script.tapLeafScript,
       tapMerkleRoot: script.tapMerkleRoot as Uint8Array
     }
-    console.log('nextI: ', nextI);
+    //console.log('nextI: ', nextI);
     transaction.addInput(nextI);
 
     let outAddr = pegin.sbtcWalletAddress;
     if (wrappedPsbt.txtype === 'reclaim') outAddr = commitTx.vin[0]?.prevout?.scriptpubkey_address
 
     const fee = 500 //transaction.fee;
-    console.log('sign: fee: ', fee);
+    //console.log('sign: fee: ', fee);
     const amount = pegin.amount - fee;
     /**
     if (this.addressInfo.utxos.length === -1) { // never
@@ -104,27 +104,23 @@ export class TransactionController {
 
     try {
       if (wrappedPsbt.txtype === 'reclaim') {
-        console.log('sign: btcSchnorrReclaim: ', getConfig().btcSchnorrReclaim);
         transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
-        console.log('sign: btcSchnorrReclaim: signed');
         transaction.finalize();
-        console.log('sign: btcSchnorrReclaim: finalised');
       } else {
-        console.log('sign: btcSchnorrReveal: ', getConfig().btcSchnorrReveal);
         transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
-        console.log('sign: btcSchnorrReveal: signed');
+        //console.log('sign: btcSchnorrReveal: signed');
         transaction.finalize();
-        console.log('sign: btcSchnorrReveal: finalised');
+        //console.log('sign: btcSchnorrReveal: finalised');
       }
     } catch (err:any) {
       console.log('Error signing: ', err)
     }
     //const tx = btc.Transaction.fromRaw(hex.decode(wrappedPsbt.tx), { allowUnknowInput: true, allowUnknowOutput: true });
 		wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
-		console.log('b64: ', wrappedPsbt.signedPsbt)
+		//console.log('b64: ', wrappedPsbt.signedPsbt)
     const ttttt = btc.Transaction.fromPSBT(transaction.toPSBT());
     wrappedPsbt.signedTransaction = hex.encode(ttttt.toBytes());
-		console.log('hex: ', wrappedPsbt.signedTransaction)
+		//console.log('hex: ', wrappedPsbt.signedTransaction)
     return wrappedPsbt;
   }
   
@@ -151,11 +147,11 @@ export class TransactionController {
   public async sendRawTransaction(hex:string): Promise<any> {
       try {
         const resp = await sendRawTx(hex);
-        console.log('sendRawTransaction 1: ', resp);
+        //console.log('sendRawTransaction 1: ', resp);
         return resp;
       } catch (err) {
         const resp =  await sendRawTxRpc(hex);
-        console.log('sendRawTransaction 2: ', resp);
+        //console.log('sendRawTransaction 2: ', resp);
         return resp;
       }
   }

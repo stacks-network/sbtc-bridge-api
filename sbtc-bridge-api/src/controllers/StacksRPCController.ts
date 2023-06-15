@@ -1,10 +1,13 @@
 import { Get, Route } from "tsoa";
-import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
+import { fetchDataVar, indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
 import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
 import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
+import { getConfig } from '../lib/config.js';
+import { encodeStacksAddress } from '../lib/stacks_helper.js'
+import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 
 export interface BalanceI {
   balance: number;
@@ -81,12 +84,22 @@ export class SbtcWalletController {
       console.log(err)
     }
     try {
+      const contractId = getConfig().sbtcContractId;
+      const contractOwner = await fetchDataVar(contractId.split('.')[0], contractId.split('.')[1], 'contract-owner');
+      const result = cvToJSON(deserializeCV(contractOwner.data));
+      console.log(result)
+      sbtcContractData.contractOwner = result.value
+    } catch (err) {
+      console.log(err)
+    }
+    try {
       const bc = await getBlockCount();
       sbtcContractData.burnHeight = bc.count;
     } catch (err) {
       console.log(err)
       sbtcContractData.burnHeight = -1;
     }
+    console.log('sbtcContractData: ', sbtcContractData)
     return sbtcContractData;
   }
 

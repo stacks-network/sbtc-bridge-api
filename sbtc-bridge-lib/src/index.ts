@@ -100,3 +100,14 @@ export type {
     AddressMempoolObject,
     AddressHiroObject
 }
+import type {
+    PoxInfo,
+    StacksInfo,
+    BlockchainInfo
+} from './types/pox_types.js'
+
+export type {
+    PoxInfo,
+    StacksInfo,
+    BlockchainInfo
+}

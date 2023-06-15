@@ -59,7 +59,7 @@ export async function updatePeginRequest (pegger:any, changes: any) {
 		_id: pegger._id
 	}, 
     { $set: changes});
-	console.log('updatePeginRequest: ', result)
+	//console.log('updatePeginRequest: ', result)
 	return result;
 }
 
