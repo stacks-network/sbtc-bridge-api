@@ -128,12 +128,23 @@ router.get("/bridge-api/:network/v1/btc/tx/keys", async (req, res, next) => {
   }
 });
 
+router.get("/bridge-api/:network/v1/btc/tx/commitment/:stxAddress/:revealFee", async (req, res, next) => {
+  try {
+    const controller = new TransactionController();
+    const response = await controller.commitment(req.params.stxAddress, Number(req.params.revealFee));
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 router.post("/bridge-api/:network/v1/btc/tx/sign", async (req, res, next) => {
   try {
     const wrappedPsbt:WrappedPSBT = req.body;
     console.log('wrappedPsbt 0: ', req.body);
     const controller = new TransactionController();
-    const response = await controller.sign(wrappedPsbt);
+    const response = await controller.signAndBroadcast(wrappedPsbt);
     return res.send(response);
   } catch (error) { 
     console.log('Error in routes: ', error)
@@ -262,8 +273,21 @@ router.get("/bridge-api/:network/v1/sbtc/events/:page", async (req, res, next) =
 
 router.get("/bridge-api/:network/v1/sbtc/data", async (req, res, next) => {
   try {
-    const controller = new SbtcWalletController();
-    const response = await controller.fetchSbtcContractData();
+    const controller1 = new SbtcWalletController();
+    const sbtcContractData = await controller1.fetchSbtcContractData();
+    const controller2 = new TransactionController();
+    const keys = await controller2.getKeys();
+    const controller3 = new WalletController();
+    const sbtcWalletAddressInfo = await controller3.fetchUtxoSet(sbtcContractData.sbtcWalletAddress, true);
+    const controller = new BlocksController();
+    const btcFeeRates = await controller.getFeeEstimate();
+
+    const response = {
+      keys,
+      sbtcContractData,
+      sbtcWalletAddressInfo,
+      btcFeeRates
+    }
     return res.send(response);
   } catch (error) { 
     console.log('Error in routes: ', error)
@@ -310,6 +334,19 @@ router.post("/bridge-api/:network/v1/sbtc/pegins", async (req, res, next) => {
     const peginRequest:PeginRequestI = req.body;
     const controller = new DepositsController();
     const response = await controller.savePeginCommit(peginRequest);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
+router.put("/bridge-api/:network/v1/sbtc/pegins", async (req, res, next) => {
+  try {
+    console.log('/sbtc/pegins', req.body);
+    const peginRequest:PeginRequestI = req.body;
+    const controller = new DepositsController();
+    const response = await controller.updatePeginCommit(peginRequest);
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)

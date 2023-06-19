@@ -1,0 +1,105 @@
+@font-face {
+	font-family: 'Circular Std';
+	src:
+		local('CircularStd'),
+		url('/fonts/CircularStd-Light.woff') format('woff'),
+		url('/fonts/CircularStd-Light.woff2') format('woff2');
+	font-weight: 200;
+	font-display: swap;
+}
+  
+@font-face {
+	font-family: 'Circular Std';
+	src:
+		local('CircularStd'),
+		url('/fonts/CircularStd-Medium.woff') format('woff'),
+		url('/fonts/CircularStd-Medium.woff2') format('woff2');
+	font-weight: normal;
+	font-display: swap;
+}
+  
+@font-face {
+	font-family: 'Circular Std';
+	src:
+		local('CircularStd'),
+		url('/fonts/CircularStd-Black.woff') format('woff'),
+		url('/fonts/CircularStd-Black.woff2') format('woff2');
+	font-weight: 700;
+	font-display: swap;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.background {
+    background-image: url("$lib/assets/bg-lines.png");
+    background-size: cover;
+}
+.background-chev-up {
+    background-image: url("$lib/assets/box-w-chev.png");
+	background-repeat: no-repeat;
+	background-position: 50%;
+    background-size: 15rem;
+}
+.background-chev-down {
+    background-image: url("$lib/assets/box-d-chev.png");
+	background-repeat: no-repeat;
+	background-position: 50%;
+    background-size: 15rem;
+}
+.bg-gradient {
+	background: linear-gradient(306.12deg, #ED693C 21.1%, #FDC60B 84.08%);
+	/* Primary/600 */
+	border: 1px solid #DA6137;
+	border-radius: 12px;
+}
+
+.text-gradient {
+	white-space: nowrap;
+	font-style: normal;
+	font-weight: 900;
+	font-size: 18px;
+	line-height: 18px;
+	letter-spacing: -1px;
+	background: linear-gradient(306.12deg, #ED693C 21.1%, #FDC60B 84.08%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+.menu-btn-account {
+	background: linear-gradient(306.12deg, #ED693C 21.1%, #FDC60B 84.08%);
+	border: 1px solid #DA6137;
+  }
+  
+.menu-btn-text-account {
+	font-family: 'Circular Std';
+	font-style: normal;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 20px;
+	letter-spacing: -0.02em;
+	color: #000000;
+  }
+  .menu-btn-settings {
+	background: #000000;
+	border: 1px solid #FEDB63;
+  }
+  .menu-btn-text-settings {
+	background: linear-gradient(126.12deg, #ED693C 11.8%, #FEDB63 72.43%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	font-size: 14px;
+	line-height: 20px;
+	letter-spacing: -0.02em;
+  }
+  .menu-btn-text-connect {
+	color: #000000;
+  }
+  .menu-btn-connect {
+	background: linear-gradient(306.12deg, #ED693C 21.1%, #FDC60B 84.08%);
+	border: 1px solid #DA6137;
+	border-radius: 12px;
+  }
+  

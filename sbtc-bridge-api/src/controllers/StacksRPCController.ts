@@ -3,10 +3,9 @@ import { fetchDataVar, indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, save
 import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
-import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
+import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
 import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
 import { getConfig } from '../lib/config.js';
-import { encodeStacksAddress } from '../lib/stacks_helper.js'
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 
 export interface BalanceI {
@@ -34,6 +33,21 @@ export class DepositsController {
   public async savePeginCommit(peginRequest:PeginRequestI): Promise<any> {
     const result = await savePeginCommit(peginRequest);
     return result;
+  }
+
+  public async updatePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+    const p = await findPeginRequestById(peginRequest._id);
+    if (p && p.status === 1) {
+      const up = {
+        amount: peginRequest.amount
+      }
+      const newP = await updatePeginRequest(peginRequest, up);
+      console.log('updatePeginCommit: ', newP);
+      return newP;
+    } else {
+      console.log('updatePeginCommit: error: ', p);
+      return { status: 404 };
+    }
   }
 
   @Get("/scan")

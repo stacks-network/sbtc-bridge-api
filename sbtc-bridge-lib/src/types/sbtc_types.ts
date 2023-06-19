@@ -201,10 +201,16 @@ export type KeySet = {
     reclaimPubKey: string;
   }
 }
+export type StxSignature = {
+  signature: string;
+  publicKey: string;
+  message: string;
+};
 export type WrappedPSBT = {
   depositId: string;
   txtype: string;
   broadcastResult?: any;
   signedTransaction?: string;
   signedPsbt?: string;
+  stxSignature?: StxSignature;
 }

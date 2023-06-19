@@ -102,7 +102,7 @@ async function inspecTx(tx:any, peginRequest:PeginRequestI) {
       // reclaim path spent
       const up = {
         tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
-        status: 3,
+        status: 4,
         reveal: {
           btcTxid: tx.txid,
           vout: vout

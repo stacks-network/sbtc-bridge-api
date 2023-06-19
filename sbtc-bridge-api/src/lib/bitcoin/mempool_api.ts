@@ -112,9 +112,9 @@ export async function readTx(txid:string) {
   throw new Error(error);
 }
 
-export async function sendRawTx(hex:string) {
+export async function sendRawTxDirectMempool(hex:string) {
   const url = getConfig().mempoolUrl + '/tx';
-  //console.log('sendRawTx:mempoolUrl: ', url)
+  console.log('sendRawTxDirectMempool: ', url)
   const response = await fetch(url, {
     method: 'POST',
     //headers: { 'Content-Type': 'application/json' },

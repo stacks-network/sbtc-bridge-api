@@ -74,6 +74,7 @@ import type {
     depositPayloadType,
     KeySet,
     WrappedPSBT,
+    StxSignature,
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject
@@ -96,6 +97,7 @@ export type {
     depositPayloadType,
     KeySet,
     WrappedPSBT,
+    StxSignature,
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject

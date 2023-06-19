@@ -242,7 +242,7 @@ export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:
 		// works for Hiro sig but not unit test sig ?
 		const sigM = recoverSignature({ signature: signature, mode: 'rsv' }); // vrs to rsv
 		let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
-		sig = sig.addRecoveryBit(1);
+		sig = sig.addRecoveryBit(compression); // sometime 0 sometiimes 1 ??
 		const pubkeyM = sig.recoverPublicKey(messageHash);
 		pubkey = hex.decode(pubkeyM.toHex());
 	} catch (err) {
