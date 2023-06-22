@@ -78,8 +78,9 @@ export async function fetchAddress(address:string):Promise<AddressMempoolObject>
   return result;
 }
 
-export async function fetchAddressTransactions(address:string) {
-  const url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+export async function fetchAddressTransactions(address:string, lastId?:string) {
+  let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+  if (lastId) url += '/' + lastId
   const response = await fetch(url);
   //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
   const result = await response.json();

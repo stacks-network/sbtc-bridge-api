@@ -1,6 +1,10 @@
-import { fetchAddressTransactions } from './mempool_api.js';
+import { fetchAddressTransactions, fetchUTXOs } from './mempool_api.js';
 import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
-import type { PeginRequestI } from 'sbtc-bridge-lib' 
+import type { PeginRequestI, PeginScriptI } from 'sbtc-bridge-lib'
+import * as btc from '@scure/btc-signer';
+import { buildDepositPayload } from 'sbtc-bridge-lib' 
+import { getConfig } from '../config.js';
+import { hex } from '@scure/base';
 
 export async function savePeginCommit(peginRequest:PeginRequestI) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;
@@ -30,11 +34,9 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
           vout: vout
         }
         await updatePeginRequest(peginRequest, up);
-        //console.log('scanPeginCommitTransactions: changes: ', up);
         matchCount++;
     } else {
         await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
-        //console.log('scanPeginCommitTransactions: saveNewPeginRequest: ', peginRequest);
       }
     }
   }
@@ -112,7 +114,6 @@ async function inspecTx(tx:any, peginRequest:PeginRequestI) {
       //console.log('matchRevealOrReclaimIn: changes: ', up);
     } else {
       await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
-      //console.log('matchRevealOrReclaimIn: saveNewPeginRequest: ', peginRequest);
     }
   }
   return matchedTx;
@@ -174,4 +175,84 @@ export async function scanPeginRRTransactions() {
     console.log('scanPeginRRTransactions: requests: ', err)
   }
 	return { matched: matchCount };
+}
+
+export async function scanCommitments(btcAddress:string, stxAddress:string, sbtcWalletAddress:string, revealFee:number, commitment:PeginScriptI) {
+  console.log('scanCommitments: Scanning commits: ')
+  let txs:Array<any> = await fetchAddressTransactions(btcAddress);
+  if (!txs || txs.length === 0) return
+  console.log('fixCommitments: ' + txs.length + ' from ' + btcAddress);
+  let matchCount = 0;
+  console.log('fixCommitments: txs.length: ' + txs.length);
+  const foundTx = [];
+  do {
+    for (const tx of txs) {
+      if (tx.txid === '22304ae9f83e68a9db4eb05d2a43861a12647ba8d0261402f0bf8bb2c5fd2b3d') console.log('fixCommitments: tx: ', tx);
+      //console.log('fixCommitments: tx: ' + tx.txid);
+      if (tx.vout && tx.vout[0]) {
+        if (tx.vout[0].scriptpubkey_type === 'op_return') {
+          console.log('scanCommitments: return: tx: ' + tx.txid + ' is ' + tx.vout[0].scriptpubkey_type + ' value = ' + tx.vout[1].value + ' sats');
+        } else {
+          if (tx.vout[0].scriptpubkey_type === 'v1_p2tr') {
+            if (isUnspent(tx.vout[0].scriptpubkey_address, tx.txid)) {
+              //if (pegins) {
+              //  for (const pegin of pegins) {
+              //    console.log('pegin: ' + pegin._id + ' value ' + pegin.amount + ' vout value = ' + tx.vout[0].value);
+              //  }
+              //}
+              const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+              const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
+              const peginRequest:PeginRequestI = {
+                btcTxid: tx.txid,
+                commitTxScript: commitment,
+                originator: stxAddress,
+                amount: tx.vout[0].value,
+                status: 2,
+                mode: 'op_drop',
+                requestType: 'deposit',
+                fromBtcAddress: btcAddress,
+                stacksAddress: hex.encode(data),
+                sbtcWalletAddress,
+                vout: tx.vout[0]
+              }
+              const pegins = await findPeginRequestsByFilter({ status:2, fromBtcAddress: btcAddress, amount: tx.vout[0].value, originator: stxAddress, mode: 'op_drop', })
+              console.log('pegin  pegins.length: ' + pegins.length);
+              if (!pegins || pegins.length === 0) {
+                try {
+                  if (peginRequest.commitTxScript.address !== peginRequest.vout.scriptpubkey_address) {
+                    throw new Error('Commitment data does not match the payment - probably an old version of the wire format... skipping entry.')
+                  }
+                  // avoid overwriting the data for now..
+                  //const saveP = await saveNewPeginRequest(peginRequest);
+                  foundTx.push(peginRequest);
+                } catch(err) {
+                  console.log(err.message)
+                }
+              }
+              console.log('scanCommitments: drop: tx: ' + tx.txid + ' is ' + tx.vout[0].scriptpubkey_type + ' value = ' + tx.vout[0].value + ' sats' + ' scriptpubkey_address = ' + tx.vout[0].scriptpubkey_address + ' commit address: ' + peginRequest.commitTxScript.address);
+            }
+          }
+        }
+      }
+      matchCount++;
+    }
+    try {
+      txs = await fetchAddressTransactions(btcAddress, getLastSeenTxId(txs));
+    } catch(err) {
+      txs = undefined;
+    }
+  } while (txs && txs.length === 50);
+
+  return foundTx;
+}
+
+function getLastSeenTxId (txs:Array<any>):string {
+  const lastTx = txs[txs.length - 1]
+  return lastTx.txid;
+}
+
+async function isUnspent (address:string, txid:string):Promise<boolean> {
+  const utxos = await fetchUTXOs(address)
+  if (!utxos || utxos.length === 0) return false
+  return utxos.find((o) => o.txid === txid);
 }

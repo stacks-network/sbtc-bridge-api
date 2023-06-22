@@ -229,34 +229,38 @@ export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> 
   }
 }
 
-export async function fetchUserBalances(addrs:AddressObject):Promise<AddressObject> {
+export async function fetchUserBalances(stxAddress:string, cardinal:string, ordinal:string):Promise<AddressObject> {
+  const userBalances:AddressObject = {} as AddressObject;
+  userBalances.stxAddress = stxAddress;
+  userBalances.cardinal = cardinal;
+  userBalances.ordinal = ordinal;
   try {
-    const url = getConfig().stacksApi + '/extended/v1/address/' + addrs.stxAddress + '/balances';
+    const url = getConfig().stacksApi + '/extended/v1/address/' + userBalances.stxAddress + '/balances';
     const response = await fetch(url);
     const result:any = await response.json();
-    addrs.stacksTokenInfo = result;
+    userBalances.stacksTokenInfo = result;
   } catch(err) {
     console.log('fetchUserBalances: stacksTokenInfo: ', err)
   }
   try {
-    const sBtcBalance = await fetchUserSbtcBalance(addrs.stxAddress);
-    addrs.sBTCBalance = sBtcBalance.balance
+    const sBtcBalance = await fetchUserSbtcBalance(userBalances.stxAddress);
+    userBalances.sBTCBalance = sBtcBalance.balance
   } catch(err) {
     console.log('fetchUserBalances: sBtcBalance: ', err)
   }
   try {
-    const address:AddressMempoolObject = await fetchAddress(addrs.cardinal);
-    addrs.cardinalInfo = address
+    const address:AddressMempoolObject = await fetchAddress(userBalances.cardinal);
+    userBalances.cardinalInfo = address
   } catch(err) {
     console.log('fetchUserBalances: cardinalInfo: ', err)
   }
   try {
-    const address:AddressMempoolObject = await fetchAddress(addrs.ordinal);
-    addrs.ordinalInfo = address
+    const address:AddressMempoolObject = await fetchAddress(userBalances.ordinal);
+    userBalances.ordinalInfo = address
   } catch(err) {
     console.log('fetchUserBalances: ordinalInfo: ', err)
   }
-  return addrs;
+  return userBalances;
 }
 
 export async function callContractReadOnly(data:any) {

@@ -10,9 +10,9 @@ import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
 import { schnorr } from '@noble/curves/secp256k1';
 import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
-import type { KeySet, WrappedPSBT, PeginRequestI, PeginScriptI } from 'sbtc-bridge-lib'
+import type { KeySet, WrappedPSBT, PeginRequestI, PeginScriptI, withdrawalPayloadType, depositPayloadType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { toStorable, getStacksAddressFromSignature, buildDepositPayload } from 'sbtc-bridge-lib' 
+import { toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updatePeginRequest } from '../lib/data/db_models.js';
@@ -214,6 +214,28 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
 		]
 		const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
 		return toStorable(script)
+  }
+  
+  public commitDepositData(stacksAddress:string, revealFee:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildDepositPayload(net, revealFee, stacksAddress, true, undefined);
+		return hex.encode(data);
+  }
+  
+  public commitWithdrawalData(signature:string, amount:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
+		return hex.encode(data);
+  }
+  
+  public commitWithdrawal(data:string, sbtcWallet:string, compression:number): withdrawalPayloadType {
+    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet, compression);
+		return payload;
+  }
+  
+  public commitDeposit(data:string): depositPayloadType {
+    const payload = parseDepositPayload(hex.decode(data), 0);
+		return payload;
   }
   
   @Get("/:txid")

@@ -1,12 +1,13 @@
 import { Get, Route } from "tsoa";
 import { fetchDataVar, indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
+import { scanCommitments, savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
 import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
 import { getConfig } from '../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
+import { TransactionController } from "../controllers/BitcoinRPCController.js";
 
 export interface BalanceI {
   balance: number;
@@ -55,6 +56,14 @@ export class DepositsController {
     await scanPeginRRTransactions();
     return await scanPeginCommitTransactions();
   }
+
+  @Get("/commits/scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee")
+  public async scanCommitments(btcAddress:string,stxAddress:string, sbtcWalletAddress:string, revealFee:number): Promise<any> {
+    const controller = new TransactionController();
+    const commitment = await controller.commitment(stxAddress, Number(revealFee));
+
+    return await scanCommitments(btcAddress, stxAddress, sbtcWalletAddress, revealFee, commitment);
+  }
 }
 
 
@@ -85,8 +94,8 @@ export class SbtcWalletController {
     return await fetchUserSbtcBalance(address);
   }
 
-  public async fetchUserBalances(addresses:AddressObject): Promise<AddressObject> {
-    return await fetchUserBalances(addresses);
+  public async fetchUserBalances(stxAddress:string, cardinal:string, ordinal:string): Promise<AddressObject> {
+    return await fetchUserBalances(stxAddress, cardinal, ordinal);
   }
 
   @Get("/data")

@@ -400,6 +400,57 @@
 				"parameters": []
 			}
 		},
+		"/bridge-api/{network}/v1/sbtc/pegins/commits/scan/{btcAddress}/{stxAddress}/{sbtcWalletAddress}/{revealFee}": {
+			"get": {
+				"operationId": "ScanCommitments",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "btcAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "sbtcWalletAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "revealFee",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/bridge-api/{network}/v1/sbtc/events/save": {
 			"get": {
 				"operationId": "SaveAllSbtcEvents",
