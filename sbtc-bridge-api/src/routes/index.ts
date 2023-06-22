@@ -155,7 +155,7 @@ router.get("/bridge-api/:network/v1/btc/tx/commit-withdrawal/:data/:sbtcWallet/:
     const controller = new TransactionController();
     const response = await controller.commitWithdrawal(req.params.data, req.params.sbtcWallet, Number(req.params.compression));
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -166,7 +166,7 @@ router.get("/bridge-api/:network/v1/btc/tx/commit-deposit/:data", async (req, re
     const controller = new TransactionController();
     const response = await controller.commitDeposit(req.params.data);
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -190,7 +190,7 @@ router.post("/bridge-api/:network/v1/btc/tx/sign", async (req, res, next) => {
     const controller = new TransactionController();
     const response = await controller.signAndBroadcast(wrappedPsbt);
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
