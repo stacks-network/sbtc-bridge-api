@@ -29,6 +29,170 @@
 				],
 				"type": "object"
 			},
+			"Uint8Array": {
+				"description": "A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the\r\nrequested number of bytes could not be allocated an exception is raised.",
+				"properties": {},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PeginScriptI": {
+				"properties": {
+					"tweakedPubkey": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"tapMerkleRoot": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"tapLeafScript": {},
+					"tapInternalKey": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"leaves": {},
+					"wsh": {
+						"type": "string"
+					},
+					"witnessScript": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"redeemScript": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"paymentType": {
+						"type": "string"
+					},
+					"script": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/Uint8Array"
+							}
+						]
+					},
+					"address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"paymentType"
+				],
+				"type": "object"
+			},
+			"depositPayloadType": {
+				"properties": {
+					"amountSats": {
+						"type": "number",
+						"format": "double"
+					},
+					"revealFee": {
+						"type": "number",
+						"format": "double"
+					},
+					"memo": {
+						"type": "string"
+					},
+					"lengthOfMemo": {
+						"type": "number",
+						"format": "double"
+					},
+					"cname": {
+						"type": "string"
+					},
+					"lengthOfCname": {
+						"type": "number",
+						"format": "double"
+					},
+					"stacksAddress": {
+						"type": "string"
+					},
+					"prinType": {
+						"type": "number",
+						"format": "double"
+					},
+					"opcode": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"amountSats",
+					"revealFee",
+					"lengthOfMemo",
+					"lengthOfCname",
+					"stacksAddress",
+					"prinType",
+					"opcode"
+				],
+				"type": "object"
+			},
+			"withdrawalPayloadType": {
+				"properties": {
+					"dustAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"amountSats": {
+						"type": "number",
+						"format": "double"
+					},
+					"compression": {
+						"type": "number",
+						"format": "double"
+					},
+					"signature": {
+						"type": "string"
+					},
+					"stacksAddress": {
+						"type": "string"
+					},
+					"opcode": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"amountSats",
+					"compression",
+					"signature",
+					"stacksAddress",
+					"opcode"
+				],
+				"type": "object"
+			},
 			"FeeEstimateResponse": {
 				"properties": {
 					"feeInfo": {
@@ -235,6 +399,190 @@
 				"parameters": []
 			}
 		},
+		"/bridge-api/{network}/v1/btc/tx/commitment/{stxAddress}/{revealFee}": {
+			"get": {
+				"operationId": "Commitment",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PeginScriptI"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "revealFee",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/tx/commit-deposit-data/{stxAddress}/{revealFee}": {
+			"get": {
+				"operationId": "CommitDepositData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "revealFee",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/tx/commit-deposit/{data}": {
+			"get": {
+				"operationId": "CommitDeposit",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/depositPayloadType"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "data",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/tx/commit-withdrawal-data/{signature}/{amount}": {
+			"get": {
+				"operationId": "CommitWithdrawalData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "signature",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/tx/commit-withdrawal/{data}/{sbtcWallet}/{compression}": {
+			"get": {
+				"operationId": "CommitWithdrawal",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/withdrawalPayloadType"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "data",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "sbtcWallet",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "compression",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
 		"/bridge-api/{network}/v1/btc/tx/{txid}": {
 			"get": {
 				"operationId": "FetchRawTransaction",
@@ -279,6 +627,32 @@
 					{
 						"in": "path",
 						"name": "txid",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/wallet/address/{address}/txs": {
+			"get": {
+				"operationId": "FetchAddressTransactions",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "address",
 						"required": true,
 						"schema": {
 							"type": "string"

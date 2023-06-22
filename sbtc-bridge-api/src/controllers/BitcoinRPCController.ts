@@ -1,4 +1,4 @@
-import { Get, Route } from "tsoa";
+import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
@@ -202,12 +202,13 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     return wrappedPsbt;
   } 
   
-  public async commitment(stacksAddress:string, revealFee:number): Promise<PeginScriptI> {
+  @Get("/commitment/:stxAddress/:revealFee")
+  public async commitment(stxAddress:string, revealFee:number): Promise<PeginScriptI> {
     const keys = this.getKeys();
 		console.log('reclaimAddr.pubkey: ' + keys.deposits.reclaimPubKey)
 		console.log('revealAddr.pubkey: ' + keys.deposits.revealPubKey)
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildDepositPayload(net, revealFee, stacksAddress, true, undefined);
+    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
 		const scripts =  [
 			{ script: btc.Script.encode([data, 'DROP', hex.decode(keys.deposits.revealPubKey), 'CHECKSIG']) },
 			{ script: btc.Script.encode([hex.decode(keys.deposits.reclaimPubKey), 'CHECKSIG']) }
@@ -216,25 +217,29 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
 		return toStorable(script)
   }
   
-  public commitDepositData(stacksAddress:string, revealFee:number): string {
+  @Get("/commit-deposit-data/:stxAddress/:revealFee")
+  public commitDepositData(stxAddress:string, revealFee:number): string {
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildDepositPayload(net, revealFee, stacksAddress, true, undefined);
+    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
 		return hex.encode(data);
   }
   
+  @Get("/commit-deposit/:data")
+  public commitDeposit(data:string): depositPayloadType {
+    const payload = parseDepositPayload(hex.decode(data), 0);
+		return payload;
+  }
+  
+  @Get("/commit-withdrawal-data/:signature/:amount")
   public commitWithdrawalData(signature:string, amount:number): string {
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
     const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
 		return hex.encode(data);
   }
   
+  @Get("/commit-withdrawal/:data/:sbtcWallet/:compression")
   public commitWithdrawal(data:string, sbtcWallet:string, compression:number): withdrawalPayloadType {
     const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet, compression);
-		return payload;
-  }
-  
-  public commitDeposit(data:string): depositPayloadType {
-    const payload = parseDepositPayload(hex.decode(data), 0);
 		return payload;
   }
   
@@ -276,16 +281,19 @@ export class WalletController {
     return result;
   }
 
+  //@Post("/walletprocesspsbt")
   public async processPsbt(psbtHex:string): Promise<any> {
     const result = await walletProcessPsbt(psbtHex);
     return result;
   }
 
+  @Get("/address/:address/txs")
   public async fetchAddressTransactions(address:string): Promise<any> {
     const result = await fetchAddressTransactions(address);
     return result;
   }
 
+  //@Get("/address/:address/utxos?verbose=true")
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     const result = await getAddressInfo(address);
     try {
