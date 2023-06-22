@@ -1,5 +1,6 @@
 import { getConfig } from '../config.js';
 import fetch from 'node-fetch';
+import type { AddressMempoolObject } from 'sbtc-bridge-lib';
 
 /**
 export async function fetchUtxoSet(address:string) {
@@ -18,6 +19,30 @@ export async function fetchUtxoSet(address:string) {
 }
  */
 
+export async function fetchMainnetTipHeight() {
+  try {
+    const url = 'https://mempool.space/api/blocks/tip/height';
+    const response = await fetch(url);
+    const hex = await response.text();
+    return hex;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
+}
+export async function fetchTestnetTipHeight(txid:string) {
+  try {
+    //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true
+    //https://mempool.space/api/tx/15e10745f15593a899cef391191bdd3d7c12412cc4696b7bcb669d0feadc8521/hex
+    const url = 'https://mempool.space/testnet/api/blocks/tip/height';
+    const response = await fetch(url);
+    const hex = await response.text();
+    return hex;
+  } catch(err) {
+    console.log(err)
+    return;
+  }
+}
 export async function fetchTransactionHex(txid:string) {
   try {
     //https://api.blockcypher.com/v1/btc/test3/txs/<txID here>?includeHex=true
@@ -45,8 +70,17 @@ export async function fetchTransaction(txid:string) {
   }
 }
 
-export async function fetchAddressTransactions(address:string) {
-  const url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+export async function fetchAddress(address:string):Promise<AddressMempoolObject> {
+  const url = getConfig().mempoolUrl + '/address/' + address;
+  const response = await fetch(url);
+  //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
+  const result = await response.json();
+  return result;
+}
+
+export async function fetchAddressTransactions(address:string, lastId?:string) {
+  let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+  if (lastId) url += '/' + lastId
   const response = await fetch(url);
   //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
   const result = await response.json();
@@ -79,9 +113,9 @@ export async function readTx(txid:string) {
   throw new Error(error);
 }
 
-export async function sendRawTx(hex:string) {
+export async function sendRawTxDirectMempool(hex:string) {
   const url = getConfig().mempoolUrl + '/tx';
-  //console.log('sendRawTx:mempoolUrl: ', url)
+  console.log('sendRawTxDirectMempool: ', url)
   const response = await fetch(url, {
     method: 'POST',
     //headers: { 'Content-Type': 'application/json' },

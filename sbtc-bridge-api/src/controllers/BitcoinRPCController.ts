@@ -2,17 +2,20 @@ import { Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs, sendRawTx, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
-import { fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
+import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
+import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { findPeginRequestById } from "../lib/data/db_models.js";
 import { getConfig } from '../lib/config.js';
 import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
 import { schnorr } from '@noble/curves/secp256k1';
 import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
-import type { KeySet, WrappedPSBT, PeginRequestI } from 'sbtc-bridge-lib'
+import type { KeySet, WrappedPSBT, PeginRequestI, PeginScriptI, withdrawalPayloadType, depositPayloadType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { toStorable } from 'sbtc-bridge-lib' 
+import { toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
+import { verifyMessageSignatureRsv } from '@stacks/encryption';
+import { hashMessage } from '@stacks/encryption';
+import { updatePeginRequest } from '../lib/data/db_models.js';
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -51,32 +54,58 @@ export class TransactionController {
         reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim))
       }
     }
-  }
+}
   
-  public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
+public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
+    if (!wrappedPsbt?.stxSignature || !wrappedPsbt?.stxSignature.message) {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'No signature data found.' }
+      return wrappedPsbt;
+    }
+    const verified = verifyMessageSignatureRsv({
+      message:wrappedPsbt.stxSignature.message, 
+      publicKey: wrappedPsbt.stxSignature.publicKey,
+      signature: wrappedPsbt.stxSignature.signature 
+    });
+    if (!verified) {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'Invalid signature.' }
+      return wrappedPsbt;
+    }
+    const msgHash = hashMessage(wrappedPsbt.stxSignature.message);
+    const stxAddresses = await getStacksAddressFromSignature(msgHash, wrappedPsbt.stxSignature.signature, 0);
+    const stacksAddress = (getConfig().network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
+  
     console.log('sign: ', wrappedPsbt);
-    const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId)
-
+    console.log('sign: stxAddresses: ', stxAddresses);
+    const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId);
+  
+    if (pegin.originator !== stacksAddress) {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'Stgacks address of signer is different to the deposit originator: ' + pegin.originator + ' p2pkh address recovered: ' + stacksAddress };
+      return wrappedPsbt;
+    }
+  
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-
+  
     const transaction:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
-		const script = toStorable(pegin.commitTxScript)
+    const script = toStorable(pegin.commitTxScript)
     
-    console.log('sign: script: ', script);
-
-    if (pegin.status !== 2 || !pegin.btcTxid || !script) throw new Error('Incorrect status to be revealed / reclaimed')
-    if (!pegin.commitTxScript) throw new Error('Incorrect data passed')
-    if (!pegin.commitTxScript.address) throw new Error('Incorrect data passed')
-    if (!script.tapMerkleRoot) throw new Error('Incorrect data passed')
-    if (!script.tapInternalKey) throw new Error('Incorrect data passed')
-
+    console.log('sign: btcTxid: ', pegin.btcTxid);
+  
+    if (pegin.status !== 2 || !pegin.btcTxid || !script)  {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'Incorrect status to be revealed / reclaimed' }
+      return wrappedPsbt;
+    }
+    if (!pegin.commitTxScript || !pegin.commitTxScript.address || !script.tapMerkleRoot || !script.tapInternalKey)  {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'Incorrect data passed' }
+      return wrappedPsbt;
+    }
+  
     const sbtcWalletAddrScript = btc.Address(net).decode(pegin.sbtcWalletAddress)
     if (sbtcWalletAddrScript.type !== 'tr') throw new Error('Taproot required')
     const commitAddressScript = btc.Address(net).decode(pegin.commitTxScript.address);
     if (commitAddressScript.type !== 'tr') throw new Error('Taproot required')
     
-    console.log('sign: commitAddressScript: ', commitAddressScript);
-
+    //console.log('sign: commitAddressScript: ', commitAddressScript);
+  
     const commitTx = await fetchRawTx(pegin.btcTxid, true)
     const nextI:btc.TransactionInput = {
       txid: hex.decode(pegin.btcTxid),
@@ -85,62 +114,134 @@ export class TransactionController {
       tapLeafScript: script.tapLeafScript,
       tapMerkleRoot: script.tapMerkleRoot as Uint8Array
     }
-    console.log('nextI: ', nextI);
+    //console.log('nextI: ', nextI);
     transaction.addInput(nextI);
-
+  
     let outAddr = pegin.sbtcWalletAddress;
     if (wrappedPsbt.txtype === 'reclaim') outAddr = commitTx.vin[0]?.prevout?.scriptpubkey_address
-
-    const fee = 500 //transaction.fee;
-    console.log('sign: fee: ', fee);
-    const amount = pegin.amount - fee;
+  
+    const fee = 4000 //transaction.fee;
+    //console.log('sign: fee: ', fee);
+    if (!pegin.vout) throw new Error('no vout??')
+    const amount = pegin.vout.value - fee;
+    console.log('pegin.vout.value: ', pegin.vout.value);
+    console.log('fee: ', fee);
+    console.log('wrappedPsbt.txtype: ', wrappedPsbt.txtype);
     /**
     if (this.addressInfo.utxos.length === -1) { // never
       const feeUtxo = this.addInputForFee(tx);
       amount = pegin.amount + feeUtxo?.value - this.fee;
     }
     */
-    transaction.addOutputAddress(outAddr, BigInt(amount), net);
-
+    
+    transaction.addOutputAddress(pegin.fromBtcAddress, BigInt(amount), net);
+  
     try {
       if (wrappedPsbt.txtype === 'reclaim') {
-        console.log('sign: btcSchnorrReclaim: ', getConfig().btcSchnorrReclaim);
+
         transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
-        console.log('sign: btcSchnorrReclaim: signed');
-        transaction.finalize();
-        console.log('sign: btcSchnorrReclaim: finalised');
       } else {
-        console.log('sign: btcSchnorrReveal: ', getConfig().btcSchnorrReveal);
         transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
-        console.log('sign: btcSchnorrReveal: signed');
-        transaction.finalize();
-        console.log('sign: btcSchnorrReveal: finalised');
       }
+      console.log('sign: signed');
+      transaction.finalize();
     } catch (err:any) {
       console.log('Error signing: ', err)
+      wrappedPsbt.broadcastResult = { failed: true, reason: err.message }
+      return wrappedPsbt;      
     }
     //const tx = btc.Transaction.fromRaw(hex.decode(wrappedPsbt.tx), { allowUnknowInput: true, allowUnknowOutput: true });
-		wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
-		console.log('b64: ', wrappedPsbt.signedPsbt)
+    wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
+    //console.log('b64: ', wrappedPsbt.signedPsbt)
     const ttttt = btc.Transaction.fromPSBT(transaction.toPSBT());
     wrappedPsbt.signedTransaction = hex.encode(ttttt.toBytes());
-		console.log('hex: ', wrappedPsbt.signedTransaction)
+    //console.log('hex: ', wrappedPsbt.signedTransaction)
     return wrappedPsbt;
   }
   
   public async signAndBroadcast(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     wrappedPsbt = await this.sign(wrappedPsbt);
+    if (wrappedPsbt.broadcastResult && wrappedPsbt.broadcastResult.failed) {
+      return wrappedPsbt;
+    }
     const signedTx = wrappedPsbt.signedTransaction;
-    console.log('signAndBroadcast: ', signedTx);
-    wrappedPsbt.broadcastResult = await this.sendRawTransaction(signedTx)
+    try {
+      const result = await this.sendRawTransaction(signedTx);
+      console.log(result)
+      wrappedPsbt.broadcastResult = result;
+      const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId);
+      let upd = undefined;
+      if (wrappedPsbt.txtype === 'reclaim') {
+        if (wrappedPsbt.broadcastResult.tx) {
+          upd = {
+            status: 3,
+            reclaim: {
+              btcTxid: wrappedPsbt.broadcastResult.tx.txid,
+              //vout: vout
+            }
+          }
+        }
+      } else {
+        if (wrappedPsbt.broadcastResult.tx) {
+          upd = {
+            status: 4,
+            reveal: {
+              btcTxid: wrappedPsbt.broadcastResult.tx.txid,
+              //vout: vout
+            }
+          }
+        }
+      }
+      if (upd) await updatePeginRequest(pegin, upd);
+
+    } catch (err:any) {
+      wrappedPsbt.broadcastResult = { failed: true, reason: 'Error broadcasting - ' + err.message }
+      console.log('signAndBroadcast: ', err)
+    }
     console.log('signAndBroadcast: wrappedPsbt: ', wrappedPsbt);
     return wrappedPsbt;
+  } 
+  
+  public async commitment(stacksAddress:string, revealFee:number): Promise<PeginScriptI> {
+    const keys = this.getKeys();
+		console.log('reclaimAddr.pubkey: ' + keys.deposits.reclaimPubKey)
+		console.log('revealAddr.pubkey: ' + keys.deposits.revealPubKey)
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildDepositPayload(net, revealFee, stacksAddress, true, undefined);
+		const scripts =  [
+			{ script: btc.Script.encode([data, 'DROP', hex.decode(keys.deposits.revealPubKey), 'CHECKSIG']) },
+			{ script: btc.Script.encode([hex.decode(keys.deposits.reclaimPubKey), 'CHECKSIG']) }
+		]
+		const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
+		return toStorable(script)
+  }
+  
+  public commitDepositData(stacksAddress:string, revealFee:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildDepositPayload(net, revealFee, stacksAddress, true, undefined);
+		return hex.encode(data);
+  }
+  
+  public commitWithdrawalData(signature:string, amount:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
+		return hex.encode(data);
+  }
+  
+  public commitWithdrawal(data:string, sbtcWallet:string, compression:number): withdrawalPayloadType {
+    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet, compression);
+		return payload;
+  }
+  
+  public commitDeposit(data:string): depositPayloadType {
+    const payload = parseDepositPayload(hex.decode(data), 0);
+		return payload;
   }
   
   @Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
-  }
+  } 
 
   @Get("/:txid/hex")
   public async fetchTransactionHex(txid:string): Promise<any> {
@@ -150,13 +251,19 @@ export class TransactionController {
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string): Promise<any> {
       try {
-        const resp = await sendRawTx(hex);
+        const resp = await sendRawTxDirectBlockCypher(hex);
         console.log('sendRawTransaction 1: ', resp);
         return resp;
       } catch (err) {
-        const resp =  await sendRawTxRpc(hex);
-        console.log('sendRawTransaction 2: ', resp);
-        return resp;
+        try {
+          const resp = await sendRawTxDirectMempool(hex);
+          console.log('sendRawTransaction 2: ', resp);
+          return resp;
+        } catch (err) {
+          const resp =  await sendRawTxRpc(hex);
+          console.log('sendRawTransaction 3: ', resp);
+          return resp;
+        }
       }
   }
 }

@@ -1,10 +1,13 @@
 import { Get, Route } from "tsoa";
-import { indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
+import { fetchDataVar, indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
+import { scanCommitments, savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
-import { findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
-import type { PeginRequestI, SbtcContractDataI } from 'sbtc-bridge-lib';
+import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
+import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
+import { getConfig } from '../lib/config.js';
+import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
+import { TransactionController } from "../controllers/BitcoinRPCController.js";
 
 export interface BalanceI {
   balance: number;
@@ -33,10 +36,33 @@ export class DepositsController {
     return result;
   }
 
+  public async updatePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+    const p = await findPeginRequestById(peginRequest._id);
+    if (p && p.status === 1) {
+      const up = {
+        amount: peginRequest.amount
+      }
+      const newP = await updatePeginRequest(peginRequest, up);
+      console.log('updatePeginCommit: ', newP);
+      return newP;
+    } else {
+      console.log('updatePeginCommit: error: ', p);
+      return { status: 404 };
+    }
+  }
+
   @Get("/scan")
   public async scanPeginRequests(): Promise<any> {
     await scanPeginRRTransactions();
     return await scanPeginCommitTransactions();
+  }
+
+  @Get("/commits/scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee")
+  public async scanCommitments(btcAddress:string,stxAddress:string, sbtcWalletAddress:string, revealFee:number): Promise<any> {
+    const controller = new TransactionController();
+    const commitment = await controller.commitment(stxAddress, Number(revealFee));
+
+    return await scanCommitments(btcAddress, stxAddress, sbtcWalletAddress, revealFee, commitment);
   }
 }
 
@@ -68,11 +94,24 @@ export class SbtcWalletController {
     return await fetchUserSbtcBalance(address);
   }
 
+  public async fetchUserBalances(stxAddress:string, cardinal:string, ordinal:string): Promise<AddressObject> {
+    return await fetchUserBalances(stxAddress, cardinal, ordinal);
+  }
+
   @Get("/data")
   public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
     const sbtcContractData:SbtcContractDataI = await fetchNoArgsReadOnly();
     try {
       sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
+    } catch (err) {
+      console.log(err)
+    }
+    try {
+      const contractId = getConfig().sbtcContractId;
+      const contractOwner = await fetchDataVar(contractId.split('.')[0], contractId.split('.')[1], 'contract-owner');
+      const result = cvToJSON(deserializeCV(contractOwner.data));
+      console.log(result)
+      sbtcContractData.contractOwner = result.value
     } catch (err) {
       console.log(err)
     }
@@ -83,6 +122,7 @@ export class SbtcWalletController {
       console.log(err)
       sbtcContractData.burnHeight = -1;
     }
+    console.log('sbtcContractData: ', sbtcContractData)
     return sbtcContractData;
   }
 

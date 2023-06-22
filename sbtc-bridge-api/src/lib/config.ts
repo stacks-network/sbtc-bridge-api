@@ -17,7 +17,8 @@ const TESTNET_CONFIG = {
   port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
-  sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
+  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -42,6 +43,7 @@ const MAINNET_CONFIG = {
   port: PORT,
   network: 'mainnet',
   walletPath: '/wallet/descwallet',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -67,7 +69,8 @@ const DEVNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
+  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -92,7 +95,8 @@ const LINODE_CONFIG = {
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
-  sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
+  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -102,7 +106,30 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { mongoDbUrl: string; mongoUser: string; mongoPwd: string; mongoDbName: string; btcNode: string; btcRpcUser: string; btcRpcPwd: string; btcSchnorrReveal: string; btcSchnorrReclaim: string; host: string; port: number; walletPath: string; network: string; sbtcContractId: string; stacksApi: string; stacksExplorerUrl: string; bitcoinExplorerUrl: string; mempoolUrl: string; blockCypherUrl: string; publicAppName: string; publicAppVersion: string; };
+let CONFIG: { 
+  mongoDbUrl: string; 
+  mongoUser: string; 
+  mongoPwd: string; 
+  mongoDbName: string; 
+  btcNode: string; 
+  btcRpcUser: string; 
+  btcRpcPwd: string; 
+  btcSchnorrReveal: string; 
+  btcSchnorrReclaim: string; 
+  host: string; 
+  port: number; 
+  walletPath: string; 
+  network: string; 
+  poxContractId: string; 
+  sbtcContractId: string; 
+  stacksApi: string; 
+  stacksExplorerUrl: string; 
+  bitcoinExplorerUrl: string; 
+  mempoolUrl: string; 
+  blockCypherUrl: string; 
+  publicAppName: string; 
+  publicAppVersion: string; 
+};
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
@@ -117,18 +144,30 @@ function setOverrides() {
   if (isDev() || isLinode()) {
     console.log('================================================ >>' + process.env.TARGET_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
-    CONFIG.mongoDbUrl = process.env.mongoDbUrl;
-    CONFIG.mongoDbName = process.env.mongoDbName;
-    CONFIG.mongoUser = process.env.mongoUser;
-    CONFIG.mongoPwd = process.env.mongoPwd;
-    CONFIG.btcNode = process.env.btcNode;
-    CONFIG.btcRpcUser = process.env.btcRpcUser;
-    CONFIG.btcRpcPwd = process.env.btcRpcPwd;
-    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal;
-    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim;
+    CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
+    CONFIG.mongoDbName = process.env.mongoDbName || '';
+    CONFIG.mongoUser = process.env.mongoUser || ''
+    CONFIG.mongoPwd = process.env.mongoPwd || '';
+    CONFIG.btcNode = process.env.btcNode || '';
+    CONFIG.btcRpcUser = process.env.btcRpcUser || '';
+    CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
+    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
+    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
   }
   if (isDev()) {
-    CONFIG.btcNode = 'host.docker.internal:18332'
+    /**
+    CONFIG.mongoDbUrl = '.kepjbx..'
+    CONFIG.mongoDbName = 'sbtc-bridge-db'
+    CONFIG.mongoUser = ''
+    CONFIG.mongoPwd = ''
+    CONFIG.btcNode = '127.0.0.1:18332'
+    CONFIG.btcRpcUser = ''
+    CONFIG.btcRpcPwd = ''
+    CONFIG.btcSchnorrReveal = ''
+    CONFIG.btcSchnorrReclaim = ''
+     */
+    //CONFIG.poxContractId = 'SP000000000000000000002Q6VF78.pox-3'
+    
   }
   if (isLinode()) {
     console.log('linode env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)

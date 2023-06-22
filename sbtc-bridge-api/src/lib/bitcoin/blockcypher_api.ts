@@ -12,3 +12,25 @@ export async function fetchCurrentFeeRates() {
     return { feeInfo: { low_fee_per_kb:20000, medium_fee_per_kb:30000, high_fee_per_kb:40000 }};
   }
 }
+
+export async function sendRawTxDirectBlockCypher(hex:string) {
+  const url = getConfig().blockCypherUrl + '/txs/push';
+  console.log('sendRawTxDirectBlockCypher: ', url)
+  const response = await fetch(url, {
+    method: 'POST',
+    //headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({tx: hex})
+  });
+  //if (response.status !== 200) console.log('Mempool error: ' + response.status + ' : ' + response.statusText);
+  try {
+    return await response.json();
+  } catch (err) {
+    try {
+      console.log(err)
+      return await response.text();
+    } catch (err1) {
+      console.log(err1)
+    }
+  }
+  return 'success';
+}
