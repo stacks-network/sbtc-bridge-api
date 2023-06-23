@@ -8,7 +8,6 @@ import type { KeySet } from 'sbtc-bridge-lib'
 export const defaultSbtcConfig:SbtcConfig = {
   pegIn: true,
   loggedIn: false,
-  balance: { balance: 0, address: '' },
   sigData: undefined,
   sbtcContractData: {} as SbtcContractDataI,
   pegInTransaction: undefined,
@@ -19,21 +18,6 @@ export const defaultSbtcConfig:SbtcConfig = {
     debugMode: false,
     testAddresses: false
   },
-  peginRequest: {
-    _id: undefined,
-    originator: '',
-    status: 0,
-    tries: undefined,
-    updated: undefined,
-    amount: 0,
-    mode: '',
-    requestType: '',
-    wallet: undefined,
-    btcTxid: undefined,
-    fromBtcAddress: '',
-    stacksAddress: '',
-    sbtcWalletAddress: '',
-    commitTxScript: undefined,
-    vout: undefined
-  }
+  innerWidth: 1000
 }
+

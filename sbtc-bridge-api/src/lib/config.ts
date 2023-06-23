@@ -156,16 +156,16 @@ function setOverrides() {
   }
   if (isDev()) {
     /**
-    CONFIG.mongoDbUrl = '.kepjbx..'
-    CONFIG.mongoDbName = 'sbtc-bridge-db'
-    CONFIG.mongoUser = ''
-    CONFIG.mongoPwd = ''
-    CONFIG.btcNode = '127.0.0.1:18332'
-    CONFIG.btcRpcUser = ''
-    CONFIG.btcRpcPwd = ''
-    CONFIG.btcSchnorrReveal = ''
-    CONFIG.btcSchnorrReclaim = ''
      */
+    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
+    CONFIG.mongoDbName = 'sbtc-bridge-db'
+    CONFIG.mongoUser = 'dockerdev1'
+    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
+    CONFIG.btcNode = '127.0.0.1:18332'
+    CONFIG.btcRpcUser = 'bob'
+    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
+    CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
+    CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'
     //CONFIG.poxContractId = 'SP000000000000000000002Q6VF78.pox-3'
     
   }

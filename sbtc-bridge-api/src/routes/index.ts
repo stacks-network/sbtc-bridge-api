@@ -473,6 +473,18 @@ router.get("/bridge-api/:network/v1/config/:param", async (req, res, next) => {
   }
 });
 
+router.get("/signers-api/:network/v1/pox/info", async (req, res, next) => {
+  try {
+    console.log('signers/pox/info')
+    const controller = new SignersController();
+    const response = await controller.fetchPoxInfo();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
 router.get('*', function(req, res) {
   res.sendStatus(404);
 });

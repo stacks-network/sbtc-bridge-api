@@ -3,48 +3,56 @@
 	import "../sbtc.css";
 	import Header from "$lib/header/Header.svelte";
 	import Footer from "$lib/header/Footer.svelte";
+	import { fetchPoxInfo, fetchSbtcData } from "$lib/bridge_api";
 	import { fetchSbtcBalance, userSession, isLegal } from "$lib/stacks_connect";
-	import { fetchSbtcData, fetchPoxInfo, fetchCurrentFeeRates, fetchKeys } from "$lib/bridge_api";
 	import { setConfig } from '$lib/config';
-	import { beforeNavigate, goto } from "$app/navigation";
+	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 	import { page } from "$app/stores";
-	import { onMount, onDestroy } from 'svelte';
+	import { tick, onMount, onDestroy } from 'svelte';
 	import { sbtcConfig } from '$stores/stores'
-	import type { SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
+	import type { BlockchainInfo, SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'
 	import { loginStacksJs } from '$lib/stacks_connect'
 
-    let componentKey = 0;
+	export let data:{ sbtcContractData: SbtcContractDataI, keys: KeySet, sbtcWalletAddressInfo: any, btcFeeRates: any } ;
+	const unsubscribe = sbtcConfig.subscribe((conf) => {});
+	onDestroy(unsubscribe);
+	let inited = false;
+	let errorReason:string|undefined;
+	let innerWidth = 0
 
+	$: {
+		const conf = $sbtcConfig;
+		conf.innerWidth = innerWidth;
+		//sbtcConfig.update(() => conf);
+		console.log(`the count is ${$sbtcConfig.innerWidth}`)
+	}
+	let componentKey = 0;
 	console.log('process.env: ', import.meta.env);
 	setConfig($page.url.search);
 	const search = $page.url.search;
+	if (!isLegal(location.href)) {
+		componentKey++;
+		goto('/' + '?net=testnet')
+	}
 	beforeNavigate((nav) => {
 		if (!isLegal(nav.to?.route.id || '')) {
 			nav.cancel();
 			loginStacksJs(initApplication);
+			componentKey++;
 			return;
 		}
 		const next = (nav.to?.url.pathname || '') + (nav.to?.url.search || '');
-			if (!nav.to?.route.id && nav.to?.url.href) {
-				location.replace(nav.to?.url.href)
-			}
 			if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {
 			nav.cancel();
 			goto(next + '?net=testnet')
 		}
+	})
+	afterNavigate((nav) => {
 		componentKey++;
 	})
-	export let data:SbtcContractDataI;
-	export let bcInfo:BlockchainInfo|undefined;
-	const unsubscribe = sbtcConfig.subscribe((conf) => {});
-	onDestroy(unsubscribe);
-	//setUpMicroStacks();
-	//setUpStacksJs();
-	let inited = false;
-	let errorReason:string|undefined;
 
 	const initApplication = async () => {
 		let conf = defaultSbtcConfig as SbtcConfig;
@@ -53,10 +61,7 @@
 		}
 		try {
 			data = await fetchSbtcData();
-			if (!data) data = defaultSbtcConfig.sbtcContractData;
-			$sbtcConfig.sbtcContractData = data
-			const keys:KeySet = await fetchKeys();
-			conf.keys = keys;
+			if (!data) data = {} as any;
 			$sbtcConfig.bcInfo = await fetchPoxInfo();
 			conf.loggedIn = false;
 			if (userSession.isUserSignedIn()) {
@@ -64,11 +69,12 @@
 				await fetchSbtcBalance();
 			}
 		} catch (err) {
-			console.log(err)
-			data = defaultSbtcConfig.sbtcContractData;
+			data = {} as any;
 		}
-		if (!$sbtcConfig.btcFeeRates) $sbtcConfig.btcFeeRates = await fetchCurrentFeeRates();
-		conf.sbtcContractData = data;
+		conf.sbtcContractData = data.sbtcContractData;
+		conf.keys = data.keys;
+		conf.sbtcWalletAddressInfo = data.sbtcWalletAddressInfo;
+		conf.btcFeeRates = data.btcFeeRates;
 		sbtcConfig.update(() => conf);
 	}
 
@@ -85,17 +91,17 @@
 </script>
 
 {#if inited}
-<div class="min-h-screen background flex flex-col justify-between text-white font-thin">
-	<div class="h-20 w-screen px-20 ">
-		{#key componentKey}
-		<Header on:init_application={initApplication}></Header>
-		{/key}
+	<div class="bg-gray-1000 bg-[url('$lib/assets/bg-lines.png')] bg-cover text-white font-extralight min-h-screen">
+		<div>
+			{#key componentKey}
+			<Header on:init_application={initApplication} />
+			{/key}
+		</div>
+		<div class="flex min-h-[calc(100vh-160px)] mx-auto lg:px-8 align-middle justify-center flex-grow">
+			<slot></slot>
+		</div>
+
+		<Footer />
 	</div>
-	<div class="flex justify-center items-start">
-		<slot></slot>
-	</div>
-	<div class="h-20 w-screen px-20">
-		<Footer></Footer>
-	</div>
-</div>
 {/if}
+<svelte:window bind:innerWidth />

@@ -22,8 +22,8 @@ app.use(
   serve,
   setup(undefined, {
     swaggerOptions: {
-      spec: swagger
-      //url: "/swagger.json",
+      spec: swagger,
+      url: "/swagger.json",
     },
   })
 );
