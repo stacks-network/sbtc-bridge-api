@@ -3,9 +3,17 @@ import type { BlockchainInfo, AddressObject } from 'sbtc-bridge-lib'
 
 function addNetSelector (path:string) {
   if (CONFIG.VITE_NETWORK === 'testnet' || CONFIG.VITE_NETWORK === 'devnet') {
-    return path.replace('bridge-api', 'bridge-api/testnet');
+    if (path.indexOf('bridge-api') > -1) {
+      return path.replace('bridge-api', 'bridge-api/testnet');
+    } else {
+      return path.replace('signer-api', 'signer-api/testnet');
+    }
   } else {
-    return path.replace('bridge-api', 'bridge-api/mainnet');
+    if (path.indexOf('bridge-api') > -1) {
+      return path.replace('bridge-api', 'bridge-api/mainnet');
+    } else {
+      return path.replace('signer-api', 'signer-api/mainnet');
+    }
   }
 }
 async function fetchCatchErrors(path:string) {
@@ -29,17 +37,6 @@ async function extractResponse(response:any) {
     } catch(err) {
       console.log('error fetching response.. ', err)
     }
-  }
-}
-
-export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
-  const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/signers/pox-info');
-  try {
-    const response = await fetch(path);
-    const res = await response.json();
-    return res;
-  } catch(err) {
-    return undefined;
   }
 }
 
@@ -77,3 +74,26 @@ export async function fetchUserBalances(adrds:AddressObject) {
   const res = await extractResponse(response);
   return res;
 }
+
+export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/info');
+  try {
+    const response = await fetch(path);
+    const res = await response.json();
+    return res;
+  } catch(err) {
+    return undefined;
+  }
+}
+
+export async function fetchStatelessInfo():Promise<any> {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/info');
+  try {
+    const response = await fetch(path);
+    const res = await response.json();
+    return res;
+  } catch(err) {
+    return undefined;
+  }
+}
+

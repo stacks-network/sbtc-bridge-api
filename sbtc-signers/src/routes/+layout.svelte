@@ -3,14 +3,14 @@
 	import "../sbtc.css";
 	import Header from "$lib/header/Header.svelte";
 	import Footer from "$lib/header/Footer.svelte";
-	import { fetchPoxInfo, fetchSbtcData } from "$lib/bridge_api";
+	import { fetchStatelessInfo, fetchSbtcData } from "$lib/bridge_api";
 	import { fetchSbtcBalance, userSession, isLegal } from "$lib/stacks_connect";
 	import { setConfig } from '$lib/config';
 	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { tick, onMount, onDestroy } from 'svelte';
 	import { sbtcConfig } from '$stores/stores'
-	import type { BlockchainInfo, SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
+	import type { PoxCycleInfo, BlockchainInfo, SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'
@@ -21,14 +21,7 @@
 	onDestroy(unsubscribe);
 	let inited = false;
 	let errorReason:string|undefined;
-	let innerWidth = 0
 
-	$: {
-		const conf = $sbtcConfig;
-		conf.innerWidth = innerWidth;
-		//sbtcConfig.update(() => conf);
-		console.log(`the count is ${$sbtcConfig.innerWidth}`)
-	}
 	let componentKey = 0;
 	console.log('process.env: ', import.meta.env);
 	setConfig($page.url.search);
@@ -62,7 +55,10 @@
 		try {
 			data = await fetchSbtcData();
 			if (!data) data = {} as any;
-			$sbtcConfig.bcInfo = await fetchPoxInfo();
+			const statelessInfo = await fetchStatelessInfo();
+			$sbtcConfig.bcInfo = statelessInfo?.bcInfo;
+			$sbtcConfig.sbtcContractData = statelessInfo?.sbtcContractData;
+			$sbtcConfig.poxCycleInfo = statelessInfo?.poxCycleInfo;
 			conf.loggedIn = false;
 			if (userSession.isUserSignedIn()) {
 				conf.loggedIn = true;
@@ -71,10 +67,6 @@
 		} catch (err) {
 			data = {} as any;
 		}
-		conf.sbtcContractData = data.sbtcContractData;
-		conf.keys = data.keys;
-		conf.sbtcWalletAddressInfo = data.sbtcWalletAddressInfo;
-		conf.btcFeeRates = data.btcFeeRates;
 		sbtcConfig.update(() => conf);
 	}
 
@@ -104,4 +96,3 @@
 		<Footer />
 	</div>
 {/if}
-<svelte:window bind:innerWidth />

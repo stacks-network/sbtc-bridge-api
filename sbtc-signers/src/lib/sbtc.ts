@@ -14,10 +14,7 @@ export const defaultSbtcConfig:SbtcConfig = {
   pegOutTransaction: undefined,
   keys: {} as KeySet,
   userSettings: {
-    useOpDrop: true,
     debugMode: false,
-    testAddresses: false
-  },
-  innerWidth: 1000
+  }
 }
 

@@ -16,7 +16,6 @@
 		const prepareLength = bcInfo?.poxInfo.prepareCycleLength || 0;
 		const cycle1 = numbSinceFirst / cycleLength
 		const cycle2 = numbSinceFirst / (cycleLength + prepareLength)
-		//const th = $sbtcConfig.poxData.;
 		return prepareLength
 	}
 
@@ -50,14 +49,10 @@
 		const conf:SbtcConfig = $sbtcConfig;
 		if (typeof conf.userSettings === 'undefined') {
 			conf.userSettings = {
-				useOpDrop: false,
-				debugMode: false,
-				testAddresses: false
+				debugMode: false
 			}
 		}
-		if (arg === 'txmode') conf.userSettings.useOpDrop = !conf.userSettings.useOpDrop;
 		if (arg === 'debug') conf.userSettings.debugMode = !conf.userSettings.debugMode;
-		if (arg === 'testAddresses') conf.userSettings.testAddresses = !conf.userSettings.testAddresses;
 		sbtcConfig.update(() => conf);
 	}
 
@@ -67,14 +62,6 @@
 		setConfig(net);
 		await fetchSbtcBalance();
 		sbtcConfig.update((conf:SbtcConfig) => {
-			conf.stxAddress = addresses().stxAddress;
-			if (conf.pegInTransaction) {
-				conf.pegInTransaction.fromBtcAddress = addresses().ordinal;
-				if (conf.pegInTransaction.pegInData) conf.pegInTransaction.pegInData.stacksAddress = addresses().stxAddress;
-			}
-			if (conf.pegOutTransaction) {
-				conf.pegOutTransaction.fromBtcAddress = addresses().ordinal;
-			}
 			return conf;
 		});
 		const url = new URL(location.href);
@@ -183,10 +170,6 @@
 	
   </div>
 	<DropdownItem defaultClass="hover:bg-black">
-		<li class="px-4 py-2 hover:bg-gray-900 text-white">
-			<Toggle class=" text-white" checked={$sbtcConfig.userSettings?.useOpDrop} on:click={() => toggleSettings('txmode')}>Transaction mode</Toggle>
-			<Helper helperClass="pl-14 !font-extralight text-white">{#if $sbtcConfig.userSettings?.useOpDrop}Using OP_DROP Mechanism{:else}Using OP_RETURN Mechanism{/if}</Helper>
-		</li>
 		<li class="px-4 py-2 hover:bg-gray-900">
 			<Toggle class=" text-white" checked={$sbtcConfig.userSettings?.debugMode} on:click={() => toggleSettings('debug')} >Debug mode</Toggle>
 			<Helper helperClass="pl-14 !font-extralight text-white">{#if $sbtcConfig.userSettings?.debugMode}Show advanced info{:else}Hide advanced info{/if}</Helper>
