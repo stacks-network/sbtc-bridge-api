@@ -13,7 +13,7 @@ const TESTNET_CONFIG = {
   btcRpcPwd: 'blockstacksystem',
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
-  host: 'http://localhost',
+  host: 'http://localhost', 
   port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
