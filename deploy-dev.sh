@@ -7,7 +7,7 @@ export DOCKER_CMD='docker'
 
 $DOCKER_CMD build -t mijoco/bridge_api sbtc-bridge-api
 $DOCKER_CMD tag mijoco/bridge_api mijoco/bridge_api
-$DOCKER_CMD push mijoco/bridge_api:latest
+#$DOCKER_CMD push mijoco/bridge_api:latest
 
 printf "\nConnecting to $SERVER.\n\n"
 

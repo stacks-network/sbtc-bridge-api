@@ -26,7 +26,7 @@ function __build() {
 
 function __pushcode() {
   echo "\n- deploying from pipeline build \n";
-  rsync -aP $PATH_DEPLOY/* static/* bob@$SERVER:/var/www/sbtc-bridge
+  rsync -aP $PATH_DEPLOY/* static/* bob@$SERVER:/var/www/sbtc-sign
 }
 
 BUILD_PATH=./

@@ -17,7 +17,8 @@ const TESTNET_CONFIG = {
   port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
-  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -69,7 +70,8 @@ const DEVNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -95,7 +97,8 @@ const LINODE_CONFIG = {
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
-  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
@@ -106,7 +109,7 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { 
+let CONFIG: {
   mongoDbUrl: string; 
   mongoUser: string; 
   mongoPwd: string; 
@@ -156,21 +159,24 @@ function setOverrides() {
   }
   if (isDev()) {
     /**
-    CONFIG.mongoDbUrl = '.kepjbx..'
-    CONFIG.mongoDbName = 'sbtc-bridge-db'
-    CONFIG.mongoUser = ''
-    CONFIG.mongoPwd = ''
-    CONFIG.btcNode = '127.0.0.1:18332'
-    CONFIG.btcRpcUser = ''
-    CONFIG.btcRpcPwd = ''
-    CONFIG.btcSchnorrReveal = ''
-    CONFIG.btcSchnorrReclaim = ''
      */
-    //CONFIG.poxContractId = 'SP000000000000000000002Q6VF78.pox-3'
-    
+    console.log('dev env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
+    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
+    CONFIG.mongoDbName = 'sbtc-bridge-db'
+    CONFIG.mongoUser = 'dockerdev1'
+    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
+    CONFIG.btcNode = '127.0.0.1:18332'
+    CONFIG.btcRpcUser = 'bob'
+    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
+    CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
+    CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   }
   if (isLinode()) {
-    console.log('linode env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
+    console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
+    console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
+    console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
+    console.log('linode env.. process.env.mongoDbName = ' + process.env.mongoDbName)
+    console.log('linode env.. process.env.BTC_NODE = ' + process.env.btcNode)
     console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
     console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
     console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))

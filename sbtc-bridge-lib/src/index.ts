@@ -105,11 +105,13 @@ export type {
 import type {
     PoxInfo,
     StacksInfo,
-    BlockchainInfo
+    BlockchainInfo,
+    PoxCycleInfo
 } from './types/pox_types.js'
 
 export type {
     PoxInfo,
     StacksInfo,
-    BlockchainInfo
+    BlockchainInfo,
+    PoxCycleInfo
 }

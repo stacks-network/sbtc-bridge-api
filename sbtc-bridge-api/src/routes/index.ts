@@ -3,7 +3,7 @@ import { TransactionController, BlocksController, DefaultController, WalletContr
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
 import { ConfigController } from "../controllers/ConfigController.js";
 import { SignersController } from "../controllers/SignersRPCController.js";
-import type { PeginRequestI, WrappedPSBT, AddressObject } from 'sbtc-bridge-lib';
+import type { PeginRequestI, WrappedPSBT } from 'sbtc-bridge-lib';
 
 const router = express.Router();
 
@@ -438,18 +438,6 @@ router.get("/bridge-api/:network/v1/sbtc/pegins/:_id", async (req, res, next) =>
   }
 });
 
-router.get("/bridge-api/:network/v1/signers/pox-info", async (req, res, next) => {
-  try {
-    console.log('signers/pox-info')
-    const controller = new SignersController();
-    const response = await controller.fetchPoxInfo();
-    return res.send(response);
-  } catch (error) { 
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
 
 router.get("/bridge-api/:network/v1/config", async (req, res, next) => {
   try {
@@ -470,6 +458,52 @@ router.get("/bridge-api/:network/v1/config/:param", async (req, res, next) => {
   } catch (error) { 
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
+  }
+});
+
+router.get("/bridge-api/:network/v1/signers/pox-info", async (req, res, next) => {
+  try {
+    console.log('signers/pox-info')
+    const controller = new SignersController();
+    const response = await controller.fetchPoxInfo();
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
+
+router.get("/signer-api/:network/v1/info", async (req, res, next) => {
+  try {
+    const controller = new SignersController();
+    const bcInfo = await controller.fetchPoxInfo();
+    const poxCycleInfo = await controller.fetchPoxCycleInfo(bcInfo.poxInfo.rewardCycleId)
+    const controller1 = new SbtcWalletController();
+    const sbtcContractData = await controller1.fetchSbtcContractData();
+
+    const response = {
+      bcInfo,
+      sbtcContractData,
+      poxCycleInfo
+    }
+
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/signer-api/:network/v1/pox/info", async (req, res, next) => {
+  try {
+    console.log('signers/pox/info')
+    const controller = new SignersController();
+    const poxInfo = await controller.fetchPoxInfo();
+    return res.send(poxInfo);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
   }
 });
 

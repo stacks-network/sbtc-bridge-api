@@ -14,19 +14,6 @@ export const userSession = new UserSession({ appConfig }); // we will use this e
 
 export const webWalletNeeded = false;
 
-const allowed = [
-	{ btc: '2N8fMsws2pTGfNzkFTLWdUYM5RTWEAphieb', stx: 'SP1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRCBGD7R'}, // devnet testing
-	{ btc: '2N8fMsws2pTGfNzkFTLWdUYM5RTWEAphieb', stx: 'SP1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28GBQA1W0F'}, // mike 1
-	{ btc: 'bc1qfdxax8gr9lufdf4j5wzkhelczr804n89ze2rfa', stx: 'SP3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSQP2HGT6'}, // mike 2
-	{ btc: '1EJboSZVgPNrKCVmhmkV2rjLW4KN2Urti', stx: 'SP1ACWJC0TMD9F3Q3FJQFDWV9GSSTXN8RY31HR10B'}, // igor
-	{ btc: '1FFaqXGJPNvU28QhsCz9gsRatc1C55V33e', stx: 'SP2E57N3DDG0CSF6XYWABZ1E7QBF8CTKJ4J1PHP0V'}, // jude
-	{ btc: 'bc1q8j0gh8754jd9jerlxvpvxx4kc82e4u7f8ynnvp', stx: 'SP1R3S5RB1FSKCGQGW16ZHHPK6FAN57EAQ3RD7HP9'}, // marten
-]
-	
-export function isAllowed(address:string) {
-	return allowed.find((o) => o.stx === address);
-}
-
 export function getStacksNetwork() {
 	const network = CONFIG.VITE_NETWORK;
 	let stxNetwork:StacksMainnet|StacksTestnet;
@@ -41,7 +28,7 @@ export function decodeStacksAddress(stxAddress:string) {
 	const decoded = c32addressDecode(stxAddress)
 	return decoded
 }
-  
+
 export function encodeStacksAddress (network:string, b160Address:string) {
 	let version = 26
 	if (network === 'mainnet') version = 22
@@ -54,6 +41,13 @@ export async function fetchSbtcBalance () {
 	let result:AddressObject;
 	try {
 		result = await fetchUserBalances(adrds);
+		try {
+			result.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens[CONFIG.VITE_SBTC_CONTRACT_ID + '::sbtc'].balance)
+		} catch (err) {
+			// for testing..
+			try { result.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens['ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant::sbtc'].balance) }
+			catch (err) { result.sBTCBalance = 0 }
+		}
 
 	} catch(err) {
 		result = adrds;
@@ -62,6 +56,14 @@ export async function fetchSbtcBalance () {
 	//const result = await fetchUserSbtcBalance(adrds.stxAddress);
 	await sbtcConfig.update((conf:SbtcConfig) => {
 		try {
+			if (conf.pegInTransaction) {
+				conf.pegInTransaction.pegInData.stacksAddress = adrds.stxAddress;
+				conf.pegInTransaction.fromBtcAddress = adrds.cardinal;
+			}
+			if (conf.pegOutTransaction) {
+				conf.pegOutTransaction.pegInData.stacksAddress = adrds.stxAddress;
+				conf.pegOutTransaction.fromBtcAddress = adrds.cardinal;
+			}
 			conf.addressObject = result;
 			conf.loggedIn = true;
 	
@@ -96,9 +98,11 @@ export function addresses():AddressObject {
 	}
 }
 
-export const appDetails = {
-	name: 'sBTC Client',
-	icon: '/img/logo-white.jpeg',
+export function appDetails() {
+	return {
+		name: 'sBTC Bridge',
+		icon: (window) ? window.location.origin + '/img/icon_sbtc.png' : '/img/icon_sbtc.png',
+	}
 }
 
 export function makeFlash(el1:HTMLElement|null) {
@@ -122,7 +126,11 @@ export function makeFlash(el1:HTMLElement|null) {
 
 export function isLegal(routeId:string):boolean {
 	if (userSession.isUserSignedIn()) return true;
-	if (['/deposit', '/withdraw'].includes(routeId)) {
+	if (routeId.startsWith('http')) {
+		if (routeId.indexOf('/deposit') > -1 || routeId.indexOf('/withdraw') > -1 || routeId.indexOf('/admin') > -1 || routeId.indexOf('/transactions') > -1) {
+			return false;
+		}
+	} else if (['/deposit', '/withdraw', '/admin', '/transactions'].includes(routeId)) {
 		return false;
 	}
 	return true;
@@ -139,7 +147,7 @@ export async function loginStacksJs(callback:any):Promise<any> {
 		if (!userSession.isUserSignedIn()) {
 			showConnect({
 				userSession,
-				appDetails,
+				appDetails: appDetails(),
 				onFinish: async () => {
 					await fetchSbtcBalance();
 					callback(true);
@@ -162,7 +170,7 @@ export function signMessage(callback:any, script:string) {
 	openSignatureRequestPopup({
 		message: script,
 		network: getStacksNetwork(), // for mainnet, `new StacksMainnet()`
-		appDetails: appDetails,
+		appDetails: appDetails(),
 		onFinish(value) {
 		  console.log('Signature of the message', value.signature);
 		  console.log('Use public key:', value.publicKey);
@@ -205,7 +213,14 @@ export function verifyAmount(amount:number) {
   	if (amount < 10000) {
 		throw new Error('Amount less than mnimum transaction fee.');
 	  }
-  }
-  
+}
+export function verifySBTCAmount(amount:number, balance:number, fee:number) {
+	if (!amount || amount === 0) {
+		throw new Error('No amount entered');
+	}
+	if (amount > (balance - fee)) {
+		throw new Error('No more then balance (less fee of ' + fee + ')');
+	}
+}
   
 	

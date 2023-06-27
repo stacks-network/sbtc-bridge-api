@@ -122,7 +122,7 @@ export class SbtcWalletController {
       console.log(err)
       sbtcContractData.burnHeight = -1;
     }
-    console.log('sbtcContractData: ', sbtcContractData)
+    //console.log('sbtcContractData: ', sbtcContractData)
     return sbtcContractData;
   }
 

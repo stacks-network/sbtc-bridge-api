@@ -1,14 +1,7 @@
 <script lang="ts">
-import logoWhite from '$lib/assets/Stacks Logo White.png';
-
-
+	import LogoStacks from '../components/shared/LogoStacks.svelte';
 </script>
-<div class="">
-	<div class="">
-		<a href="/"><img width="100px" height="60px" class="" src={logoWhite} alt="sBTC Bridge" /></a>
-	</div>
-	<div class="flex flex-nowrap text-gradient">sBTC Signers</div>
-</div>
 
-<style>
-</style>
+<div class="flex flex-col mr-4">
+  <div class="font-bold text-transparent bg-clip-text text-2xl bg-primary-01"><span style="white-space:nowrap;">sBTC Signers</span></div>
+</div>

@@ -46,7 +46,7 @@ export default {
         "700": "#d5a609",
         "800": "#b68f08",
         "900": "#8e6f06",
-        "1000": "#F7931A"
+        "1000": "#654f04"
       },
       "blue": {
         "100": "#fafbfe",
@@ -58,7 +58,7 @@ export default {
         "700": "#6b7fca",
         "800": "#5b6dae",
         "900": "#475587",
-        "1000": "#5546FF"
+        "1000": "#333c60"
       },
       "success": {
         "100": "#f5fcfa",
@@ -117,33 +117,6 @@ export default {
       "gray-01": "linear-gradient(126.12deg, #121212 44.07%, #404040 89.82%)",
       "black-01": "linear-gradient(126.12deg, #000000 21.1%, #121212 53.58%)"
     },
-    fontFamily: {
-      sans: [
-        "Circular Std",
-      ],
-    },
-    fontWeight: {
-      thin: '100',
-      hairline: '100',
-      extralight: '200',
-      light: '300',
-      normal: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-      extrabold: '800',
-      'extra-bold': '800',
-      black: '900',
-    },
-    borderRadius: {
-      'none': '0',
-       'sm': '0.125rem',
-       default: '0.25rem',
-       'md': '12px',
-       'lg': '1.5rem',
-       'full': '9999px',
-       'large': '22px',
-    },
     extend: {
       fontFamily: {
         'sans': ['Circular Std', ...defaultTheme.fontFamily.sans],
@@ -153,6 +126,5 @@ export default {
         "02": "4px 4px 12px -2px rgba(117,139,222,0.6), -4px -4px 12px -2px rgba(91,109,174,0.6)"
       },
     },
-  },
-  plugins: [],
+  }
 }

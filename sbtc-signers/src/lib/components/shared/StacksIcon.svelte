@@ -1,22 +1,9 @@
-<div class="circle circle-blue">
-    <svg width="16" height="16" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M10.3464 11.3332L8.08325 7.90434H11.3334V6.61067H0.666748V7.90567H3.91575L1.65341 11.3332H3.34108L6.00008 7.30484L8.65875 11.3332H10.3464ZM11.3332 5.355V4.04834H8.14925L10.3812 0.666504H8.69375L5.99992 4.74784L3.30625 0.666504H1.61875L3.85375 4.0515H0.666748V5.355H11.3332Z" fill="white"/>
-    </svg>
-</div>
-
-<style>
-.circle {
-    background-color: #5546FF;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    align-content: center;
-    text-align: center;
-
-}
-
-.circle-blue {
-    background-color: #5546FF;
-}
-</style>
+<script lang="ts">
+    export let clazz:string;
+</script>
+  
+<svg class="{clazz}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+    <path fill="#5546FF" d="M10 20c5.523 0 10-4.477 10-10S15.523 0 10 0 0 4.477 0 10s4.477 10 10 10Z"/>
+    <path fill="#fff" d="m14.346 15.333-2.263-3.429h3.25v-1.293H4.667v1.295h3.248l-2.262 3.427h1.688L10 11.305l2.659 4.028h1.687Zm.987-5.978V8.048h-3.184l2.232-3.381h-1.688L10 8.747l-2.694-4.08H5.618l2.236 3.385H4.665v1.303h10.667Z"/>
+</svg>
     
