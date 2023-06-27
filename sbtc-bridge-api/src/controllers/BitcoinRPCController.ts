@@ -334,7 +334,6 @@ export class WalletController {
   }
   @Get("/listwallets")
   public async listWallets(): Promise<any> {
-    const wallets = await listWallets();
     const result = await listWallets();
     return result;
   }

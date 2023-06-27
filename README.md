@@ -50,7 +50,7 @@ docker rm -f bridge_api_staging
 
 ## Swagger API Docs
 
-See https://testnet.stx.eco/bridge-api/docs/#/
+See https://bridge.stx.eco/bridge-api/docs/#/
 
 ## Deployment
 
