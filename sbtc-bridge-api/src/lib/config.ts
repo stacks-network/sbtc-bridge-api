@@ -109,7 +109,7 @@ const LINODE_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: { 
+let CONFIG: {
   mongoDbUrl: string; 
   mongoUser: string; 
   mongoPwd: string; 
@@ -160,6 +160,7 @@ function setOverrides() {
   if (isDev()) {
     /**
      */
+    console.log('dev env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
     CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
     CONFIG.mongoDbName = 'sbtc-bridge-db'
     CONFIG.mongoUser = 'dockerdev1'
@@ -171,7 +172,11 @@ function setOverrides() {
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   }
   if (isLinode()) {
-    console.log('linode env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
+    console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
+    console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
+    console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
+    console.log('linode env.. process.env.mongoDbName = ' + process.env.mongoDbName)
+    console.log('linode env.. process.env.BTC_NODE = ' + process.env.btcNode)
     console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
     console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
     console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))
