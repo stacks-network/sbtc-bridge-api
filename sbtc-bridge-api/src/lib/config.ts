@@ -82,7 +82,7 @@ const DEVNET_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-const LINODE_CONFIG = {
+const LINODE_TESTNET_CONFIG = {
   environment: 'staging',
   mongoDbUrl: '',
   mongoDbName: '',
@@ -106,6 +106,32 @@ const LINODE_CONFIG = {
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
   publicAppName: 'sBTC Bridge Staging API',
+  publicAppVersion: '1.0.0',
+}
+
+const LINODE_MAINNET_CONFIG = {
+  environment: 'production',
+  mongoDbUrl: '',
+  mongoDbName: '',
+  mongoUser: '',
+  mongoPwd: '',
+  btcNode: '',
+  btcRpcUser: '',
+  btcRpcPwd: '',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
+  host: 'http://localhost',
+  port: 3020,
+  network: 'mainnet',
+  walletPath: '/wallet/SBTC-0003',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
+  sbtcContractId: '',
+  stacksApi: 'https://api.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
+  bitcoinExplorerUrl: 'https://mempool.space/api',
+  mempoolUrl: 'https://mempool.space/api',
+  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
+  publicAppName: 'sBTC Bridge Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -136,7 +162,8 @@ let CONFIG: {
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
-	else if (isLinode()) CONFIG = LINODE_CONFIG;
+	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
+	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
 	else if (isTMTestnet()) CONFIG = TESTNET_CONFIG;
 	else CONFIG = MAINNET_CONFIG;
   setOverrides();
@@ -144,7 +171,7 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   //console.log('process.env: ', process.env)
-  if (isDev() || isLinode()) {
+  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
     console.log('================================================ >>' + process.env.TARGET_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
@@ -167,11 +194,11 @@ function setOverrides() {
     CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
     CONFIG.btcNode = '127.0.0.1:18332'
     CONFIG.btcRpcUser = 'bob'
-    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
+    CONFIG.btcRpcPwd = '***'
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   }
-  if (isLinode()) {
+  if (isLinodeTestnet() || isLinodeMainnet()) {
     console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
     console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
     console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
@@ -191,19 +218,24 @@ function isDev() {
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
 }
 
-function isLinode() {
+function isLinodeTestnet() {
   const environ = process.env.TARGET_ENV;
-  return (environ && environ.indexOf('linode') > -1)
+  return (environ && environ.indexOf('linode-staging') > -1)
+}
+
+function isLinodeMainnet() {
+  const environ = process.env.TARGET_ENV;
+  return (environ && environ.indexOf('linode-production') > -1)
 }
 
 function isTMMainnet() {
   const environ = process.env.NODE_ENV;
-  return ((!isLinode() || isDev()) && (environ === 'production' || environ === 'prod'))
+  return ((!isLinodeTestnet() || isDev()) && (environ === 'production' || environ === 'prod'))
 }
 
 function isTMTestnet() {
   const environ = process.env.NODE_ENV;
-  return ((!isLinode() || isDev()) && (environ === 'staging' || environ === 'stag'))
+  return ((!isLinodeTestnet() || isDev()) && (environ === 'staging' || environ === 'stag'))
 }
 
 /**
@@ -212,7 +244,7 @@ export function setConfig(search:string) {
 	else if (search.indexOf('net=testnet') > -1) {
 
     if (isDev()) CONFIG = DEVNET_CONFIG;
-    else if (isLinode()) CONFIG = LINODE_CONFIG;
+    else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
     else CONFIG = TESTNET_CONFIG;
   }
 	else if (search.indexOf('net=devnet') > -1) CONFIG = DEVNET_CONFIG;
