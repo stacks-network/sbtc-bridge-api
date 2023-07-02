@@ -497,13 +497,23 @@ router.get("/signer-api/:network/v1/info", async (req, res, next) => {
 
 router.get("/signer-api/:network/v1/pox/info", async (req, res, next) => {
   try {
-    console.log('signers/pox/info')
     const controller = new SignersController();
-    const poxInfo = await controller.fetchPoxInfo();
-    return res.send(poxInfo);
+    const res = await controller.fetchPoxInfo();
+    return res.send(res);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.')
+    next('An error occurred fetching pox/info.')
+  }
+});
+
+router.get("/signer-api/:network/v1/vouching/domain/:domain", async (req, res, next) => {
+  try {
+    const controller = new SignersController();
+    const result = await controller.fetchWebDid(req.params.domain);
+    return res.send(result);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching vouching/domain/:domain.')
   }
 });
 

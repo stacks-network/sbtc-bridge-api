@@ -1,5 +1,5 @@
 const TESTNET_CONFIG = {
-    VITE_PUBLIC_APP_NAME: 'sBTC Bridge Testnet',
+    VITE_PUBLIC_APP_NAME: 'sBTC Signers Dashboard',
     VITE_PUBLIC_APP_VERSION: '1.0.0',
     VITE_URI_BRIDGE: 'https://bridge.stx.eco',
     VITE_URI_SIGN: 'https://sign.stx.eco',
@@ -19,7 +19,7 @@ const TESTNET_CONFIG = {
 }
 
 const MAINNET_CONFIG = {
-    VITE_PUBLIC_APP_NAME: 'sBTC Bridge',
+    VITE_PUBLIC_APP_NAME: 'sBTC Signers Dashboard',
     VITE_PUBLIC_APP_VERSION: '1.0.0',
     VITE_URI_BRIDGE: 'https://bridge.stx.eco',
     VITE_URI_SIGN: 'https://sign.stx.eco',
@@ -40,7 +40,7 @@ const MAINNET_CONFIG = {
 }
 
 const DEVNET_CONFIG = {
-    VITE_PUBLIC_APP_NAME: 'sBTC Bridge Devnet',
+    VITE_PUBLIC_APP_NAME: 'sBTC Signers Dashboard',
     VITE_PUBLIC_APP_VERSION: '1.0.0',
     VITE_URI_BRIDGE: 'http://localhost:8080',
     VITE_URI_SIGN: 'http://localhost:8081',

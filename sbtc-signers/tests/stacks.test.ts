@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, expect, describe, it, vi } from 'vitest'
-import { isAllowed, decodeStacksAddress, encodeStacksAddress } from "$lib/stacks_connect";
+import { decodeStacksAddress, encodeStacksAddress } from "$lib/stacks_connect";
 import { allowed } from './data/test_data';
 
 const network = 'testnet'
@@ -10,16 +10,6 @@ describe('suite', () => {
 
   beforeEach(async () => {
     // cant fetch mock here as only first mock is recognised
-  })
-
-  it.concurrent('stacks: isAllowed() check login allowed from known address', async () => {
-    const res = isAllowed(allowed[0].stx);
-    expect(typeof res).equals('object');
-  })
-
-  it.concurrent('stacks: isAllowed() check login not allowed from unknown address', async () => {
-    const res = isAllowed(allowed[0].stx + '1');
-    expect(typeof res).equals('undefined');
   })
 
   it.concurrent('stacks: decodeStacksAddress() check mainnet stacks address can be decoded', async () => {

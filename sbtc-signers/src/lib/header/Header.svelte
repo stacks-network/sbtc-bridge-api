@@ -1,13 +1,12 @@
 <script lang="ts">
-	import { CONFIG } from '$lib/config';
-	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Dropdown, DropdownItem, Chevron } from 'flowbite-svelte'
+	import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte'
 	import { createEventDispatcher } from "svelte";
 	import Brand from './Brand.svelte'
 	import { sbtcConfig } from '$stores/stores';
 	import type { SbtcConfig } from '$types/sbtc_config';
 	import { goto } from "$app/navigation";
 	import { loginStacksJs } from '$lib/stacks_connect'
-	import { logUserOut, addresses } from '$lib/stacks_connect'
+	import { logUserOut } from '$lib/stacks_connect'
 	import AccountDropdown from './AccountDropdown.svelte'
 	import SettingsDropdown from './SettingsDropdown.svelte';
 
@@ -21,9 +20,6 @@
 		logUserOut();
 		sbtcConfig.update((conf:SbtcConfig) => {
 			conf.loggedIn = false;
-			conf.addressObject = undefined;
-			conf.pegInTransaction = undefined;
-			conf.pegOutTransaction = undefined;
 			return conf;
 		});
 		goto('/')
@@ -82,7 +78,8 @@
     <NavLi nonActiveClass={getNavActiveClass('/deposit')} href="/deposit">Deposit</NavLi>
     <NavLi nonActiveClass={getNavActiveClass('/withdraw')} href="/withdraw">Withdraw</NavLi>
 	-->
-    <NavLi nonActiveClass={getNavActiveClass('/transactions')} href="/transactions">History</NavLi>
+    <NavLi nonActiveClass={getNavActiveClass('/dashboard')} href="/dashboard">Dashboard</NavLi>
+    <NavLi nonActiveClass={getNavActiveClass('/proofs')} href="/web-did">DNS Vouch</NavLi>
     <NavLi nonActiveClass={getNavActiveClass('/faq')} href="/faq">FAQ</NavLi>
   </NavUl>
 </Navbar>

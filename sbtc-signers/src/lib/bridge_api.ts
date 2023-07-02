@@ -86,6 +86,17 @@ export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
   }
 }
 
+export async function fetchWebDid(domain:string):Promise<BlockchainInfo|undefined> {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/vouching/domain/' + encodeURI(domain));
+  try {
+    const response = await fetch(path);
+    const res = await response.json();
+    return res;
+  } catch(err) {
+    return undefined;
+  }
+}
+
 export async function fetchStatelessInfo():Promise<any> {
   const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/info');
   try {

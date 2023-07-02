@@ -11,7 +11,6 @@
 	import { truncate } from '$lib/utils'
 	import { sbtcConfig } from '$stores/stores'
 	import { fmtSatoshiToBitcoin, fmtMicroToStx, bitcoinBalanceFromMempool } from '$lib/utils'
-	import { addresses } from '$lib/stacks_connect'
 	const dispatch = createEventDispatcher();
 
 	let copied = false;
@@ -28,7 +27,7 @@
 		}
 		const app = new CopyClipboard(clippy);
 		app.$destroy();
-		makeFlash(document.getElementById(ele))
+		makeFlash(document.getElementById(ele), 1)
 		copied = true;
 		return false;
 	}
@@ -64,10 +63,10 @@
 				<div class="px-4 py-1 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
 					<div id="icon-stacks" class="flex items-center gap-3 text-sm">
 						<StacksIcon clazz={'w-5 h-5'}/>
-						<span>{transformAddress(addresses().stxAddress)}</span>
+						<span>{transformAddress($sbtcConfig.addressObject.stxAddress)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', addresses().stxAddress)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.stxAddress)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon on:keyup on:click={(event) => handleClick(event)} src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
@@ -76,10 +75,10 @@
 					<div id="bitcoin-c-stacks" class="flex items-center gap-3 text-sm">
 						<BitcoinIcon clazz={'w-5 h-5'}/>
 
-						<span><span class="font-bold">Cardinal:</span>{' '}{transformAddress(addresses().cardinal)}</span>
+						<span><span class="font-bold">Cardinal:</span>{' '}{transformAddress($sbtcConfig.addressObject.cardinal)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', addresses().cardinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.cardinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
@@ -88,10 +87,10 @@
 					<div id="bitcoin-o-stacks" class="flex items-center gap-3 text-sm">
 						<BitcoinIcon clazz={'w-5 h-5'}/>
 
-						<span><span class="font-bold">Ordinal:</span>{' '}{transformAddress(addresses().ordinal)}</span>
+						<span><span class="font-bold">Ordinal:</span>{' '}{transformAddress($sbtcConfig.addressObject.ordinal)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', addresses().ordinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.ordinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
