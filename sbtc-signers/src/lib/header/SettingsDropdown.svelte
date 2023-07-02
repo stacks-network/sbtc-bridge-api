@@ -6,7 +6,7 @@
 	import { truncate, explorerAddressUrl, explorerBtcAddressUrl } from '$lib/utils'
 	import { sbtcConfig } from '$stores/stores';
 	import type { SbtcConfig } from '$types/sbtc_config';
-	import { fetchSbtcBalance, addresses } from '$lib/stacks_connect'
+	import { fetchSbtcBalance } from '$lib/stacks_connect'
 
 	const getNextCycleBurnchainBlock = () => {
 		const bcInfo = $sbtcConfig.bcInfo;

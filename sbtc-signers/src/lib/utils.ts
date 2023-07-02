@@ -22,6 +22,11 @@ export function fmtAmount(amount:number, currency:string) {
   }
 }
 
+export function dnsValidate(val:string|undefined) {
+  if (!val) return false
+  return (/^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/.test(val))
+}
+
 export function fmtNumber(amount:number|undefined, precision:number|undefined) {
   if (!amount || amount === 0) return 0;
   if (precision && precision > 0) {

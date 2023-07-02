@@ -100,7 +100,13 @@ export class SbtcWalletController {
 
   @Get("/data")
   public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
-    const sbtcContractData:SbtcContractDataI = await fetchNoArgsReadOnly();
+    let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
+    try {
+      sbtcContractData = await fetchNoArgsReadOnly();
+    } catch (err) {
+      sbtcContractData = {} as SbtcContractDataI;
+      console.log(err)
+    }
     try {
       sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
     } catch (err) {

@@ -14,6 +14,6 @@
 
     /* Base/Black */
 
-    border: 0px solid #000000;
+    border: 0px solid #fff;
 }
 </style>

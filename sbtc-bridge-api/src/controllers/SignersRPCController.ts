@@ -9,6 +9,14 @@ export interface BalanceI {
 @Route("/signer-api/:network/v1/signers/pox-info")
 export class SignersController {
   
+  public async fetchWebDid(domain:string): Promise<any> {
+    const path = 'https://' + domain + '/.well-known/did.json';
+    const response = await fetch(path);
+    const res = await response.json();
+    console.log('fetchWebDid: ' + res)
+    return res;
+  }
+
   public async fetchPoxInfo(): Promise<any> {
     const contractId = getConfig().poxContractId;
     const result = await fetchPoxInfo(contractId);

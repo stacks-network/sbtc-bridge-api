@@ -6,9 +6,11 @@ import { fetchUserBalances } from '$lib/bridge_api'
 import type { SbtcConfig } from '$types/sbtc_config';
 import { StacksTestnet, StacksMainnet, StacksMocknet } from '@stacks/network';
 import { openSignatureRequestPopup } from '@stacks/connect';
-import { AppConfig, UserSession, showConnect, getStacksProvider } from '@stacks/connect';
+import { AppConfig, UserSession, showConnect, getStacksProvider, openStructuredDataSignatureRequestPopup } from '@stacks/connect';
 import type { AddressObject } from 'sbtc-bridge-lib' 
+import { stringUtf8CV, tupleCV, uintCV, stringAsciiCV } from '@stacks/transactions';
 
+export const txtRecordPrecis = 'sBTC Signer: ';
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 export const userSession = new UserSession({ appConfig }); // we will use this export from other files
 
@@ -21,6 +23,27 @@ export function getStacksNetwork() {
 	else if (network === 'mainnet') stxNetwork = new StacksMainnet();
 	else stxNetwork = new StacksMocknet();
 	return stxNetwork;
+}
+
+const didRecordBare = {
+	"@context": ["https://www.w3.org/ns/did/v1", "https://w3id.org/security/suites/secp256k1recovery-2020/v2"],
+	"id": "did:web:__domain_name__",
+	"verificationMethod": [{
+		"id": "did:web:__domain_name__#address-0",
+		"type": "EcdsaSecp256k1RecoveryMethod2020",
+		"controller": "did:web:__domain_name__",
+		"blockchainAccountId": "__stacks_principal__"
+	}],
+	"authentication": [
+		"did:web:__domain_name__#address-0"
+	]
+}
+
+export function getDidWeb(domainName:string, stxAddress:string) {
+	const strWebDefn = JSON.stringify(didRecordBare);
+	const dns1 = strWebDefn.replaceAll('__domain_name__', domainName)
+	const dns2 = dns1.replaceAll('__stacks_principal__', stxAddress)
+	return dns2
 }
 
 export function decodeStacksAddress(stxAddress:string) {
@@ -56,14 +79,6 @@ export async function fetchSbtcBalance () {
 	//const result = await fetchUserSbtcBalance(adrds.stxAddress);
 	await sbtcConfig.update((conf:SbtcConfig) => {
 		try {
-			if (conf.pegInTransaction) {
-				conf.pegInTransaction.pegInData.stacksAddress = adrds.stxAddress;
-				conf.pegInTransaction.fromBtcAddress = adrds.cardinal;
-			}
-			if (conf.pegOutTransaction) {
-				conf.pegOutTransaction.pegInData.stacksAddress = adrds.stxAddress;
-				conf.pegOutTransaction.fromBtcAddress = adrds.cardinal;
-			}
 			conf.addressObject = result;
 			conf.loggedIn = true;
 	
@@ -75,7 +90,7 @@ export async function fetchSbtcBalance () {
 	return true;
 }
 
-export function addresses():AddressObject {
+function addresses():AddressObject {
 	if (!userSession) return {} as AddressObject;
 	try {
 		const userData = userSession.loadUserData();
@@ -105,23 +120,25 @@ export function appDetails() {
 	}
 }
 
-export function makeFlash(el1:HTMLElement|null) {
+export function makeFlash(el1:HTMLElement|null, styler:number|undefined) {
 	let count = 0;
 	if (!el1) return;
-	el1.classList.add("flasherize-button");
+	let clazz = 'flasherize-under';
+	if (!styler) clazz = 'flasherize-button';
+	el1.classList.add(clazz);
     const ticker = setInterval(function () {
 		count++;
 		if ((count % 2) === 0) {
-			el1.classList.add("flasherize-button");
+			el1.classList.add(clazz);
 		}
 		else {
-			el1.classList.remove("flasherize-button");
+			el1.classList.remove(clazz);
 		}
 		if (count === 2) {
-			el1.classList.remove("flasherize-button");
+			el1.classList.remove(clazz);
 			clearInterval(ticker)
 		}
-	  }, 2000)
+	  }, 1000)
 }
 
 export function isLegal(routeId:string):boolean {
@@ -166,6 +183,43 @@ export async function loginStacksJs(callback:any):Promise<any> {
 	}
 }
 
+export const domain = {
+	name: CONFIG.VITE_PUBLIC_APP_NAME,
+	version: CONFIG.VITE_PUBLIC_APP_VERSION,
+	'chain-id': CONFIG.VITE_NETWORK === "mainnet" ? ChainID.Mainnet : ChainID.Testnet,
+};
+
+const enum ChainID {
+    Testnet = 2147483648,
+    Mainnet = 1
+}
+
+export const domainCV = tupleCV({
+	name: stringAsciiCV(domain.name),
+	version: stringAsciiCV(domain.version),
+	'chain-id': uintCV(domain['chain-id']),
+});
+export function message_to_tuple(body:string, timestamp:string) {
+	return tupleCV({
+		domain: stringUtf8CV(body),
+		date: stringUtf8CV(timestamp)
+	});
+}
+
+export function signSip18Message(callback:any, script:string) {
+	const today = new Date();
+	openStructuredDataSignatureRequestPopup({
+		message: message_to_tuple(script, today.toLocaleDateString("en-US")),
+		domain: domainCV, // for mainnet, `new StacksMainnet()`
+		appDetails: appDetails(),
+		onFinish(value) {
+		  console.log('Signature of the message', value.signature);
+		  console.log('Use public key:', value.publicKey);
+		  callback(value, script);
+		},
+	});
+}
+
 export function signMessage(callback:any, script:string) {
 	openSignatureRequestPopup({
 		message: script,
@@ -200,9 +254,9 @@ export function verifyStacksPricipal(stacksAddress?:string) {
 		throw new Error('Please enter a valid stacks blockchain mainnet address');
 	  }
 	  return stacksAddress;
-	  } catch (err:any) {
-		  throw new Error('Invalid stacks principal - please enter a valid ' + CONFIG.VITE_NETWORK + ' account or contract principal.');
-	  }
+	} catch (err:any) {
+		throw new Error('Invalid stacks principal - please enter a valid ' + CONFIG.VITE_NETWORK + ' account or contract principal.');
+	}
 }
   
   
