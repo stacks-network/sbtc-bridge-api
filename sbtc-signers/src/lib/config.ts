@@ -9,6 +9,12 @@ const TESTNET_CONFIG = {
     VITE_SBTC_WALLET: 'tb1q6zlpyrzvzjcrf6dlsctcrh9yl3dwfktsw0nclq',
     VITE_SBTC_CONTRACT_ID: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
     VITE_SBTC_COORDINATOR: 'ST2BJA4JYFJ7SDMNFJZ9TJ3GB80P9Z80ADNF2R2AG',
+    VITE_POX_CONTRACT: 'ST000000000000000000002AMW42H.pox-3',
+    VITE_SBTC_DEPLOYER: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+    VITE_SBTC_CONTRACTS: {
+        pool: 'sbtc-stacking-pool',
+        registry: 'sbtc-registry',
+    },
     VITE_BRIDGE_API: 'https://bridge.stx.eco/bridge-api/v1',
     VITE_SIGNER_API: 'https://bridge.stx.eco/signer-api/v1',
     VITE_STACKS_API: 'https://api.testnet.hiro.so',
@@ -29,7 +35,12 @@ const MAINNET_CONFIG = {
     VITE_SBTC_WALLET: 'tb1q6ue638m4t5knwxl4kwhwyuffttlp0ffee3zn3e',
     VITE_SBTC_CONTRACT_ID: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
     VITE_SBTC_COORDINATOR: 'ST2BJA4JYFJ7SDMNFJZ9TJ3GB80P9Z80ADNF2R2AG',
-    //VITE_BRIDGE_API: 'https://api.sbtc.world/bridge-api/v1',
+    VITE_POX_CONTRACT: 'ST000000000000000000002AMW42H.pox-3',
+    VITE_SBTC_DEPLOYER: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+    VITE_SBTC_CONTRACTS: {
+        pool: 'sbtc-stacking-pool',
+        registry: 'sbtc-registry',
+    },
     VITE_BRIDGE_API: 'https://bridge.stx.eco/bridge-api/v1',
     VITE_SIGNER_API: 'https://bridge.stx.eco/signer-api/v1',
     VITE_STACKS_API: 'https://api.hiro.so',
@@ -50,8 +61,14 @@ const DEVNET_CONFIG = {
     VITE_SBTC_WALLET: 'tb1q6zlpyrzvzjcrf6dlsctcrh9yl3dwfktsw0nclq',
     VITE_SBTC_COORDINATOR: 'ST2BJA4JYFJ7SDMNFJZ9TJ3GB80P9Z80ADNF2R2AG',
     VITE_SBTC_CONTRACT_ID: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-    VITE_BRIDGE_API: 'http://localhost:3010/bridge-api/v1',
-    VITE_SIGNER_API: 'http://localhost:3010/signer-api/v1',
+    VITE_POX_CONTRACT: 'ST000000000000000000002AMW42H.pox-3',
+    VITE_SBTC_DEPLOYER: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+    VITE_SBTC_CONTRACTS: {
+        pool: 'sbtc-stacking-pool',
+        registry: 'sbtc-registry',
+    },
+    VITE_BRIDGE_API: 'http://localhost:3030/bridge-api/v1',
+    VITE_SIGNER_API: 'http://localhost:3030/signer-api/v1',
     VITE_STACKS_API: 'http://localhost:3999',
     VITE_STACKS_EXPLORER: 'http://localhost:8000',
     VITE_BSTREAM_EXPLORER: 'https://mempool.space/testnet',
@@ -66,7 +83,7 @@ export function setConfig(search:string) {
     //console.log('import.meta.env.MODE: ' + import.meta.env.MODE);
 	if (search.indexOf('testnet') > -1) CONFIG = TESTNET_CONFIG;
 	else if (search.indexOf('devnet') > -1) CONFIG = DEVNET_CONFIG;
-	else CONFIG = MAINNET_CONFIG
+	else CONFIG = MAINNET_CONFIG;
     if (import.meta.env.MODE === 'linode-staging') {
         CONFIG.VITE_BRIDGE_API = 'https://bridge.stx.eco/bridge-api/v1'
     } else if (import.meta.env.MODE === 'development') {
@@ -77,8 +94,8 @@ export function setConfig(search:string) {
         CONFIG.VITE_URI_VOTE = 'http://localhost:8082'
     
         // toggle depending on location / ip address etc
-        CONFIG.VITE_BRIDGE_API = 'http://localhost:3010/bridge-api/v1'
-        CONFIG.VITE_SIGNER_API = 'http://localhost:3010/signer-api/v1'
+        CONFIG.VITE_BRIDGE_API = 'http://localhost:3030/bridge-api/v1'
+        CONFIG.VITE_SIGNER_API = 'http://localhost:3030/signer-api/v1'
     }
     //console.log('CONFIG.VITE_BRIDGE_API: ' + CONFIG.VITE_BRIDGE_API);
 }

@@ -3,7 +3,8 @@
 	import "../sbtc.css";
 	import Header from "$lib/header/Header.svelte";
 	import Footer from "$lib/header/Footer.svelte";
-	import { fetchStatelessInfo, fetchSbtcData } from "$lib/bridge_api";
+	import { fetchStatelessInfo } from "$lib/signers_api";
+	import { fetchSbtcData } from "$lib/bridge_api";
 	import { fetchSbtcBalance, userSession, isLegal } from "$lib/stacks_connect";
 	import { setConfig } from '$lib/config';
 	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";

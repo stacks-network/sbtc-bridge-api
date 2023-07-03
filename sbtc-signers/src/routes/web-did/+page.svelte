@@ -6,7 +6,7 @@ import TimeLine from '$lib/components/register-proof/TimeLine.svelte';
 import { Tooltip } from 'flowbite-svelte';
 import { Icon, InformationCircle } from "svelte-hero-icons"
 import JSONTree from 'svelte-json-tree'
-import { fetchWebDid } from '$lib/bridge_api'
+import { fetchWebDid } from '$lib/signers_api'
 
 let inited = false;
 let errored = false;

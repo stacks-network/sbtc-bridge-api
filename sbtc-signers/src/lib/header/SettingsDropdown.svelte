@@ -8,17 +8,6 @@
 	import type { SbtcConfig } from '$types/sbtc_config';
 	import { fetchSbtcBalance } from '$lib/stacks_connect'
 
-	const getNextCycleBurnchainBlock = () => {
-		const bcInfo = $sbtcConfig.bcInfo;
-		const firstBC = bcInfo?.poxInfo?.firstBurnchainBlockHeight || 0;
-		const numbSinceFirst = (bcInfo?.mainnetTipHeight || 0) - firstBC;
-		const cycleLength = bcInfo?.poxInfo.rewardCycleLength || 0;
-		const prepareLength = bcInfo?.poxInfo.prepareCycleLength || 0;
-		const cycle1 = numbSinceFirst / cycleLength
-		const cycle2 = numbSinceFirst / (cycleLength + prepareLength)
-		return prepareLength
-	}
-
 	const getContractAddress = () => {
 		const contract = CONFIG.VITE_SBTC_CONTRACT_ID
 		return truncate(contract.split('.')[0]) + '.' + contract.split('.')[1]
@@ -150,23 +139,6 @@
 			</div>
 		</div>
 		
-		<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
-			<p class="text-sm text-white font-normal">
-				Current Reward Cycle:
-				<span class="text-sm inline-block font-extralight text-gray-100">{$sbtcConfig.bcInfo?.poxInfo.rewardCycleId}</span>
-			</p>
-			<div class="ml-auto flex items-center">
-			</div>
-		</div>
-		
-		<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
-			<p class="text-sm text-white font-normal">
-				Next Cycle:
-				<span class="text-sm inline-block font-extralight text-gray-100">{getNextCycleBurnchainBlock()}</span>
-			</p>
-			<div class="ml-auto flex items-center">
-			</div>
-		</div>
 	
   </div>
 	<DropdownItem defaultClass="hover:bg-black">

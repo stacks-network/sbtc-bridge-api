@@ -67,7 +67,7 @@ const DEVNET_CONFIG = {
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
   host: 'http://localhost',
-  port: 3010,
+  port: 3030,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
@@ -194,7 +194,7 @@ function setOverrides() {
     CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
     CONFIG.btcNode = '127.0.0.1:18332'
     CONFIG.btcRpcUser = 'bob'
-    CONFIG.btcRpcPwd = '***'
+    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   }

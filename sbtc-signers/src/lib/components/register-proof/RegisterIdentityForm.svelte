@@ -10,7 +10,7 @@ import EditIcon from '$lib/components/shared/EditIcon.svelte';
 import { truncate } from '$lib/utils'
 import CopyClipboard from '$lib/components/common/CopyClipboard.svelte';
 import { verifyStacksPricipal, getDidWeb } from "$lib/stacks_connect";
-import { fetchWebDid } from '$lib/bridge_api'
+import { fetchWebDid } from '$lib/signers_api'
 
 const dispatch = createEventDispatcher();
 let mine = true;

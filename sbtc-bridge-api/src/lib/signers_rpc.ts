@@ -1,4 +1,4 @@
-import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
+import { deserializeCV, cvToJSON, serializeCV, principalCV } from "micro-stacks/clarity";
 import fetch from 'node-fetch';
 //import { callContractReadOnly } from './sbtc_rpc.js'
 import type { BlockchainInfo, PoxInfo, StacksInfo } from 'sbtc-bridge-lib';
@@ -16,6 +16,17 @@ function getData(contractId:string, functionName:string) {
     network: getConfig().network
   }
 }
+export async function fetchDelegationInfo(stxAddress:string):Promise<any> {
+  const contractId = getConfig().poxContractId;
+  const data = getData(contractId, 'get-check-delegation') 
+  console.log('getDelegationInfo: ', data)
+  data.functionArgs = [`0x${bytesToHex(serializeCV(principalCV(stxAddress)))}`];
+  const response = await callContractReadOnly(data);
+  console.log('getDelegationInfo: ', response)
+  if (!response || response.type === '(optional none)') return undefined;
+  return response.value;
+}
+
 export async function fetchPoxInfo(contractId:string):Promise<BlockchainInfo> {
   const data = getData(contractId, 'get-pox-info') 
   const response = await callContractReadOnly(data);
