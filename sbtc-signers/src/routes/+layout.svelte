@@ -98,7 +98,7 @@
 {#if inited}
 	<div class="bg-gray-1000 bg-[url('$lib/assets/bg-lines.png')] bg-cover text-white font-extralight min-h-screen">
 		<div class="flex w-full bg-warning-200 justify-center">
-			<span class="text-error-700 py-5 font-medium">under construction</span>
+			<span class="text-error-700 py-5 font-medium">under construction see <a href="https://brighton-blockchain.gitbook.io/sbtc-bridge/sbtc-signer-dashboard/sbtc-mini-devnet#devnet-wallet-setup" target="_blank">connect your web wallet to devnet?</a></span>
 		</div>
 		<div>
 			{#key componentKey}
