@@ -5,7 +5,7 @@
 	import Footer from "$lib/header/Footer.svelte";
 	import { fetchStatelessInfo } from "$lib/signers_api";
 	import { fetchSbtcData } from "$lib/bridge_api";
-	import { fetchSbtcBalance, userSession, isLegal } from "$lib/stacks_connect";
+	import { fetchSbtcBalance, userSession, isLegal,isDevnet } from "$lib/stacks_connect";
 	import { setConfig } from '$lib/config';
 	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 	import { page } from "$app/stores";
@@ -25,11 +25,15 @@
 
 	let componentKey = 0;
 	console.log('process.env: ', import.meta.env);
-	setConfig($page.url.search);
+	setConfig('?net=devnet')   //($page.url.search);
 	const search = $page.url.search;
 	if (!isLegal(location.href)) {
 		componentKey++;
-		goto('/' + '?net=testnet')
+		goto('/' + '?net=devnet')
+	}
+	if (!isDevnet(location.href)) {
+		componentKey++;
+		goto('/' + '?net=devnet')
 	}
 	beforeNavigate((nav) => {
 		if (!isLegal(nav.to?.route.id || '')) {
@@ -39,13 +43,18 @@
 			return;
 		}
 		const next = (nav.to?.url.pathname || '') + (nav.to?.url.search || '');
+		if (next.indexOf('devnet') === -1) {
+			nav.cancel();
+			goto(next + '?net=devnet')
+		}
+		/**
 		if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {
 			nav.cancel();
 			goto(next + '?net=testnet')
 		} else if (nav.to?.url.search.indexOf('devnet') === -1 && search.indexOf('net=devnet') > -1) {
 			nav.cancel();
 			goto(next + '?net=devnet')
-		}
+		}*/
 	})
 	afterNavigate((nav) => {
 		componentKey++;
@@ -89,7 +98,7 @@
 {#if inited}
 	<div class="bg-gray-1000 bg-[url('$lib/assets/bg-lines.png')] bg-cover text-white font-extralight min-h-screen">
 		<div class="flex w-full bg-warning-200 justify-center">
-			<span class="text-error-700">under construction - this is not the final version!</span>
+			<span class="text-error-700 py-5 font-medium">under construction see <a href="https://brighton-blockchain.gitbook.io/sbtc-bridge/sbtc-signer-dashboard/sbtc-mini-devnet#devnet-wallet-setup" target="_blank">connect your web wallet to devnet?</a></span>
 		</div>
 		<div>
 			{#key componentKey}
