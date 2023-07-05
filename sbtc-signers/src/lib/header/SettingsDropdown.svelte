@@ -98,6 +98,7 @@
 					{CONFIG.VITE_NETWORK}
 				</span>
 			</p>
+			<!--
 			<div class="ml-auto">
 				<button class="border border-white bg-black px-3 py-0.5 rounded-xl text-xs inline-flex items-center text-white font-normal gap-1 hover:text-black hover:bg-white transition duration-200" on:click={() => toggleNetwork()}>
 					Switch
@@ -108,6 +109,7 @@
 					<Icon src="{ArrowsRightLeft}" mini class="-mr-0.5 h-4 w-4" aria-hidden="true" />
 				</button>
 			</div>
+			-->
 		</div>
 		<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
 			<p class="text-sm text-white font-normal">

@@ -143,6 +143,12 @@ export function makeFlash(el1:HTMLElement|null, styler:number|undefined) {
 	  }, 1000)
 }
 
+export function isDevnet(href:string):boolean {
+	if (href.indexOf('?net=devnet') === -1) {
+		return false;
+	}
+}
+
 export function isLegal(routeId:string):boolean {
 	if (userSession.isUserSignedIn()) return true;
 	if (routeId.startsWith('http')) {
