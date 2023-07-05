@@ -21,7 +21,9 @@ export function getStacksNetwork() {
 	let stxNetwork:StacksMainnet|StacksTestnet;
 	if (network === 'testnet') stxNetwork = new StacksTestnet();
 	else if (network === 'mainnet') stxNetwork = new StacksMainnet();
-	else stxNetwork = new StacksMocknet();
+	else {
+		stxNetwork = new StacksMocknet({ url: "http://devnet.stx.eco" });
+	}
 	return stxNetwork;
 }
 
@@ -96,9 +98,9 @@ function addresses():AddressObject {
 		const userData = userSession.loadUserData();
 		const network = CONFIG.VITE_NETWORK;
 		//let something = hashP2WPKH(payload.public_keys[0])
-		const stxAddress = (network === 'testnet') ? userData.profile.stxAddress.testnet : userData.profile.stxAddress.mainnet;
-		const cardinal = (network === 'testnet') ? userData.profile.btcAddress.p2wpkh.testnet : userData.profile.btcAddress.p2wpkh.mainnet;
-		const ordinal = (network === 'testnet') ? userData.profile.btcAddress.p2tr.testnet : userData.profile.btcAddress.p2tr.mainnet;
+		const stxAddress = (network === 'testnet' || network === 'devnet') ? userData.profile.stxAddress.testnet : userData.profile.stxAddress.mainnet;
+		const cardinal = (network === 'testnet' || network === 'devnet') ? userData.profile.btcAddress.p2wpkh.testnet : userData.profile.btcAddress.p2wpkh.mainnet;
+		const ordinal = (network === 'testnet' || network === 'devnet') ? userData.profile.btcAddress.p2tr.testnet : userData.profile.btcAddress.p2tr.mainnet;
 		return {
 			stxAddress,
 			cardinal,

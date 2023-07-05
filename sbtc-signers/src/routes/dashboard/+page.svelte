@@ -4,11 +4,11 @@
     import { Tooltip } from 'flowbite-svelte';
     import { fmtNumber } from '$lib/utils';
     import { Icon, InformationCircle } from "svelte-hero-icons"
-    import { a_primary } from '$lib/css_utils';
+    import type { BlockchainInfo } from 'sbtc-bridge-lib';
     import JSONTree from 'svelte-json-tree'
 
     const getNextCycleBurnchainBlock = () => {
-      const bcInfo = $sbtcConfig.bcInfo;
+      const bcInfo:BlockchainInfo = $sbtcConfig.bcInfo!;
       const firstBC = bcInfo?.poxInfo?.firstBurnchainBlockHeight || 0;
       const numbSinceFirst = (bcInfo?.mainnetTipHeight || 0) - firstBC;
       const cycleLength = bcInfo?.poxInfo.rewardCycleLength || 0;
@@ -32,8 +32,13 @@
         <div>
           <div class="w-full bg-primary-03 p-10 md:p-10 rounded-2xl relative">
             <div class="pb-10 w-full flex justify-between align-baseline items-baseline">
-              <div id="po-cycle" class=" text-black inline-block">
-                <a class={a_primary} href={'/cycles/' + $sbtcConfig.bcInfo?.poxInfo.rewardCycleId} >Cycle {$sbtcConfig.bcInfo?.poxInfo.rewardCycleId}</a>
+              <div class="flex flex-col">
+                <div id="po-cycle" class=" text-black inline-block">
+                  <span class="font-bold">PoX Cycle:</span> <a href={'/cycles/' + $sbtcConfig.bcInfo?.poxInfo.rewardCycleId} >{$sbtcConfig.bcInfo?.poxInfo.rewardCycleId}</a>
+                </div>
+                <div id="po-cycle" class=" text-black inline-block">
+                  <span class="font-bold">sBTC Window:</span> <a href={'/cycles/' + $sbtcConfig.bcInfo?.sbtcWindow} >{$sbtcConfig.bcInfo?.sbtcWindow}</a>
+                </div>
               </div>
               <div class="flex gap-x-2 justify-between align-baseline items-baseline">
                 <div id="po-bitcoin-bh" class=" text-black inline-block">

@@ -5,7 +5,7 @@ export interface IStringToStringDictionary { [key: string]: string|number|undefi
 @Route("/bridge-api/:network/v1/config")
 export class ConfigController {
   @Get("/")
-  public getAllParam(): IStringToStringDictionary {
+  public getAllParam(): any {
     const config = getConfig();
     config.mongoDbUrl = '*****'
     config.mongoDbName = '*****'
@@ -13,7 +13,7 @@ export class ConfigController {
     config.mongoUser = '*****'
     config.btcRpcPwd = '*****'
     config.btcRpcUser = '*****'
-    return config
+    return config;
   }
 
   @Get("/:param")

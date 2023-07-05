@@ -57,6 +57,17 @@
 		url.searchParams.set('net', net);
 		location.assign(url.search);
 	}
+	const toggleDevnet = async () => {
+		let net = 'devnet';
+		setConfig(net);
+		await fetchSbtcBalance();
+		sbtcConfig.update((conf:SbtcConfig) => {
+			return conf;
+		});
+		const url = new URL(location.href);
+		url.searchParams.set('net', net);
+		location.assign(url.search);
+	}
 </script>
 
 <Button btnClass="bg-primary-02 p-px font-normal rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500/50">
@@ -90,6 +101,10 @@
 			<div class="ml-auto">
 				<button class="border border-white bg-black px-3 py-0.5 rounded-xl text-xs inline-flex items-center text-white font-normal gap-1 hover:text-black hover:bg-white transition duration-200" on:click={() => toggleNetwork()}>
 					Switch
+					<Icon src="{ArrowsRightLeft}" mini class="-mr-0.5 h-4 w-4" aria-hidden="true" />
+				</button>
+				<button class="border border-white bg-black px-3 py-0.5 rounded-xl text-xs inline-flex items-center text-white font-normal gap-1 hover:text-black hover:bg-white transition duration-200" on:click={() => toggleDevnet()}>
+					devnet
 					<Icon src="{ArrowsRightLeft}" mini class="-mr-0.5 h-4 w-4" aria-hidden="true" />
 				</button>
 			</div>

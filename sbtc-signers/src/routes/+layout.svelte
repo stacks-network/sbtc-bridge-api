@@ -9,9 +9,9 @@
 	import { setConfig } from '$lib/config';
 	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 	import { page } from "$app/stores";
-	import { tick, onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { sbtcConfig } from '$stores/stores'
-	import type { PoxCycleInfo, BlockchainInfo, SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
+	import type { SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'
@@ -39,9 +39,12 @@
 			return;
 		}
 		const next = (nav.to?.url.pathname || '') + (nav.to?.url.search || '');
-			if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {
+		if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {
 			nav.cancel();
 			goto(next + '?net=testnet')
+		} else if (nav.to?.url.search.indexOf('devnet') === -1 && search.indexOf('net=devnet') > -1) {
+			nav.cancel();
+			goto(next + '?net=devnet')
 		}
 	})
 	afterNavigate((nav) => {
@@ -85,6 +88,9 @@
 
 {#if inited}
 	<div class="bg-gray-1000 bg-[url('$lib/assets/bg-lines.png')] bg-cover text-white font-extralight min-h-screen">
+		<div class="flex w-full bg-warning-200 justify-center">
+			<span class="text-error-700">under construction - this is not the final version!</span>
+		</div>
 		<div>
 			{#key componentKey}
 			<Header on:init_application={initApplication} />

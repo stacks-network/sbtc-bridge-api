@@ -350,21 +350,6 @@
 					"contractOwner"
 				],
 				"type": "object"
-			},
-			"IStringToStringDictionary": {
-				"properties": {},
-				"type": "object",
-				"additionalProperties": {
-					"anyOf": [
-						{
-							"type": "string"
-						},
-						{
-							"type": "number",
-							"format": "double"
-						}
-					]
-				}
 			}
 		},
 		"securitySchemes": {}
@@ -994,9 +979,7 @@
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/IStringToStringDictionary"
-								}
+								"schema": {}
 							}
 						}
 					}

@@ -6,7 +6,7 @@ import { onMount } from 'svelte';
 import { sbtcConfig } from '$stores/stores'
 import JSONTree from 'svelte-json-tree'
 
-let untilBlock:number|undefined = 0;
+let untilBlock = 0;
 let error:string|undefined;
 let stxAddress:string|undefined;
 let delegationInfo:any;
@@ -18,7 +18,7 @@ const allowDelegate = async () => {
     return;
   }
   error = undefined;
-  await delegate(resultOfDelegate);
+  await delegate(resultOfDelegate, untilBlock);
 }
 const resultOfDelegate = async (data:any) => {
   console.log(data)

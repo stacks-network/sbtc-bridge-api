@@ -2,7 +2,7 @@
  * sbtc - interact with Stacks Blockchain to read sbtc contract info
  */
 import { CONFIG } from '$lib/config';
-import { contractPrincipalCV, PostConditionMode, uintCV, stringAsciiCV, bufferCVFromString, noneCV } from '@stacks/transactions';
+import { contractPrincipalCV, PostConditionMode, uintCV, stringAsciiCV, bufferCVFromString, someCV } from '@stacks/transactions';
 import { tupleCV } from '@stacks/transactions/dist/esm/clarity/index.js';
 import { principalCV } from '@stacks/transactions/dist/esm/clarity/types/principalCV.js';
 import { openContractCall } from '@stacks/connect';
@@ -25,10 +25,10 @@ export function isCoordinator(address:string) {
 	return coordinators.find((o) => o.stxAddress === address);
 }
 
-export async function delegate(callback:any) {
+export async function delegate(callback:any, burnHeight:number) {
   //data {addr: principal, key: (buff 33)}
   const delegateTo = contractPrincipalCV(CONFIG.VITE_SBTC_DEPLOYER, CONFIG.VITE_SBTC_CONTRACTS.pool);
-  const until = noneCV();
+  const until = someCV(uintCV(burnHeight * 2));
   const functionArgs = [delegateTo, until]
   await openContractCall({
     network: getStacksNetwork(),
