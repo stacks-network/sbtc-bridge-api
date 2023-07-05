@@ -8,17 +8,6 @@
 	import type { SbtcConfig } from '$types/sbtc_config';
 	import { fetchSbtcBalance } from '$lib/stacks_connect'
 
-	const getNextCycleBurnchainBlock = () => {
-		const bcInfo = $sbtcConfig.bcInfo;
-		const firstBC = bcInfo?.poxInfo?.firstBurnchainBlockHeight || 0;
-		const numbSinceFirst = (bcInfo?.mainnetTipHeight || 0) - firstBC;
-		const cycleLength = bcInfo?.poxInfo.rewardCycleLength || 0;
-		const prepareLength = bcInfo?.poxInfo.prepareCycleLength || 0;
-		const cycle1 = numbSinceFirst / cycleLength
-		const cycle2 = numbSinceFirst / (cycleLength + prepareLength)
-		return prepareLength
-	}
-
 	const getContractAddress = () => {
 		const contract = CONFIG.VITE_SBTC_CONTRACT_ID
 		return truncate(contract.split('.')[0]) + '.' + contract.split('.')[1]
@@ -68,6 +57,17 @@
 		url.searchParams.set('net', net);
 		location.assign(url.search);
 	}
+	const toggleDevnet = async () => {
+		let net = 'devnet';
+		setConfig(net);
+		await fetchSbtcBalance();
+		sbtcConfig.update((conf:SbtcConfig) => {
+			return conf;
+		});
+		const url = new URL(location.href);
+		url.searchParams.set('net', net);
+		location.assign(url.search);
+	}
 </script>
 
 <Button btnClass="bg-primary-02 p-px font-normal rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500/50">
@@ -101,6 +101,10 @@
 			<div class="ml-auto">
 				<button class="border border-white bg-black px-3 py-0.5 rounded-xl text-xs inline-flex items-center text-white font-normal gap-1 hover:text-black hover:bg-white transition duration-200" on:click={() => toggleNetwork()}>
 					Switch
+					<Icon src="{ArrowsRightLeft}" mini class="-mr-0.5 h-4 w-4" aria-hidden="true" />
+				</button>
+				<button class="border border-white bg-black px-3 py-0.5 rounded-xl text-xs inline-flex items-center text-white font-normal gap-1 hover:text-black hover:bg-white transition duration-200" on:click={() => toggleDevnet()}>
+					devnet
 					<Icon src="{ArrowsRightLeft}" mini class="-mr-0.5 h-4 w-4" aria-hidden="true" />
 				</button>
 			</div>
@@ -150,23 +154,6 @@
 			</div>
 		</div>
 		
-		<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
-			<p class="text-sm text-white font-normal">
-				Current Reward Cycle:
-				<span class="text-sm inline-block font-extralight text-gray-100">{$sbtcConfig.bcInfo?.poxInfo.rewardCycleId}</span>
-			</p>
-			<div class="ml-auto flex items-center">
-			</div>
-		</div>
-		
-		<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
-			<p class="text-sm text-white font-normal">
-				Next Cycle:
-				<span class="text-sm inline-block font-extralight text-gray-100">{getNextCycleBurnchainBlock()}</span>
-			</p>
-			<div class="ml-auto flex items-center">
-			</div>
-		</div>
 	
   </div>
 	<DropdownItem defaultClass="hover:bg-black">

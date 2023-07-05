@@ -103,14 +103,14 @@ export class SbtcWalletController {
     let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
     try {
       sbtcContractData = await fetchNoArgsReadOnly();
-    } catch (err) {
+    } catch (err:any) {
       sbtcContractData = {} as SbtcContractDataI;
-      console.log(err)
+      console.log(err.message)
     }
     try {
       sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
-    } catch (err) {
-      console.log(err)
+    } catch (err:any) {
+      console.log(err.message)
     }
     try {
       const contractId = getConfig().sbtcContractId;
@@ -118,14 +118,14 @@ export class SbtcWalletController {
       const result = cvToJSON(deserializeCV(contractOwner.data));
       console.log(result)
       sbtcContractData.contractOwner = result.value
-    } catch (err) {
-      console.log(err)
+    } catch (err:any) {
+      console.log(err.message)
     }
     try {
       const bc = await getBlockCount();
       sbtcContractData.burnHeight = bc.count;
-    } catch (err) {
-      console.log(err)
+    } catch (err:any) {
+      console.log(err.message)
       sbtcContractData.burnHeight = -1;
     }
     //console.log('sbtcContractData: ', sbtcContractData)

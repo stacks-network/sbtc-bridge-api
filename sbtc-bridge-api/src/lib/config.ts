@@ -20,6 +20,11 @@ const TESTNET_CONFIG = {
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
+  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
+  sbtcContracts: {
+      pool: 'sbtc-stacking-pool',
+      registry: 'sbtc-registry',
+  },
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -46,6 +51,11 @@ const MAINNET_CONFIG = {
   walletPath: '/wallet/descwallet',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
+  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContracts: {
+      pool: 'sbtc-stacking-pool',
+      registry: 'sbtc-registry',
+  },
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -67,14 +77,18 @@ const DEVNET_CONFIG = {
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
   host: 'http://localhost',
-  port: 3010,
+  port: 3030,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
-  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
+  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  stacksApi: 'https://api.testnet.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
+  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContracts: {
+      pool: 'sbtc-stacking-pool',
+      registry: 'sbtc-registry',
+  },
+  stacksApi: 'http://devnet.stx.eco',
+  stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -100,6 +114,11 @@ const LINODE_TESTNET_CONFIG = {
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
+  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContracts: {
+      pool: 'sbtc-stacking-pool',
+      registry: 'sbtc-registry',
+  },
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -125,7 +144,12 @@ const LINODE_MAINNET_CONFIG = {
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
-  sbtcContractId: '',
+  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
+  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContracts: {
+      pool: 'sbtc-stacking-pool',
+      registry: 'sbtc-registry',
+  },
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -151,12 +175,17 @@ let CONFIG: {
   network: string; 
   poxContractId: string; 
   sbtcContractId: string; 
+  sbtcDeployer: string; 
+  sbtcContracts: {
+      pool: string; 
+      registry: string;
+  },
   stacksApi: string; 
   stacksExplorerUrl: string; 
   bitcoinExplorerUrl: string; 
   mempoolUrl: string; 
-  blockCypherUrl: string; 
-  publicAppName: string; 
+  blockCypherUrl: string;
+  publicAppName: string;
   publicAppVersion: string; 
 };
 
@@ -192,9 +221,10 @@ function setOverrides() {
     CONFIG.mongoDbName = 'sbtc-bridge-db'
     CONFIG.mongoUser = 'dockerdev1'
     CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
-    CONFIG.btcNode = '127.0.0.1:18332'
+    //CONFIG.btcNode = '127.0.0.1:18332'
+    CONFIG.btcNode = 'http://localhost:18443'
     CONFIG.btcRpcUser = 'bob'
-    CONFIG.btcRpcPwd = '***'
+    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   }

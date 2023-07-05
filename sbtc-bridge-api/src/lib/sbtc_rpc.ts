@@ -179,8 +179,8 @@ export async function fetchDataVar(contractAddress:string, contractName:string, 
     const response = await fetch(url);
     const result:any = await response.json();
     return result;
-  } catch(err) {
-    console.log('fetchUserBalances: stacksTokenInfo: ', err);
+  } catch(err:any) {
+    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message);
   }
 }
 

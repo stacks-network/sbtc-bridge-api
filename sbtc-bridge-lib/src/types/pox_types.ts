@@ -56,4 +56,5 @@ export type  BlockchainInfo =  {
   stacksInfo:StacksInfo;
   poxInfo:PoxInfo;
   mainnetTipHeight: number;
+  sbtcWindow: string;
 }
