@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { saveAllSbtcEvents } from '../lib/sbtc_rpc.js';
 import { scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
+import { fetchExchangeRates } from '../lib/bitcoin/blockcypher_api.js';
 import { checkReveal } from '../lib/bitcoin/rpc_reveal.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
@@ -31,4 +32,11 @@ export const revealCheckJob = cron.schedule('*/23 * * * *', (fireDate) => {
   }
 });
 
-
+export const exchangeRates = cron.schedule('*/5 * * * *', (fireDate) => {
+  console.log('Running: exchangeRates at: ' + fireDate);
+  try {
+    fetchExchangeRates();
+  } catch (err) {
+    console.log('Error running: exchangeRates: ', err);
+  }
+});

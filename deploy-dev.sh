@@ -16,7 +16,7 @@ docker login;
 
 docker rm -f bridge_api
 #source ~/.profile;
-docker run -d -t -i --name bridge_api -p 3010:3010 \
+docker run -d -t -i --name bridge_api -p 3030:3030 \
   -e TARGET_ENV='development' \
   -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
   -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \

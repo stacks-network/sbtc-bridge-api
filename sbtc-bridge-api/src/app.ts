@@ -6,10 +6,18 @@ import Router from "./routes/index.js";
 import { serve, setup } from 'swagger-ui-express';
 import { sbtcEventJob, peginRequestJob, revealCheckJob } from './controllers/JobScheduler.js';
 import cors from "cors";
-import { connect } from './lib/data/db_models.js'
+import { connect, getExchangeRates } from './lib/data/db_models.js'
 import { MAGIC_BYTES_TESTNET } from 'sbtc-bridge-lib' 
+import http from 'http'
+import { WebSocketServer } from 'ws'
 
 const app = express();
+
+//const wsServer = new WebSocketServer({ noServer: true });
+//wsServer.on('connection', socket => {
+//  socket.on('message', message => console.log(message));
+//});
+
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.static("public"));
@@ -36,15 +44,30 @@ console.log(`\n\nBitcoin connection at ${getConfig().btcNode} \nBitcoin Wallet P
 console.log(`\n\nMongo connection at ${getConfig().mongoDbUrl}`);
 async function connectToMongoCloud() {
   await connect();
-  app.listen(getConfig().port, () => {
-  
+  const server = app.listen(getConfig().port, () => {
     return;
   });
+  const wss = new WebSocketServer({ server })
   revealCheckJob.start();
   sbtcEventJob.start();
   peginRequestJob.start();
+  let rates = await getExchangeRates()
   console.log(`Running on ${getConfig().host}:${getConfig().port}\n\n`);
+  //const server = http.createServer(app)
+  wss.on('connection', function connection(ws) {
+    //console.log('new client connected');
+    ws.send(JSON.stringify(rates))
+    setInterval(async function () {
+      rates = await getExchangeRates()
+      ws.send(JSON.stringify(rates))
+    }, (60 * 5 * 1000)) // 5 mins.
+    ws.on('message', function incoming(message) { 
+      //console.log('received %s', message);
+      ws.send('Got your new rates : ' + message)
+    })
+  })
 }
 
 connectToMongoCloud();
 
+ 

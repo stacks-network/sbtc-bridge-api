@@ -144,9 +144,7 @@ export function makeFlash(el1:HTMLElement|null, styler:number|undefined) {
 }
 
 export function isDevnet(href:string):boolean {
-	if (href.indexOf('?net=devnet') === -1) {
-		return false;
-	}
+	return (href.indexOf('?net=devnet') > -1)
 }
 
 export function isLegal(routeId:string):boolean {

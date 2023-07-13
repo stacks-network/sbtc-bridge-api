@@ -82,9 +82,6 @@ body, html {
 	border-radius: 8px;
 }
 
-.text-gradient {
-	color: linear-gradient(126.12deg, #ED693C 11.8%, #FEDB63 72.43%);
-}
 .flasherize-button {
 	background-color: #ef4444!important;
 	border: 1pt solid #FEDB63!important;

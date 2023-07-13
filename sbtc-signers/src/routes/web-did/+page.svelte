@@ -67,8 +67,6 @@ onMount(async () => {
   You'll need to add a txt record to the domain so please make sure this is possible.
 </Tooltip>
 
-<div class="mt-20 w-full mx-auto md:h-[calc(100vh-180px)] lg:h-[calc(100vh-180px)] flex flex-col justify-center">
-	<div class="w-full mx-auto max-w-2xl">
     <div>
       <div class="flex flex-col p-2 gap-10 items-start bg-gray-1000">
         {#key componentKey}<TimeLine {timeLineStatus}/>{/key}
@@ -110,6 +108,4 @@ onMount(async () => {
           {/if}
         </div>
       </div>
-      </div>
-  </div>
-</div>
+    </div>

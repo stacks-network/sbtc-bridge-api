@@ -2,6 +2,7 @@ import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
 import { getConfig } from '../config.js';
 
+let exchangeRates:Collection;
 let sbtcContractEvent:Collection;
 let peginRequest:Collection;
 let commitments:Collection;
@@ -36,6 +37,20 @@ export async function connect() {
 	await peginRequest.createIndex({status: 1, amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1}, { unique: true })
 	commitments = database.collection('commitments');
 	await commitments.createIndex({status: 1, amount: 1, fromBtcAddress: 1, originator: 1, sbtcWalletAddress: 1}, { unique: true })
+	exchangeRates = database.collection('exchangeRates');
+}
+
+// Exchange Rates 
+export async function delExchangeRates () {
+	await exchangeRates.deleteMany();
+	return;
+}
+export async function setExchangeRates (ratesObj:any) {
+	return await exchangeRates.insertMany(ratesObj);
+}
+export async function getExchangeRates () {
+	const result = await exchangeRates.find({}).sort({'symbol': -1}).toArray();
+	return result;
 }
 
 // Compile model from schema 

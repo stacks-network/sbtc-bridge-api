@@ -118,6 +118,17 @@ router.get("/bridge-api/:network/v1/btc/wallet/listwallets", async (req, res, ne
   }
 });
 
+router.get("/bridge-api/:network/v1/btc/tx/rates", async (req, res, next) => {
+  try {
+    const controller = new TransactionController();
+    const response = await controller.getRates();
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 router.get("/bridge-api/:network/v1/btc/tx/keys", async (req, res, next) => {
   try {
     const controller = new TransactionController();

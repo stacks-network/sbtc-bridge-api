@@ -74,6 +74,7 @@
     "sbtc-bridge-lib": "^1.0.24",
     "swagger-ui-express": "^4.6.3",
     "tsoa": "^5.1.1",
-    "uninstall": "^0.0.0"
+    "uninstall": "^0.0.0",
+    "ws": "^8.13.0"
   }
 }

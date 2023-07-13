@@ -2,6 +2,7 @@ import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
+import { fetchExchangeRates } from "../lib/bitcoin/blockcypher_api.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { findPeginRequestById } from "../lib/data/db_models.js";
@@ -16,6 +17,7 @@ import { toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWi
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updatePeginRequest } from '../lib/data/db_models.js';
+
 
 export interface FeeEstimateResponse {
     feeInfo: {
@@ -56,6 +58,12 @@ export class TransactionController {
     }
 }
   
+@Get("/rates")
+public getRates() {
+  const rates = fetchExchangeRates();
+  return rates;
+}
+
 public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     if (!wrappedPsbt?.stxSignature || !wrappedPsbt?.stxSignature.message) {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'No signature data found.' }
