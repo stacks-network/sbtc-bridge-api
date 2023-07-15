@@ -303,12 +303,13 @@ export class WalletController {
 
   //@Get("/address/:address/utxos?verbose=true")
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
-    const result = await getAddressInfo(address);
+    let result;
     try {
+      result = await getAddressInfo(address);
       const addressValidation = await validateAddress(address);
       result.addressValidation = addressValidation
     } catch (err:any) {
-      console.log('fetchUtxoSet: addressValidation: ' + err.message)
+      console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
       // carry on
     }
     try {
@@ -322,7 +323,7 @@ export class WalletController {
       }
       result.utxos = utxos
     } catch (err:any) {
-      console.log('fetchUtxoSet: fetchUTXOs: ' + err.message)
+      console.log('fetchUtxoSet: fetchUTXOs: ' + address + ' : ' + err.message)
       // carry on
     }
     return result;

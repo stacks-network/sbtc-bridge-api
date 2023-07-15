@@ -45,7 +45,8 @@
 		const next = (nav.to?.url.pathname || '') + (nav.to?.url.search || '');
 		if (next.indexOf('devnet') === -1) {
 			nav.cancel();
-			goto(next + '?net=devnet')
+			goto(next + '?net=devnet', { invalidateAll: true, replaceState: false })
+			//window.onbeforeunload = null;
 		}
 		/**
 		if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {

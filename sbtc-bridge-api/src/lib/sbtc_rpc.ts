@@ -67,11 +67,12 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
       try {
         const fullPK = response.value.value.split('x')[1];
         // converting to x-only..
-        result.sbtcWalletPublicKey = fullPK.substring(2);
+        result.sbtcWalletPublicKey = fullPK;
         const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-        const trObj = btc.p2tr(result.sbtcWalletPublicKey, undefined, net);
+        const trObj = btc.p2tr(fullPK.substring(1), undefined, net);
         if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
       } catch(err) {
+        console.log('get-bitcoin-wallet-public-key: current: ', current)
         console.log('get-bitcoin-wallet-public-key: err: ', err)
       }
       break;

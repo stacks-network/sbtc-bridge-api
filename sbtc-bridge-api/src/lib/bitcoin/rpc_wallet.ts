@@ -86,7 +86,7 @@ export async function getAddressInfo(address:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getaddressinfo","params":["${address}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'getAddressInfo internal error');
+  await handleError(response, 'getAddressInfo internal error: ' + address);
   const result = await response.json();
   return result.result;
 }
@@ -95,7 +95,7 @@ export async function importAddress(address:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"importaddress","params":["${address}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'importAddress internal error');
+  await handleError(response, 'importAddress internal error: ' + address);
   const result = await response.json();
   return result.result;
 }
@@ -104,7 +104,7 @@ export async function importPubkey(pubkey:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"importpubkey","params":["${pubkey}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'importPubkey internal error');
+  await handleError(response, 'importPubkey internal error: ' + pubkey);
   const result = await response.json();
   return result.result;
 }
@@ -113,7 +113,7 @@ export async function getWalletInfo(pubkey:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getwalletinfo","params":[]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'getWalletInfo internal error');
+  await handleError(response, 'getWalletInfo internal error: ' + pubkey);
   const result = await response.json();
   return result.result;
 }

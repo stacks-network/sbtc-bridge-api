@@ -79,7 +79,7 @@
     <NavLi nonActiveClass={getNavActiveClass('/withdraw')} href="/withdraw">Withdraw</NavLi>
 	-->
     <NavLi nonActiveClass={getNavActiveClass('/dashboard')} href="/dashboard">Dashboard</NavLi>
-    <NavLi nonActiveClass={getNavActiveClass('/stacking')} href="/stacking">Stack Test</NavLi>
+    <NavLi nonActiveClass={getNavActiveClass('/stacking')} href="/stacking">Register</NavLi>
     <NavLi nonActiveClass={getNavActiveClass('/web-did')} href="/web-did">DNS Vouch</NavLi>
     <NavLi nonActiveClass={getNavActiveClass('/faq')} href="/faq">FAQ</NavLi>
   </NavUl>
