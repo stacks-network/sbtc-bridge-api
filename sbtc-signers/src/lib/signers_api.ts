@@ -29,6 +29,17 @@ export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
 }
  */
 
+export async function getAllowanceContractCallers(stxAddress:string):Promise<BlockchainInfo|undefined> {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/get-allowance-contract-callers/' + stxAddress);
+  try {
+    const response = await fetch(path);
+    const res = await response.json();
+    return res;
+  } catch(err) {
+    return undefined;
+  }
+}
+
 export async function getDelegationInfo(stxAddress:string):Promise<BlockchainInfo|undefined> {
   const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/get-delegation-info/' + stxAddress);
   try {

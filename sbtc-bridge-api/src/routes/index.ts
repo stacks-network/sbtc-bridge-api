@@ -118,6 +118,17 @@ router.get("/bridge-api/:network/v1/btc/wallet/listwallets", async (req, res, ne
   }
 });
 
+router.get("/bridge-api/:network/v1/btc/tx/rates", async (req, res, next) => {
+  try {
+    const controller = new TransactionController();
+    const response = await controller.getRates();
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 router.get("/bridge-api/:network/v1/btc/tx/keys", async (req, res, next) => {
   try {
     const controller = new TransactionController();
@@ -455,7 +466,7 @@ router.get("/bridge-api/:network/v1/config/:param", async (req, res, next) => {
     const controller = new ConfigController();
     const response = await controller.getParam(req.params.param);
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -467,7 +478,7 @@ router.get("/bridge-api/:network/v1/signers/pox-info", async (req, res, next) =>
     const controller = new SignersController();
     const response = await controller.fetchPoxInfo();
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -496,9 +507,19 @@ router.get("/signer-api/:network/v1/info", async (req, res, next) => {
   }
 });
 router.get("/signer-api/:network/v1/pox/get-delegation-info/:stxAddress", async (req, res, next) => {
-  try { 
+  try {
     const controller = new SignersController();
     const result = await controller.getDelegationInfo(req.params.stxAddress);
+    return res.send(result);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching vouching/domain/:domain.')
+  }
+});
+router.get("/signer-api/:network/v1/pox/get-allowance-contract-callers/:stxAddress", async (req, res, next) => {
+  try {
+    const controller = new SignersController();
+    const result = await controller.getAllowanceContractCallers(req.params.stxAddress);
     return res.send(result);
   } catch (error) {
     console.log('Error in routes: ', error)

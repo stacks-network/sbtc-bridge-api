@@ -1,4 +1,4 @@
-import { deserializeCV, cvToJSON, serializeCV, principalCV } from "micro-stacks/clarity";
+import { contractPrincipalCV, deserializeCV, cvToJSON, serializeCV, principalCV } from "micro-stacks/clarity";
 import fetch from 'node-fetch';
 //import { callContractReadOnly } from './sbtc_rpc.js'
 import type { BlockchainInfo, PoxInfo, StacksInfo } from 'sbtc-bridge-lib';
@@ -32,6 +32,25 @@ export async function fetchDelegationInfo(stxAddress:string):Promise<any> {
   if (!response || response.type === '(optional none)') return undefined;
   return response.value;
 }
+ 
+export async function fetchAllowanceContractCallers(stxAddress:string):Promise<any> {
+  try {
+    const delegateTo = getConfig().sbtcDeployer + '.' + getConfig().sbtcContracts.pool;
+    const contractId = getConfig().poxContractId;    console.log('fetchAllowanceContractCallers: contractId: ', contractId)
+    const data = getData(contractId, 'get-allowance-contract-callers');
+    data.functionArgs = [`0x${bytesToHex(serializeCV(principalCV(stxAddress)))}`, `0x${bytesToHex(serializeCV(contractPrincipalCV(delegateTo)))}`];
+    const response = await callContractReadOnly(data);
+    console.log('fetchAllowanceContractCallers: response: ', response.value.value['until-burn-ht'].value.value)
+    //const result = Number(response.value);
+    return { untilBlockHeight: Number(response.value.value['until-burn-ht'].value.value) };
+  } catch(err:any) {
+    console.log(err.message)
+    return { untilBlockHeight: 0 };
+  }
+}
+
+
+
 
 export async function fetchPoxInfo(contractId:string):Promise<BlockchainInfo> {
   let poxInfo:PoxInfo;
@@ -193,8 +212,6 @@ export async function getStackingMinimum(contractId:string):Promise<any> {
     return 0;
   }
 }
-
-
 
 export async function callContractReadOnly(data:any) {
   const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName

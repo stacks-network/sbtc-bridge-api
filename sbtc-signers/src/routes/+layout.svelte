@@ -45,7 +45,8 @@
 		const next = (nav.to?.url.pathname || '') + (nav.to?.url.search || '');
 		if (next.indexOf('devnet') === -1) {
 			nav.cancel();
-			goto(next + '?net=devnet')
+			goto(next + '?net=devnet', { invalidateAll: true, replaceState: false })
+			//window.onbeforeunload = null;
 		}
 		/**
 		if (nav.to?.url.search.indexOf('testnet') === -1 && search.indexOf('net=testnet') > -1) {
@@ -98,7 +99,8 @@
 {#if inited}
 	<div class="bg-gray-1000 bg-[url('$lib/assets/bg-lines.png')] bg-cover text-white font-extralight min-h-screen">
 		<div class="flex w-full bg-warning-200 justify-center">
-			<span class="text-error-700 py-5 font-medium">under construction see <a href="https://brighton-blockchain.gitbook.io/sbtc-bridge/sbtc-signer-dashboard/sbtc-mini-devnet#devnet-wallet-setup" target="_blank">connect your web wallet to devnet?</a></span>
+			<span class="text-error-700 py-5 px-5 font-medium">under construction</span>
+			<span class="text-dark-700 py-5 font-medium"><a class="text-blue-500" href="https://brighton-blockchain.gitbook.io/sbtc-bridge/sbtc-signer-dashboard/sbtc-mini-devnet#devnet-wallet-setup" target="_blank">see devnet how too</a></span>
 		</div>
 		<div>
 			{#key componentKey}
@@ -106,9 +108,12 @@
 			{/key}
 		</div>
 		<div class="flex min-h-[calc(100vh-160px)] mx-auto lg:px-8 align-middle justify-center flex-grow">
-			<slot></slot>
+			<div class="mx-auto flex flex-col justify-start w-full sm:max-w-4xl py-6 px-6 lg:px-8">
+				<div class="sm:grid sm:grid-cols-1 sm:gap-2 space-y-2 sm:space-y-0">
+					<slot></slot>
+				</div>
+			</div>
 		</div>
-
 		<Footer />
 	</div>
 {/if}

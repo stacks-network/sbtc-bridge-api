@@ -384,6 +384,26 @@
 				"parameters": []
 			}
 		},
+		"/bridge-api/{network}/v1/btc/tx/rates": {
+			"get": {
+				"operationId": "GetRates",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/bridge-api/{network}/v1/btc/tx/commitment/{stxAddress}/{revealFee}": {
 			"get": {
 				"operationId": "Commitment",

@@ -45,6 +45,7 @@
 		sbtcConfig.update(() => conf);
 	}
 
+	/**
 	const toggleNetwork = async () => {
 		let net = 'mainnet';
 		if ('mainnet' === CONFIG.VITE_NETWORK) net = 'testnet';
@@ -67,7 +68,7 @@
 		const url = new URL(location.href);
 		url.searchParams.set('net', net);
 		location.assign(url.search);
-	}
+	}*/
 </script>
 
 <Button btnClass="bg-primary-02 p-px font-normal rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500/50">

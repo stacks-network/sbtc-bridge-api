@@ -27,10 +27,8 @@
       Current pox cycle - click for more infomation.
     </Tooltip>
     
-    <div class="mx-auto flex flex-col justify-start w-full sm:max-w-4xl py-6 px-6 lg:px-8">
-      <div class="sm:grid sm:grid-cols-1 sm:gap-2 space-y-2 sm:space-y-0">
         <div>
-          <div class="w-full bg-primary-03 p-10 md:p-10 rounded-2xl relative">
+          <div class="w-full bg-primary-03 p-10 md:p-10 rounded-2xl ">
             <div class="pb-10 w-full flex justify-between align-baseline items-baseline">
               <div class="flex flex-col">
                 <div id="po-cycle" class=" text-black inline-block">
@@ -63,9 +61,7 @@
               <p class="text-black">Next cycle in: {getNextCycleBurnchainBlock()} blocks</p>
             </div>
           </div>
-        </div>
-      </div>
-      <div class="bg-white border rounded-lg p-5 text-2xl my-10" style="--json-tree-string-color: blue; --json-tree-font-size: 18px;">
-        <JSONTree value={$sbtcConfig.bcInfo}/>
-      </div>
-    </div>
+          <div class="bg-white border rounded-lg p-5 text-2xl my-10" style="--json-tree-string-color: blue; --json-tree-font-size: 18px;">
+            <JSONTree value={$sbtcConfig.bcInfo}/>
+          </div>
+            </div>

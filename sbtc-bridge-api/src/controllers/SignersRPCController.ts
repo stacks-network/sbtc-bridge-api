@@ -1,5 +1,5 @@
 import { Route } from "tsoa";
-import { fetchDelegationInfo, fetchPoxInfo, getNumRewardSetPoxAddresses, getTotalPoxRejection, isPoxActive, rewardCycleToBurnHeight, getRewardSetSize, getTotalUstxStacked, getStackingMinimum } from '../lib/signers_rpc.js'
+import { fetchAllowanceContractCallers, fetchDelegationInfo, fetchPoxInfo, getNumRewardSetPoxAddresses, getTotalPoxRejection, isPoxActive, rewardCycleToBurnHeight, getRewardSetSize, getTotalUstxStacked, getStackingMinimum } from '../lib/signers_rpc.js'
 import { getConfig } from '../lib/config.js';
 import type { PoxCycleInfo } from 'sbtc-bridge-lib'
 export interface BalanceI {
@@ -11,6 +11,11 @@ export class SignersController {
   
   public async getDelegationInfo(stxAddress:string): Promise<any> {
     const result = await fetchDelegationInfo(stxAddress);
+    return result;
+  }
+
+  public async getAllowanceContractCallers(stxAddress:string): Promise<any> {
+    const result = await fetchAllowanceContractCallers(stxAddress);
     return result;
   }
 
@@ -48,5 +53,4 @@ export class SignersController {
     }
     return cycleInfo;
   }
-
 }

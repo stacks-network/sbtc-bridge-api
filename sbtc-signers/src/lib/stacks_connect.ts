@@ -63,25 +63,25 @@ export function encodeStacksAddress (network:string, b160Address:string) {
 
 export async function fetchSbtcBalance () {
 	const adrds:AddressObject = addresses();
-	let result:AddressObject;
+	//let result:AddressObject;
 	try {
-		result = await fetchUserBalances(adrds);
+		const result = await fetchUserBalances(adrds);
 		try {
-			result.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens[CONFIG.VITE_SBTC_CONTRACT_ID + '::sbtc'].balance)
+			adrds.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens[CONFIG.VITE_SBTC_CONTRACT_ID + '::sbtc'].balance)
 		} catch (err) {
 			// for testing..
-			try { result.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens['ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant::sbtc'].balance) }
-			catch (err) { result.sBTCBalance = 0 }
+			try { adrds.sBTCBalance = Number(result.stacksTokenInfo?.fungible_tokens['ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant::sbtc'].balance) }
+			catch (err) { adrds.sBTCBalance = 0 }
 		}
 
 	} catch(err) {
-		result = adrds;
+		//result = adrds;
 		console.log('Network down...');
 	}
 	//const result = await fetchUserSbtcBalance(adrds.stxAddress);
 	await sbtcConfig.update((conf:SbtcConfig) => {
 		try {
-			conf.addressObject = result;
+			conf.addressObject = adrds;
 			conf.loggedIn = true;
 	
 		} catch (err:any) {
@@ -144,9 +144,7 @@ export function makeFlash(el1:HTMLElement|null, styler:number|undefined) {
 }
 
 export function isDevnet(href:string):boolean {
-	if (href.indexOf('?net=devnet') === -1) {
-		return false;
-	}
+	return (href.indexOf('?net=devnet') > -1)
 }
 
 export function isLegal(routeId:string):boolean {

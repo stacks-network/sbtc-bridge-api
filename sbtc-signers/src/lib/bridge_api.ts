@@ -40,12 +40,6 @@ async function extractResponse(response:any) {
   }
 }
 
-export async function fetchSbtcWalletAddress() {
-  const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/sbtc/wallet-address');
-  const response = await fetchCatchErrors(path);
-  return await extractResponse(response);
-}
-
 export async function fetchSbtcData() {
   const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/sbtc/data');
   try {
