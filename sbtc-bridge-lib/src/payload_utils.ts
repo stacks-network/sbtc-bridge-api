@@ -64,7 +64,7 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPa
 	}
 	current = current + 1 + lengthOfMemo;
 	const rev = d1.subarray(current);
-	const revealFee = uint8ToAmount(rev);
+	const revealFee = bigUint64ToAmount(rev);
     //console.log('payload rev: ', revealFee)
 
 	if (opcode.toUpperCase() !== PEGIN_OPCODE) 
@@ -83,6 +83,7 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPa
 	};
 }
 
+/**
 export function amountToUint8(amt:number, size:number):Uint8Array {
 	const buffer = new ArrayBuffer(size);
 	const view = new DataView(buffer);
@@ -97,6 +98,19 @@ export function uint8ToAmount(buf:Uint8Array):number {
 	const amt = view.getUint32(0);
 	return amt;
 }
+ */
+export function amountToBigUint64(amt:number, size:number) {
+	const buffer = new ArrayBuffer(size);
+	const view = new DataView(buffer);
+	view.setBigUint64(0, BigInt(amt)); // Max unsigned 32-bit integer
+	const res = new Uint8Array(view.buffer);
+	return res;
+}
+export function bigUint64ToAmount(buf:Uint8Array):number {
+	const view = new DataView(buf.buffer, 0, 8);
+	const amt = view.getBigUint64(0);
+	return Number(amt);
+}
 
 export function parseWithdrawalPayload(network:string, d1:Uint8Array, sbtcWallet:string, compression:number):withdrawalPayloadType {
 	const magicOp = getMagicAndOpCode(d1);
@@ -110,9 +124,9 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, sbtcWallet
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3E') throw new Error('Wrong opcode for withdraw: should be 3E was ' + opcode)
     //console.log('parseWithdrawalPayloadNoMagic opcode: ', opcode)
-	const amountSats = uint8ToAmount(d1.subarray(1, 10));
+	const amountSats = bigUint64ToAmount(d1.subarray(1, 9));
     //console.log('parseWithdrawalPayloadNoMagic amountSats: ', amountSats)
-	const signature = (hex.encode(d1.subarray(10, 75)));
+	const signature = (hex.encode(d1.subarray(9, 74)));
     //console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
 	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, sbtcWallet);
     //console.log('parseWithdrawalPayloadNoMagic msgHash: ', msgHash)
@@ -155,7 +169,7 @@ export function buildDepositPayload(net:any, revealFee:number, address:string, o
 		memoLength.fill(0);
 		buf1 = concat(buf1, memoLength);
 	}
-	const feeBuf = amountToUint8(revealFee, 8)
+	const feeBuf = amountToBigUint64(revealFee, 8)
 	buf1 = concat(buf1, feeBuf)
 	
 	if (!opDrop) return concat(magicBuf, buf1)
@@ -165,9 +179,9 @@ export function buildDepositPayload(net:any, revealFee:number, address:string, o
 export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Array, opDrop:boolean):Uint8Array {
 	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
-	const amountBuf = amountToUint8(amount, 9);
+	const amountBuf = amountToBigUint64(amount, 9);
     //console.log('parseWithdrawalPayloadNoMagic amountBuf: ', hex.encode(amountBuf))
-    //console.log('parseWithdrawalPayloadNoMagic amount: ', uint8ToAmount(amountBuf))
+    //console.log('parseWithdrawalPayloadNoMagic amount: ', bigUint64ToAmount(amountBuf))
 	let data = concat(opCodeBuf, amountBuf, signature)
 	if (!opDrop) data = concat(magicBuf, opCodeBuf, amountBuf, signature);
 	return data;
@@ -221,7 +235,7 @@ export function parseOutputs(network:string, output0:any, sbtcWalletAddress:stri
 }
   
 export function getDataToSign(network:string, amount:number, sbtcWalletAddress:string):Uint8Array {
-	const amtBuf = amountToUint8(amount, 9);
+	const amtBuf = amountToBigUint64(amount, 8);
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const script = btc.OutScript.encode(btc.Address(net).decode(sbtcWalletAddress))
 	const data = concat(amtBuf, script);

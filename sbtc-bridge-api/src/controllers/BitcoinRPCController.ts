@@ -264,17 +264,19 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string): Promise<any> {
       try {
-        const resp = await sendRawTxDirectBlockCypher(hex);
-        console.log('sendRawTransaction 1: ', resp);
+        const resp =  await sendRawTxRpc(hex);
+        console.log('sendRawTransaction 1: bitcoin core:', resp);
         return resp;
       } catch (err) {
         try {
+          console.log('sendRawTransaction 2: trying mempool: ');
           const resp = await sendRawTxDirectMempool(hex);
-          console.log('sendRawTransaction 2: ', resp);
+          console.log('sendRawTransaction 2: sendRawTxDirectMempool: ', resp);
           return resp;
         } catch (err) {
-          const resp =  await sendRawTxRpc(hex);
-          console.log('sendRawTransaction 3: ', resp);
+          console.log('sendRawTransaction 2: trying block cypher: ');
+          const resp = await sendRawTxDirectBlockCypher(hex);
+          console.log('sendRawTransaction 3: sendRawTxDirectBlockCypher: ', resp);
           return resp;
         }
       }
