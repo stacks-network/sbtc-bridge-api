@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, expect, describe, it } from 'vitest'
 import { 
   parseDepositPayload, buildDepositPayload,
-  amountToUint8, uint8ToAmount,
+  amountToBigUint64, bigUint64ToAmount,
   buildWithdrawalPayload, parseWithdrawalPayload,
   getStacksSimpleHashOfDataToSign, getStacksAddressFromSignature
 } from '../src/index';
@@ -23,15 +23,15 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
 
   it.concurrent('Check converting numbers to from uint8 arrays works', async () => {
     // first byte is length
-    let s = amountToUint8(100, 20)
-    let y = uint8ToAmount(s)
+    let s = amountToBigUint64(100, 20)
+    let y = bigUint64ToAmount(s)
     assert(y === 100)
-    s = amountToUint8(5000, 8)
-    y = uint8ToAmount(s)
+    s = amountToBigUint64(5000, 8)
+    y = bigUint64ToAmount(s)
     assert(y === 5000)
-    y = uint8ToAmount(hex.decode('0000138800000000'))
+    y = bigUint64ToAmount(hex.decode('0000138800000000'))
     assert(y === 5000)
-    y = uint8ToAmount(hex.decode('00001388'))
+    y = bigUint64ToAmount(hex.decode('00001388'))
     assert(y === 5000)
   })
 
