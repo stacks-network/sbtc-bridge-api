@@ -65,4 +65,5 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     assert(trObj.address === 'tb1pewpc7x6nnea8clm2vn2d8xvpdwvkhucmfdwmm0p6vk2u5xgmwlzsdx3g6w')
   })
 
+
 })
