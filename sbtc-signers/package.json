@@ -50,7 +50,7 @@
 		"classnames": "^2.3.2",
 		"flowbite": "^1.6.5",
 		"flowbite-svelte": "^0.37.5",
-		"sbtc-bridge-lib": "^1.0.28",
+		"sbtc-bridge-lib": "^1.0.29",
 		"svelte-hero-icons": "^5.0.0",
 		"svelte-json-tree": "^1.0.0",
 		"svelte-local-storage-store": "^0.4.0",
