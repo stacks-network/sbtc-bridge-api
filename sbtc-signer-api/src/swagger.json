@@ -286,7 +286,7 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/events/events/save": {
+		"/signer-api/{network}/v1/events/save": {
 			"get": {
 				"operationId": "SaveAllSbtcEvents",
 				"responses": {
@@ -303,7 +303,7 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/events/events/index/stacks/{txid}": {
+		"/signer-api/{network}/v1/events/index/stacks/{txid}": {
 			"get": {
 				"operationId": "IndexSbtcEvent",
 				"responses": {
@@ -329,7 +329,7 @@
 				]
 			}
 		},
-		"/signer-api/{network}/v1/events/events/save/{page}": {
+		"/signer-api/{network}/v1/events/save/{page}": {
 			"get": {
 				"operationId": "SaveSbtcEvents",
 				"responses": {
@@ -356,7 +356,7 @@
 				]
 			}
 		},
-		"/signer-api/{network}/v1/events/events/count": {
+		"/signer-api/{network}/v1/events/count": {
 			"get": {
 				"operationId": "CountEvents",
 				"responses": {
@@ -373,7 +373,7 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/events/events/{page}": {
+		"/signer-api/{network}/v1/events/{page}": {
 			"get": {
 				"operationId": "FindSbtcEvents",
 				"responses": {
