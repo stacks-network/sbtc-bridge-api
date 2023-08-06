@@ -31,7 +31,7 @@ app.use(
   setup(undefined, {
     swaggerOptions: {
       spec: swagger,
-      url: "/swagger.json",
+      //url: "/swagger.json",
     },
   })
 );

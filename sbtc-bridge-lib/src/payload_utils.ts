@@ -374,7 +374,7 @@ enum StacksNetworkVersion {
 }
 
 export function fromStorable(script:any) {
-	if (typeof script.tweakedPubkey === 'string') return script
+	if (typeof script.tweakedPubkey !== 'string') return script
 	return codifyScript(script, true)
 }
   
@@ -383,7 +383,7 @@ export function toStorable(script:any) {
 	return codifyScript(script, false)
 }
   
-  function codifyScript(script:any, asString:boolean) {
+function codifyScript(script:any, asString:boolean) {
 	return {
 	  address: script.address,
 	  script: codify(script.script, asString),
@@ -396,8 +396,7 @@ export function toStorable(script:any) {
 	  tapMerkleRoot: codify(script.tapMerkleRoot, asString),
 	  tweakedPubkey: codify(script.tweakedPubkey, asString),
 	}
-  
-  }
+}
   
   function codifyTapLeafScript(tapLeafScript:any, asString:boolean) {
 	if (tapLeafScript[0]) {
