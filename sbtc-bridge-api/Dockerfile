@@ -1,7 +1,7 @@
 FROM node:19-alpine
 
 # Set the environment variables
-ENV PORT 3010
+ENV PORT 7010
 
 # Create app directory
 WORKDIR /app
