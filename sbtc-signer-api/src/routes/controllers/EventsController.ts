@@ -9,17 +9,17 @@ export interface BalanceI {
 
 export class EventsController {
   
-  @Get("/save")
+  //@Get("/save")
   public async saveAllSbtcEvents(): Promise<any> {
     return await saveAllSbtcEvents();
   }
 
-  @Get("/index/stacks/:txid")
+  //@Get("/index/stacks/:txid")
   public async indexSbtcEvent(txid:string): Promise<any> {
     return await indexSbtcEvent(txid);
   }
 
-  @Get("/save/:page")
+  //@Get("/save/:page")
   public async saveSbtcEvents(page:number): Promise<any> {
     return await saveSbtcEvents(page);
   }

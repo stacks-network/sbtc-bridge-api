@@ -90,7 +90,7 @@ export class SignersController extends Router {
     return cycleInfo;
   }
 
-  @Get("/address/:address/balance")
+  //@Get("/address/:address/balance")
   public async fetchUserSbtcBalance(address:string): Promise<{ balance: number }> {
     return await fetchUserSbtcBalance(address);
   }
@@ -99,7 +99,7 @@ export class SignersController extends Router {
     return await fetchUserBalances(stxAddress, cardinal, ordinal);
   }
 
-  @Get("/wallet-address")
+  //@Get("/wallet-address")
   public async fetchSbtcWalletAddress(): Promise<any> {
     return await fetchSbtcWalletAddress();
   }
