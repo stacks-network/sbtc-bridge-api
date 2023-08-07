@@ -4,6 +4,7 @@ import { SbtcWalletController, DepositsController } from "../controllers/StacksR
 import { ConfigController } from "../controllers/ConfigController.js";
 import { SignersController } from "../controllers/SignersRPCController.js";
 import type { PeginRequestI, WrappedPSBT } from 'sbtc-bridge-lib';
+import { updateExchangeRates } from '../lib/bitcoin/blockcypher_api.js';
 
 const router = express.Router();
 
@@ -129,12 +130,24 @@ router.get("/bridge-api/:network/v1/btc/tx/rates", async (req, res, next) => {
   }
 });
 
+router.get("/bridge-api/:network/v1/btc/tx/rates/force", async (req, res, next) => {
+  try {
+    await updateExchangeRates();
+    const controller = new TransactionController();
+    const response = await controller.getRates();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 router.get("/bridge-api/:network/v1/btc/tx/keys", async (req, res, next) => {
   try {
     const controller = new TransactionController();
     const response = await controller.getKeys();
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }

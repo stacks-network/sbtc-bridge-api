@@ -199,6 +199,7 @@ export type KeySet = {
   deposits: {
     revealPubKey: string;
     reclaimPubKey: string;
+    oraclePubKey: string;
   }
 }
 export type StxSignature = {
@@ -213,4 +214,14 @@ export type WrappedPSBT = {
   signedTransaction?: string;
   signedPsbt?: string;
   stxSignature?: StxSignature;
+}
+export type ExchangeRate = {
+    _id: string;
+    currency: string;
+    fifteen: number;
+    last: number;
+    buy: number;
+    sell: number;
+    symbol: string;
+    name: string;
 }

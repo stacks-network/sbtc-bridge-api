@@ -16,7 +16,7 @@ const TESTNET_CONFIG = {
         registry: 'sbtc-registry',
     },
     VITE_BRIDGE_API: 'https://bridge.stx.eco/bridge-api/v1',
-    VITE_SIGNER_API: 'https://bridge.stx.eco/signer-api/v1',
+    VITE_SIGNER_API: 'https://sign.stx.eco/signer-api/v1',
     VITE_STACKS_API: 'https://api.testnet.hiro.so',
     VITE_STACKS_EXPLORER: 'https://explorer.hiro.so',
     VITE_BSTREAM_EXPLORER: 'https://mempool.space/testnet',
@@ -42,7 +42,7 @@ const MAINNET_CONFIG = {
         registry: 'sbtc-registry',
     },
     VITE_BRIDGE_API: 'https://bridge.stx.eco/bridge-api/v1',
-    VITE_SIGNER_API: 'https://bridge.stx.eco/signer-api/v1',
+    VITE_SIGNER_API: 'https://sign.stx.eco/signer-api/v1',
     VITE_STACKS_API: 'https://api.hiro.so',
     VITE_STACKS_EXPLORER: 'https://explorer.hiro.so',
     VITE_BSTREAM_EXPLORER: 'https://mempool.space',
@@ -68,7 +68,7 @@ const DEVNET_CONFIG = {
         registry: 'sbtc-registry',
     },
     VITE_BRIDGE_API: 'https://bridge.stx.eco/bridge-api/v1',
-    VITE_SIGNER_API: 'https://bridge.stx.eco/signer-api/v1',
+    VITE_SIGNER_API: 'https://sign.stx.eco/signer-api/v1',
     VITE_STACKS_API: 'http://devnet.stx.eco',
     VITE_STACKS_EXPLORER: 'http://localhost:8000',
     VITE_BSTREAM_EXPLORER: 'https://mempool.space/testnet',
@@ -88,14 +88,14 @@ export function setConfig(search:string) {
         CONFIG.VITE_BRIDGE_API = 'https://bridge.stx.eco/bridge-api/v1'
     } else if (import.meta.env.MODE === 'development') {
         //CONFIG.VITE_BRIDGE_API = 'https://bridge.stx.eco/bridge-api/v1'
-        //CONFIG.VITE_SIGNER_API = 'https://bridge.stx.eco/signer-api/v1'
+        //CONFIG.VITE_SIGNER_API = 'https://sign.stx.eco/signer-api/v1'
         CONFIG.VITE_URI_BRIDGE = 'http://localhost:8080'
         CONFIG.VITE_URI_SIGN = 'http://localhost:8081'
         CONFIG.VITE_URI_VOTE = 'http://localhost:8082'
     
         // toggle depending on location / ip address etc
         CONFIG.VITE_BRIDGE_API = 'http://localhost:3030/bridge-api/v1'
-        CONFIG.VITE_SIGNER_API = 'http://localhost:3030/signer-api/v1'
+        CONFIG.VITE_SIGNER_API = 'http://localhost:4030/signer-api/v1'
     }
     //console.log('CONFIG.VITE_BRIDGE_API: ' + CONFIG.VITE_BRIDGE_API);
 }

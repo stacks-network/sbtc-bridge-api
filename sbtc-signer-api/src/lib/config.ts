@@ -1,6 +1,6 @@
 import { env } from "process";
 
-const PORT = parseInt(env.PORT || '3010');
+const PORT = parseInt(env.PORT || '4030');
 
 const TESTNET_CONFIG = {
   environment: 'staging',
@@ -80,7 +80,7 @@ const DEVNET_CONFIG = {
   btcSchnorrReclaim: '',
   btcSchnorrOracle: '',
   host: 'http://localhost',
-  port: 3030,
+  port: PORT,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
@@ -90,8 +90,10 @@ const DEVNET_CONFIG = {
       pool: 'sbtc-stacking-pool',
       registry: 'sbtc-registry',
   },
-  stacksApi: 'http://devnet.stx.eco',
-  stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+  //stacksApi: 'http://devnet.stx.eco',
+  //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+  stacksApi: 'http://localhost:3999',
+  stacksExplorerUrl: 'http://localhost:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -112,7 +114,7 @@ const LINODE_TESTNET_CONFIG = {
   btcSchnorrReclaim: '',
   btcSchnorrOracle: '',
   host: 'http://localhost',
-  port: 3010,
+  port: 4010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
@@ -123,10 +125,10 @@ const LINODE_TESTNET_CONFIG = {
       pool: 'sbtc-stacking-pool',
       registry: 'sbtc-registry',
   },
-  //stacksApi: 'http://devnet.stx.eco',
-  //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
-  stacksApi: 'https://api.testnet.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
+  stacksApi: 'http://devnet.stx.eco',
+  stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+  //stacksApi: 'https://api.testnet.hiro.so',
+  //stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
@@ -147,7 +149,7 @@ const LINODE_MAINNET_CONFIG = {
   btcSchnorrReclaim: '',
   btcSchnorrOracle: '',
   host: 'http://localhost',
-  port: 3020,
+  port: 4020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
@@ -225,11 +227,12 @@ function setOverrides() {
   if (isDev()) {
     /**
      */
-    console.log('dev env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)
-    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
-    CONFIG.mongoDbName = 'sbtc-bridge-db'
-    CONFIG.mongoUser = 'dockerdev1'
-    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
+    console.log('dev env.. process.env.SIG_BTC_NODE = ' + CONFIG.btcNode)
+    CONFIG.port = 4000
+    CONFIG.mongoDbUrl = 'cluster0.eayhmli.mongodb.net'
+    CONFIG.mongoDbName = 'sbtc-signer-db'
+    CONFIG.mongoUser = 'stagsigner1'
+    CONFIG.mongoPwd = 'p2ASvMaKZS2GZuPj'
     //CONFIG.btcNode = '127.0.0.1:18332'
     CONFIG.btcNode = 'http://localhost:18443'
     CONFIG.btcRpcUser = 'bob'
@@ -243,7 +246,7 @@ function setOverrides() {
     console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
     console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
     console.log('linode env.. process.env.mongoDbName = ' + process.env.mongoDbName)
-    console.log('linode env.. process.env.BTC_NODE = ' + process.env.btcNode)
+    console.log('linode env.. process.env.SIG_BTC_NODE = ' + process.env.btcNode)
     console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
     console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
     console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))

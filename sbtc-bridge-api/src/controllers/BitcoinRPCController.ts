@@ -2,7 +2,6 @@ import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
 import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchExchangeRates } from "../lib/bitcoin/blockcypher_api.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
 import { findPeginRequestById } from "../lib/data/db_models.js";
@@ -17,6 +16,7 @@ import { toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWi
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updatePeginRequest } from '../lib/data/db_models.js';
+import { getExchangeRates } from '../lib/data/db_models.js'
 
 
 export interface FeeEstimateResponse {
@@ -53,14 +53,15 @@ export class TransactionController {
     return {
       deposits: {
         revealPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReveal)),
-        reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim))
+        reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim)),
+        oraclePubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrOracle))
       }
     }
 }
   
 @Get("/rates")
 public getRates() {
-  const rates = fetchExchangeRates();
+  const rates = getExchangeRates();
   return rates;
 }
 
@@ -146,10 +147,11 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
   
     try {
       if (wrappedPsbt.txtype === 'reclaim') {
-
         transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
-      } else {
+      } else if (wrappedPsbt.txtype === 'reveal') {
         transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
+      } else {
+        transaction.sign(hex.decode(getConfig().btcSchnorrOracle));
       }
       console.log('sign: signed');
       transaction.finalize();
@@ -162,7 +164,7 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
     //console.log('b64: ', wrappedPsbt.signedPsbt)
     const ttttt = btc.Transaction.fromPSBT(transaction.toPSBT());
-    wrappedPsbt.signedTransaction = hex.encode(ttttt.toBytes());
+    wrappedPsbt.signedTransaction = hex.encode(ttttt.extract());
     //console.log('hex: ', wrappedPsbt.signedTransaction)
     return wrappedPsbt;
   }
@@ -208,7 +210,7 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     }
     console.log('signAndBroadcast: wrappedPsbt: ', wrappedPsbt);
     return wrappedPsbt;
-  } 
+  }
   
   @Get("/commitment/:stxAddress/:revealFee")
   public async commitment(stxAddress:string, revealFee:number): Promise<PeginScriptI> {

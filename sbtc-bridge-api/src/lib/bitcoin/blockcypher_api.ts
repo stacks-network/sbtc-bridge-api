@@ -1,25 +1,24 @@
 import { getConfig } from '../config.js';
 import { delExchangeRates, setExchangeRates } from '../data/db_models.js';
 import fetch from 'node-fetch';
+import { currencies } from './currencies.js';
 
-export async function fetchExchangeRates() {
+export async function updateExchangeRates() {
   try {
-    const url = 'https://blockchain.info/ticker'; //getConfig().blockCypherUrl;
+    const url = 'https://blockchain.info/ticker';
     const response = await fetch(url);
     const info = await response.json();
     delExchangeRates()
     const rates = []
     for (var key in info) {
-      if (info.hasOwnProperty(key)) {
-          console.log(key + " -> " + info[key]);
-      }
       rates.push({
         currency: key,
         fifteen: info[key]['15m'],
         last: info[key].last,
         buy: info[key].buy,
         sell: info[key].sell,
-        symbol: info[key].symbol
+        symbol: currencies[key].symbol,
+        name: currencies[key].name
       })
     }
     setExchangeRates(rates)
@@ -43,7 +42,7 @@ export async function fetchCurrentFeeRates() {
 
 export async function sendRawTxDirectBlockCypher(hex:string) {
   const url = getConfig().blockCypherUrl + '/txs/push';
-  console.log('sendRawTxDirectBlockCypher: ', url)
+  //console.log('sendRawTxDirectBlockCypher: ', url)
   const response = await fetch(url, {
     method: 'POST',
     //headers: { 'Content-Type': 'application/json' },

@@ -77,7 +77,8 @@ import type {
     StxSignature,
     AddressObject,
     AddressMempoolObject,
-    AddressHiroObject
+    AddressHiroObject,
+    ExchangeRate
 } from './types/sbtc_types.js'
 
 export type {
@@ -100,7 +101,8 @@ export type {
     StxSignature,
     AddressObject,
     AddressMempoolObject,
-    AddressHiroObject
+    AddressHiroObject,
+    ExchangeRate
 }
 import type {
     PoxInfo,
