@@ -1,6 +1,7 @@
 import { getConfig } from '../config.js';
 import fetch from 'node-fetch';
 import type { AddressMempoolObject } from 'sbtc-bridge-lib';
+import { checkAddressForNetwork  } from 'sbtc-bridge-lib' 
 
 /**
 export async function fetchUtxoSet(address:string) {
@@ -61,7 +62,6 @@ export async function fetchTransaction(txid:string) {
 export async function fetchAddress(address:string):Promise<AddressMempoolObject> {
   const url = getConfig().mempoolUrl + '/address/' + address;
   const response = await fetch(url);
-  //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
   const result = await response.json();
   return result;
 }
@@ -70,13 +70,13 @@ export async function fetchAddressTransactions(address:string, lastId?:string) {
   let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
   if (lastId) url += '/' + lastId
   const response = await fetch(url);
-  //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
   const result = await response.json();
   return result;
 }
 
 export async function fetchUTXOs(address:string) {
   try {
+    //checkAddressForNetwork(getConfig().network, address)
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
     const response = await fetch(url);
     if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');

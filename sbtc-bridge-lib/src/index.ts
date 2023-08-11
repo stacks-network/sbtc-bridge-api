@@ -38,6 +38,22 @@ export {
     fromStorable,
     toStorable
 } 
+import {
+    maxCommit,
+    calculateFees,
+    getOpDropPeginRequest,
+    getOpReturnPeginRequest,
+    buildOpReturnTransaction,
+    buildOpDropTransaction
+} from './deposit_utils.js'
+export {
+    maxCommit,
+    calculateFees,
+    getOpDropPeginRequest,
+    getOpReturnPeginRequest,
+    buildOpReturnTransaction,
+    buildOpDropTransaction
+} 
 
 import {
     approxTxFees,
@@ -50,11 +66,13 @@ import {
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
+    checkAddressForNetwork
 } from './wallet_utils.js'
 export {
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
+    checkAddressForNetwork
 }
 
 import type {

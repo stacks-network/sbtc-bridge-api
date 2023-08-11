@@ -1,6 +1,7 @@
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
 import { getConfig } from '../config.js';
+import { ExchangeRate } from 'sbtc-bridge-lib';
 
 let exchangeRates:Collection;
 let sbtcContractEvent:Collection;
@@ -38,6 +39,7 @@ export async function connect() {
 	commitments = database.collection('commitments');
 	await commitments.createIndex({status: 1, amount: 1, fromBtcAddress: 1, originator: 1, sbtcWalletAddress: 1}, { unique: true })
 	exchangeRates = database.collection('exchangeRates');
+	await exchangeRates.createIndex({currency: 1}, { unique: true })
 }
 
 // Exchange Rates 
@@ -49,9 +51,26 @@ export async function setExchangeRates (ratesObj:any) {
 	return await exchangeRates.insertMany(ratesObj);
 }
 export async function getExchangeRates () {
-	const result = await exchangeRates.find({}).sort({'symbol': -1}).toArray();
+	const result = await exchangeRates.find({}).sort({'currency': -1}).toArray();
 	return result;
 }
+export async function findExchangeRateByCurrency(currency:string):Promise<any> {
+	const result = await exchangeRates.findOne({currency});
+	return result;
+}
+export async function saveNewExchangeRate (exchangeRate:any) {
+	const result = await exchangeRates.insertOne(exchangeRate);
+	return result;
+}
+export async function updateExchangeRate (exchangeRate:any, changes: any) {
+	const result = await exchangeRates.updateOne({
+		_id: exchangeRate._id
+	}, 
+    { $set: changes});
+	return result;
+}
+
+
 
 // Compile model from schema 
 export async function countSbtcEvents () {

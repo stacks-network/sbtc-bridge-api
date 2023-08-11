@@ -223,6 +223,25 @@ function setOverrides() {
     CONFIG.btcSchnorrOracle = process.env.btcSchnorrOracle || '';
   }
   if (isDev()) {
+    CONFIG.poxContractId = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
+    //poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
+    CONFIG.sbtcContractId = 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
+    CONFIG.sbtcDeployer = 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
+    CONFIG.sbtcContracts = {
+        pool: 'sbtc-stacking-pool',
+        registry: 'sbtc-registry',
+    },
+    //stacksApi: 'http://devnet.stx.eco',
+    //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+    CONFIG.stacksApi = 'https://api.testnet.hiro.so',
+    CONFIG.stacksExplorerUrl = 'https://explorer.hiro.co',
+    CONFIG.bitcoinExplorerUrl = 'https://mempool.space/testnet/api',
+    CONFIG.mempoolUrl = 'https://mempool.space/testnet/api',
+    CONFIG.blockCypherUrl = 'https://api.blockcypher.com/v1/btc/test3',
+    CONFIG.publicAppName = 'sBTC Bridge Staging API',
+    CONFIG.publicAppVersion = '1.0.0',
+  
+    //CONFIG = LINODE_TESTNET_CONFIG
     /**
      */
     console.log('dev env.. process.env.BTC_NODE = ' + process.env.BTC_NODE)

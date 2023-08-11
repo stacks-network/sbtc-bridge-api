@@ -12,7 +12,7 @@ import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
 import type { KeySet, WrappedPSBT, PeginRequestI, PeginScriptI, withdrawalPayloadType, depositPayloadType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
+import { checkAddressForNetwork, toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updatePeginRequest } from '../lib/data/db_models.js';
@@ -289,6 +289,7 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
 export class WalletController {
   
   public async validateAddress(address:string): Promise<any> {
+    //checkAddressForNetwork(getConfig().network, address)
     const result = await validateAddress(address);
     return result;
   }
@@ -301,6 +302,7 @@ export class WalletController {
 
   @Get("/address/:address/txs")
   public async fetchAddressTransactions(address:string): Promise<any> {
+    //checkAddressForNetwork(getConfig().network, address)
     const result = await fetchAddressTransactions(address);
     return result;
   }
@@ -308,10 +310,13 @@ export class WalletController {
   //@Get("/address/:address/utxos?verbose=true")
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     let result;
+    //checkAddressForNetwork(getConfig().network, address);
     try {
-      result = await getAddressInfo(address);
-      const addressValidation = await validateAddress(address);
-      result.addressValidation = addressValidation
+      if (address) {
+        result = await getAddressInfo(address);
+        const addressValidation = await validateAddress(address);
+        result.addressValidation = addressValidation
+      }
     } catch (err:any) {
       console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
       // carry on
