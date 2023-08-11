@@ -79,7 +79,7 @@ router.post("/bridge-api/:network/v1/btc/wallet/walletprocesspsbt", async (req, 
 
 router.get("/bridge-api/:network/v1/btc/wallet/address/:address/txs", async (req, res, next) => {
   try {
-    checkAddressForNetwork(getConfig().network, req.params.address)
+    //checkAddressForNetwork(getConfig().network, req.params.address)
     const controller = new WalletController();
     const response = await controller.fetchAddressTransactions(req.params.address);
     return res.send(response);
@@ -92,7 +92,7 @@ router.get("/bridge-api/:network/v1/btc/wallet/address/:address/txs", async (req
 
 router.get("/bridge-api/:network/v1/btc/wallet/address/:address/utxos", async (req, res, next) => {
   try {
-    checkAddressForNetwork(getConfig().network, req.params.address)
+    //checkAddressForNetwork(getConfig().network, req.params.address)
     const controller = new WalletController();
     const response = await controller.fetchUtxoSet(req.params.address, (req.query.verbose) ? true : false);
     return res.send(response);
@@ -288,9 +288,9 @@ router.get("/bridge-api/:network/v1/sbtc/address/:address/balance", async (req, 
  
 router.get("/bridge-api/:network/v1/sbtc/address/balances/:stxAddress/:cardinal/:ordinal", async (req, res, next) => {
   try {
-    checkAddressForNetwork(getConfig().network, req.params.stxAddress)
-    checkAddressForNetwork(getConfig().network, req.params.cardinal)
-    checkAddressForNetwork(getConfig().network, req.params.ordinal)
+    //checkAddressForNetwork(getConfig().network, req.params.stxAddress)
+    //checkAddressForNetwork(getConfig().network, req.params.cardinal)
+    //checkAddressForNetwork(getConfig().network, req.params.ordinal)
     const controller = new SbtcWalletController();
     console.log('/bridge-api/:network/v1/sbtc/address/balances/:stxAddress/:cardinal/:ordinal')
     const response = await controller.fetchUserBalances(req.params.stxAddress, req.params.cardinal, req.params.ordinal);
@@ -351,7 +351,7 @@ router.get("/bridge-api/:network/v1/sbtc/data", async (req, res, next) => {
   try {
     const controller1 = new SbtcWalletController();
     const sbtcContractData = await controller1.fetchSbtcContractData();
-    checkAddressForNetwork(getConfig().network, sbtcContractData.sbtcWalletAddress)
+    //checkAddressForNetwork(getConfig().network, sbtcContractData.sbtcWalletAddress)
     const controller2 = new TransactionController();
     const keys = await controller2.getKeys();
     const controller3 = new WalletController();

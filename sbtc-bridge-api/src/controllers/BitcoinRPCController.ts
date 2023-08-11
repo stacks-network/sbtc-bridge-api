@@ -289,7 +289,7 @@ public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
 export class WalletController {
   
   public async validateAddress(address:string): Promise<any> {
-    checkAddressForNetwork(getConfig().network, address)
+    //checkAddressForNetwork(getConfig().network, address)
     const result = await validateAddress(address);
     return result;
   }
@@ -302,7 +302,7 @@ export class WalletController {
 
   @Get("/address/:address/txs")
   public async fetchAddressTransactions(address:string): Promise<any> {
-    checkAddressForNetwork(getConfig().network, address)
+    //checkAddressForNetwork(getConfig().network, address)
     const result = await fetchAddressTransactions(address);
     return result;
   }
@@ -310,7 +310,7 @@ export class WalletController {
   //@Get("/address/:address/utxos?verbose=true")
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     let result;
-    checkAddressForNetwork(getConfig().network, address);
+    //checkAddressForNetwork(getConfig().network, address);
     try {
       if (address) {
         result = await getAddressInfo(address);

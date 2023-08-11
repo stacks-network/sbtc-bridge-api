@@ -76,7 +76,7 @@ export async function fetchAddressTransactions(address:string, lastId?:string) {
 
 export async function fetchUTXOs(address:string) {
   try {
-    checkAddressForNetwork(getConfig().network, address)
+    //checkAddressForNetwork(getConfig().network, address)
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
     const response = await fetch(url);
     if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');

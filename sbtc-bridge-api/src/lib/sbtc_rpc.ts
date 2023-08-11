@@ -33,7 +33,7 @@ const noArgMethods = [
 export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   const result = {} as SbtcContractDataI
   const contractId = getConfig().sbtcContractId;
-  checkAddressForNetwork(getConfig().network, contractId)
+  //checkAddressForNetwork(getConfig().network, contractId)
   const data = {
     contractAddress: contractId!.split('.')[0],
     contractName: contractId!.split('.')[1],
@@ -49,7 +49,8 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err:any) {
-      throw new Error('Error fetching data from sbtc contrcat: ' + err.message)
+      console.log('Error fetching data from sbtc contrcat')
+      //throw new Error('Error fetching data from sbtc contrcat: ' + err.message)
     }
   }
   return result;
@@ -64,7 +65,7 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
     case 'get-coordinator-data':
       result.coordinator = response.value.value;
       break;
-    case 'get-bitcoin-wallet-public-key':
+    case 'get-bitcoin-wallet-public-key1':
       //console.log('get-bitcoin-wallet-public-key: response: ', response)
       try {
         const fullPK = response.value.value.split('x')[1];
@@ -178,7 +179,7 @@ export async function findSbtcEvents(offset:number):Promise<any> {
 
 export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {
   try {
-    checkAddressForNetwork(getConfig().network, contractAddress)
+    //checkAddressForNetwork(getConfig().network, contractAddress)
     const url = getConfig().stacksApi + '/v2/data_var/' + contractAddress + '/' + contractName + '/' + dataVarName;
     const response = await fetch(url);
     const result:any = await response.json();
@@ -239,9 +240,9 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
   userBalances.cardinal = cardinal;
   userBalances.ordinal = ordinal;
   try {
-    checkAddressForNetwork(getConfig().network, stxAddress)
-    checkAddressForNetwork(getConfig().network, cardinal)
-    checkAddressForNetwork(getConfig().network, ordinal)
+    //checkAddressForNetwork(getConfig().network, stxAddress)
+    //checkAddressForNetwork(getConfig().network, cardinal)
+    //checkAddressForNetwork(getConfig().network, ordinal)
     if (userBalances.stxAddress) {
       const url = getConfig().stacksApi + '/extended/v1/address/' + userBalances.stxAddress + '/balances';
       const response = await fetch(url);
@@ -260,14 +261,14 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
     console.log('fetchUserBalances: sBtcBalance: ' + err.message)
   }
   try {
-    checkAddressForNetwork(getConfig().network, userBalances.cardinal)
+    //checkAddressForNetwork(getConfig().network, userBalances.cardinal)
     const address:AddressMempoolObject = await fetchAddress(userBalances.cardinal);
     userBalances.cardinalInfo = address
   } catch(err:any) {
     console.log('fetchUserBalances: cardinalInfo: ' + err.message)
   }
   try {
-    checkAddressForNetwork(getConfig().network, userBalances.cardinal)
+    //checkAddressForNetwork(getConfig().network, userBalances.cardinal)
     const address:AddressMempoolObject = await fetchAddress(userBalances.ordinal);
     userBalances.ordinalInfo = address
   } catch(err:any) {

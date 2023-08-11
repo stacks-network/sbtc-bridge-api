@@ -1,7 +1,7 @@
 import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
 import fetch from 'node-fetch';
 import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController.js'
-import { checkAddressForNetwork } from 'sbtc-bridge-lib';
+//import { checkAddressForNetwork } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 
 export async function listUnspent() {
@@ -14,7 +14,7 @@ export async function listUnspent() {
 }
 
 export async function validateAddress(address:string) {
-  checkAddressForNetwork(getConfig().network, address)
+  //checkAddressForNetwork(getConfig().network, address)
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"validateaddress","params":["${address}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
@@ -85,7 +85,7 @@ export async function walletProcessPsbt(psbtHex:string) {
 }
 
 export async function getAddressInfo(address:string) {
-  checkAddressForNetwork(getConfig().network, address)
+  //checkAddressForNetwork(getConfig().network, address)
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getaddressinfo","params":["${address}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
@@ -95,7 +95,7 @@ export async function getAddressInfo(address:string) {
 }
 
 export async function importAddress(address:string) {
-  checkAddressForNetwork(getConfig().network, address)
+  //checkAddressForNetwork(getConfig().network, address)
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"importaddress","params":["${address}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
