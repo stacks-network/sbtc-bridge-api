@@ -12,6 +12,7 @@ import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
 import util from 'util'
 import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
+import { checkAddressForNetwork } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
 
 const limit = 10;
@@ -32,6 +33,7 @@ const noArgMethods = [
 export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   const result = {} as SbtcContractDataI
   const contractId = getConfig().sbtcContractId;
+  checkAddressForNetwork(getConfig().network, contractId)
   const data = {
     contractAddress: contractId!.split('.')[0],
     contractName: contractId!.split('.')[1],
@@ -46,8 +48,8 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
       data.functionName = funcname;
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
-    } catch (err) {
-      console.log('Error fetching data from sbtc contrcat: ' + funcname + ' : ', response)
+    } catch (err:any) {
+      throw new Error('Error fetching data from sbtc contrcat: ' + err.message)
     }
   }
   return result;
@@ -176,12 +178,13 @@ export async function findSbtcEvents(offset:number):Promise<any> {
 
 export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {
   try {
+    checkAddressForNetwork(getConfig().network, contractAddress)
     const url = getConfig().stacksApi + '/v2/data_var/' + contractAddress + '/' + contractName + '/' + dataVarName;
     const response = await fetch(url);
     const result:any = await response.json();
     return result;
   } catch(err:any) {
-    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message);
+    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message + ' contractAddress: ' + contractAddress);
   }
 }
 
@@ -236,30 +239,39 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
   userBalances.cardinal = cardinal;
   userBalances.ordinal = ordinal;
   try {
-    const url = getConfig().stacksApi + '/extended/v1/address/' + userBalances.stxAddress + '/balances';
-    const response = await fetch(url);
-    const result:any = await response.json();
-    userBalances.stacksTokenInfo = result;
-  } catch(err) {
-    console.log('fetchUserBalances: stacksTokenInfo: ', err)
+    checkAddressForNetwork(getConfig().network, stxAddress)
+    checkAddressForNetwork(getConfig().network, cardinal)
+    checkAddressForNetwork(getConfig().network, ordinal)
+    if (userBalances.stxAddress) {
+      const url = getConfig().stacksApi + '/extended/v1/address/' + userBalances.stxAddress + '/balances';
+      const response = await fetch(url);
+      const result:any = await response.json();
+      userBalances.stacksTokenInfo = result;
+    }
+  } catch(err:any) {
+    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message)
   }
   try {
-    const sBtcBalance = await fetchUserSbtcBalance(userBalances.stxAddress);
-    userBalances.sBTCBalance = sBtcBalance.balance
-  } catch(err) {
-    console.log('fetchUserBalances: sBtcBalance: ', err)
+    if (userBalances.stxAddress) {
+      const sBtcBalance = await fetchUserSbtcBalance(userBalances.stxAddress);
+      userBalances.sBTCBalance = sBtcBalance.balance
+    }
+  } catch(err:any) {
+    console.log('fetchUserBalances: sBtcBalance: ' + err.message)
   }
   try {
+    checkAddressForNetwork(getConfig().network, userBalances.cardinal)
     const address:AddressMempoolObject = await fetchAddress(userBalances.cardinal);
     userBalances.cardinalInfo = address
-  } catch(err) {
-    console.log('fetchUserBalances: cardinalInfo: ', err)
+  } catch(err:any) {
+    console.log('fetchUserBalances: cardinalInfo: ' + err.message)
   }
   try {
+    checkAddressForNetwork(getConfig().network, userBalances.cardinal)
     const address:AddressMempoolObject = await fetchAddress(userBalances.ordinal);
     userBalances.ordinalInfo = address
-  } catch(err) {
-    console.log('fetchUserBalances: ordinalInfo: ', err)
+  } catch(err:any) {
+    console.log('fetchUserBalances: ordinalInfo: ' + err.message)
   }
   return userBalances;
 }

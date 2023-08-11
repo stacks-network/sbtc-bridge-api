@@ -1,8 +1,11 @@
 import { getAddressInfo } from './rpc_wallet.js'
 import fetch from 'node-fetch';
 import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
+import { checkAddressForNetwork } from 'sbtc-bridge-lib';
+import { getConfig } from '../../lib/config.js';
 
 export async function startScantxoutset(address:string) {
+  checkAddressForNetwork(getConfig().network, address)
   const addressInfo:any = await getAddressInfo(address);
   let dataString = `{"jsonrpc":"1.0","id":"curltext","method":"scantxoutset","params":["start", ["raw(${addressInfo.scriptPubKey})"]]}`;
   OPTIONS.body = dataString;

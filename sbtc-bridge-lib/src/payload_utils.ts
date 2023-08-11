@@ -1,7 +1,6 @@
 import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
-import { addressFromPubkey } from './wallet_utils.js';
 import { c32address, c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
 import { bitcoinToSats } from './formatting.js'
@@ -167,6 +166,22 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAdd
 	};
 }
 
+export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array {
+	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
+	const opCodeBuf = hex.decode(PEGIN_OPCODE);
+	const addr = c32addressDecode(address.split('.')[0])
+	const addr0Buf = hex.decode(addr[0].toString(16));
+	const addr1Buf = hex.decode(addr[1]);
+
+	let buf1 = concat(opCodeBuf, addr0Buf, addr1Buf);
+	if (address.indexOf('.') > -1) {
+		const cnameBuf = new TextEncoder().encode(address.split('.')[1]);
+		buf1 = concat(buf1, cnameBuf);
+	}
+			
+	return concat(magicBuf, buf1)
+}
+
 export function buildDepositPayload(net:any, revealFee:number, address:string, opDrop:boolean, memo:string|undefined):Uint8Array {
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
@@ -225,7 +240,7 @@ export function parseSbtcWalletAddress(network:string, outputs:Array<any>) {
 	  const encscript = btc.OutScript.decode(hex.decode(scriptHex));
 	  bitcoinAddress = btc.Address(net).encode(encscript);  
 	}
-	addressFromPubkey(network, outputs[0].scriptPubKey)
+	// addressFromPubkey(network, outputs[0].scriptPubKey)
 	return bitcoinAddress;
 }
 

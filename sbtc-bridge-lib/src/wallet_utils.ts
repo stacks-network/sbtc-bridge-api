@@ -76,3 +76,21 @@ export function addressFromPubkey(network:string, pubkey:Uint8Array) {
 		return hex.encode(pubkey)
 	}
 }
+
+export function checkAddressForNetwork(net:string, address:string|undefined) {
+	if (!address || typeof address !== 'string') throw new Error('No address passed')
+    if (address.length < 10) throw new Error('Address is undefined')
+	if (net === 'testnet') {
+	  if (address.startsWith('bc')) throw new Error('Mainnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('3')) throw new Error('Mainnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('1')) throw new Error('Mainnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('SP') || address.startsWith('sp')) throw new Error('Mainnet stacks address passed to testnet app: ' + address)
+	} else {
+	  if (address.startsWith('tb')) throw new Error('Testnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('2')) throw new Error('Testnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('m')) throw new Error('Testnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('n')) throw new Error('Testnet address passed to testnet app: ' + address)
+	  else if (address.startsWith('ST') || address.startsWith('st')) throw new Error('Testnet stacks address passed to testnet app: ' + address)
+	}
+  }
+  

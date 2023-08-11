@@ -1,28 +1,40 @@
 import { getConfig } from '../config.js';
-import { delExchangeRates, setExchangeRates } from '../data/db_models.js';
+import { saveNewExchangeRate, updateExchangeRate, getExchangeRates, findExchangeRateByCurrency } from '../data/db_models.js';
 import fetch from 'node-fetch';
 import { currencies } from './currencies.js';
+import { ExchangeRate } from 'sbtc-bridge-lib';
 
 export async function updateExchangeRates() {
   try {
     const url = 'https://blockchain.info/ticker';
     const response = await fetch(url);
     const info = await response.json();
-    delExchangeRates()
-    const rates = []
     for (var key in info) {
-      rates.push({
-        currency: key,
-        fifteen: info[key]['15m'],
-        last: info[key].last,
-        buy: info[key].buy,
-        sell: info[key].sell,
-        symbol: currencies[key].symbol,
-        name: currencies[key].name
-      })
+      const dbRate:ExchangeRate = await findExchangeRateByCurrency(key)
+      if (!dbRate) {
+        const newRate = {
+          currency: key,
+          fifteen: info[key]['15m'],
+          last: info[key].last,
+          buy: info[key].buy,
+          sell: info[key].sell,
+          symbol: currencies[key].symbol,
+          name: currencies[key].name
+        }
+        saveNewExchangeRate(newRate)
+      } else {
+        updateExchangeRate(dbRate, {
+          currency: key,
+          fifteen: info[key]['15m'],
+          last: info[key].last,
+          buy: info[key].buy,
+          sell: info[key].sell,
+          symbol: currencies[key].symbol,
+          name: currencies[key].name
+        })
+      }
     }
-    setExchangeRates(rates)
-    return rates;
+    return getExchangeRates();
   } catch (err) {
     console.log(err);
   }
