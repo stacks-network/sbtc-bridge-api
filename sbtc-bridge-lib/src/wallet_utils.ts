@@ -2,8 +2,9 @@ import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { schnorr } from '@noble/curves/secp256k1';
-import type { CommitKeysI } from './types/sbtc_types.js';
+import type { CommitKeysI, UTXO } from './types/sbtc_types.js';
 
+const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 const priv = secp.utils.randomPrivateKey()
 type KeySet = {
 	priv: Uint8Array,
@@ -94,3 +95,158 @@ export function checkAddressForNetwork(net:string, address:string|undefined) {
 	}
   }
   
+  /**
+ * 
+ * @param amount - if deposit this is the amount the user is sending. Note: 0 for withdrawals
+ * @param revealPayment - if op drop this is the gas fee for the reveal tx
+ * @param tx - the to add input to
+ * @param feeCalc - true if called for the purposes of calculating the fee (i.e. okay to sign inputs with internal key)
+ * @param utxos - the utxos being spent from
+ * @param userPaymentPubKey - pubkey used in script hash payments
+export function addInputs (network:string, amount:number, revealPayment:number, tx:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>, userPaymentPubKey:string, userSchnorrPubKey:string) {
+	const bar = revealPayment + amount;
+	let amt = 0;
+	for (const utxo of utxos) {
+		const hexy = (utxo.tx.hex) ? utxo.tx.hex : utxo.tx 
+		const script = btc.RawTx.decode(hex.decode(hexy))
+		if (amt < bar && utxo.status.confirmed) {
+			amt += utxo.value;
+			//const pubkey = '0248159447374471c5a6cfa18c296e6e297dbf125a9e6792435a87e80c4f771493'
+			//const script1 = (btc.p2ms(1, [hex.decode(pubkey)]))
+			const txType = utxo.tx.vout[utxo.vout].scriptPubKey.type;
+			if (txType === 'scripthash') {
+				// educated guess at the p2sh wrapping based on the type of the other (non change) output...
+				let wrappedType = ''
+				if (utxo.vout === 1) {
+					wrappedType = utxo.tx.vout[0].scriptPubKey.type
+				} else {
+					wrappedType = utxo.tx.vout[1].scriptPubKey.type
+				}
+				const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+				let p2shObj;
+				if (wrappedType === 'witness_v0_keyhash') {
+					p2shObj = btc.p2sh(btc.p2wpkh(hex.decode(userPaymentPubKey)), net)
+				} else if (wrappedType === 'witness_v1_taproot') {
+					p2shObj = btc.p2sh(btc.p2tr(hex.decode(userSchnorrPubKey)), net)
+				} else if (wrappedType.indexOf('multi') > -1) {
+					p2shObj = btc.p2sh(btc.p2ms(1, [hex.decode(userPaymentPubKey)]), net)
+				} else {
+					p2shObj = btc.p2sh(btc.p2pkh(hex.decode(userPaymentPubKey)), net)
+				}
+				const nextI:btc.TransactionInput = {
+					txid: hex.decode(utxo.txid),
+					index: utxo.vout,
+					nonWitnessUtxo: hexy,
+					redeemScript: p2shObj.redeemScript
+				}
+				tx.addInput(nextI);
+			} else {
+				let witnessUtxo = {
+					script: script.outputs[utxo.vout].script,
+					amount: BigInt(utxo.value)
+				}
+				if (feeCalc) {
+					witnessUtxo = {
+						amount: BigInt(utxo.value),
+						script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
+					}		
+				}
+				const nextI:btc.TransactionInput = {
+					txid: hex.decode(utxo.txid),
+					index: utxo.vout,
+					nonWitnessUtxo: hexy,
+					witnessUtxo
+				}
+				tx.addInput(nextI);
+			}
+		}
+	}
+}
+ */
+export function addInputs (network:string, amount:number, revealPayment:number, tx:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>, userPaymentPubKey:string) {
+	const bar = revealPayment + amount;
+	let amt = 0;
+	for (const utxo of utxos) {
+		const hexy = (utxo.tx.hex) ? utxo.tx.hex : utxo.tx 
+		const script = btc.RawTx.decode(hex.decode(hexy))
+		if (amt < bar && utxo.status.confirmed) {
+			amt += utxo.value;
+			//const pubkey = '0248159447374471c5a6cfa18c296e6e297dbf125a9e6792435a87e80c4f771493'
+			//const script1 = (btc.p2ms(1, [hex.decode(pubkey)]))
+			const txType = utxo.tx.vout[utxo.vout].scriptPubKey.type;
+			if (txType === 'scripthash') {
+				// educated guess at the p2sh wrapping based on the type of the other (non change) output...
+				const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+				let p2shObj;
+				// p2tr cannont be wrapped in p2sh !!!
+				const txTypes = ['witness_v0_keyhash', 'pubkeyhash', 'witness_v0_scripthash']
+				for (const txType of txTypes) {
+					try {
+						if (txType === 'witness_v0_keyhash') {
+							p2shObj = btc.p2sh(btc.p2wpkh(hex.decode(userPaymentPubKey)), net)
+						} else if (txType === 'witness_v1_taproot') {
+							// not allowed p2shObj = btc.p2sh(btc.p2tr(hex.decode(userSchnorrPubKey)), net)
+						} else if (txType.indexOf('multi') > -1) {
+							p2shObj = btc.p2sh(btc.p2ms(1, [hex.decode(userPaymentPubKey)]), net)
+						} else if (txType.indexOf('pubkeyhash') > -1) {
+							p2shObj = btc.p2sh(btc.p2pkh(hex.decode(userPaymentPubKey)), net)
+						} else if (txType.indexOf('witness_v0_scripthash') > -1) {
+							p2shObj = btc.p2sh(btc.p2wsh(btc.p2wpkh(hex.decode(userPaymentPubKey))), net)
+						}
+						const nextI = redeemScriptAddInput(utxo, p2shObj, hexy)
+						tx.addInput(nextI);
+						console.log('Tx type: ' + txType + ' --> input added')
+					} catch (err:any) {
+						console.log('Error: not tx type: ' + txType)
+					}
+				}
+			} else {
+				let witnessUtxo = {
+					script: script.outputs[utxo.vout].script,
+					amount: BigInt(utxo.value)
+				}
+				if (feeCalc) {
+					witnessUtxo = {
+						amount: BigInt(utxo.value),
+						script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
+					}		
+				}
+				const nextI:btc.TransactionInput = {
+					txid: hex.decode(utxo.txid),
+					index: utxo.vout,
+					nonWitnessUtxo: hexy,
+					witnessUtxo
+				}
+				tx.addInput(nextI);
+			}
+		}
+	}
+}
+
+function redeemScriptAddInput (utxo:any, p2shObj:any, hexy:any) {
+	return {
+		txid: hex.decode(utxo.txid),
+		index: utxo.vout,
+		nonWitnessUtxo: hexy,
+		redeemScript: p2shObj.redeemScript
+	}
+
+}
+
+function isUTXOConfirmed (utxo:any) {
+	return utxo.tx.confirmations >= 3;
+};
+
+export function inputAmt (tx:btc.Transaction) {
+	let amt = 0;
+	for (let idx = 0; idx < tx.inputsLength; idx++) {
+		let inp = tx.getInput(idx)
+		if (inp.witnessUtxo) amt += Number(tx.getInput(idx).witnessUtxo?.amount)
+		else if (inp.nonWitnessUtxo) amt += Number(inp.nonWitnessUtxo.outputs[inp.index!].amount)
+	}
+	return amt;
+}
+
+export function toXOnly(pubkey: string): string {
+    return hex.encode(hex.decode(pubkey).subarray(1, 33))
+}

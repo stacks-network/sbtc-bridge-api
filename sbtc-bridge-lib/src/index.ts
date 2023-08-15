@@ -39,20 +39,46 @@ export {
     toStorable
 } 
 import {
+    buildRevealOrReclaimTransaction
+} from './reveal_utils.js'
+export {
+    buildRevealOrReclaimTransaction
+} 
+
+import {
     maxCommit,
-    calculateFees,
-    getOpDropPeginRequest,
-    getOpReturnPeginRequest,
-    buildOpReturnTransaction,
-    buildOpDropTransaction
+    calculateDepositFees,
+    getOpDropDepositRequest,
+    getOpReturnDepositRequest,
+    buildOpReturnDepositTransaction,
+    buildOpDropDepositTransaction
 } from './deposit_utils.js'
 export {
     maxCommit,
-    calculateFees,
-    getOpDropPeginRequest,
-    getOpReturnPeginRequest,
-    buildOpReturnTransaction,
-    buildOpDropTransaction
+    calculateDepositFees,
+    getOpDropDepositRequest,
+    getOpReturnDepositRequest,
+    buildOpReturnDepositTransaction,
+    buildOpDropDepositTransaction
+} 
+
+import {
+    dataToSign,
+    calculateWithdrawFees,
+    getWithdrawScript,
+    getOpDropWithdrawRequest,
+    getOpReturnWithdrawRequest,
+    buildOpDropWithdrawTransaction,
+    buildOpReturnWithdrawTransaction
+} from './withdraw_utils.js'
+export {
+    dataToSign,
+    calculateWithdrawFees,
+    getWithdrawScript,
+    getOpDropWithdrawRequest,
+    getOpReturnWithdrawRequest,
+    buildOpDropWithdrawTransaction,
+    buildOpReturnWithdrawTransaction
 } 
 
 import {
@@ -66,13 +92,19 @@ import {
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
-    checkAddressForNetwork
+    checkAddressForNetwork,
+    addInputs,
+    inputAmt,
+    toXOnly
 } from './wallet_utils.js'
 export {
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
-    checkAddressForNetwork
+    checkAddressForNetwork,
+    addInputs,
+    inputAmt,
+    toXOnly
 }
 
 import type {

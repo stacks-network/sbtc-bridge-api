@@ -65,15 +65,19 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
     case 'get-coordinator-data':
       result.coordinator = response.value.value;
       break;
-    case 'get-bitcoin-wallet-public-key1':
+    case 'get-bitcoin-wallet-public-key':
       //console.log('get-bitcoin-wallet-public-key: response: ', response)
       try {
         const fullPK = response.value.value.split('x')[1];
         // converting to x-only..
         result.sbtcWalletPublicKey = fullPK;
-        const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-        const trObj = btc.p2tr(fullPK.substring(1), undefined, net);
-        if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
+        try {
+          const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+          const trObj = btc.p2tr(fullPK.substring(1), undefined, net);
+          if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
+        } catch (err:any) {
+          console.log('get-bitcoin-wallet-public-key: getting key: ' + fullPK)
+        }
       } catch(err) {
         console.log('get-bitcoin-wallet-public-key: current: ', current)
         console.log('get-bitcoin-wallet-public-key: err: ', err)

@@ -2,8 +2,6 @@ import { beforeAll, beforeEach, expect, describe, it } from 'vitest'
 import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
 import { hex } from '@scure/base';
-import PegOutTransaction from '$lib/domain/PegOutTransaction';
-import type { PegOutTransactionI } from '$lib/domain/PegOutTransaction';
 import { fail } from 'assert';
 import { pegout1 } from './data/data_pegout_p2wpkh'
 import { sha256 } from '@noble/hashes/sha256';

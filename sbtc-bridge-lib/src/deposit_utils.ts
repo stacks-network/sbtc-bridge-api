@@ -4,21 +4,32 @@ import * as P from 'micro-packed';
 import { hex } from '@scure/base';
 import type { PeginRequestI, UTXO } from './types/sbtc_types.js' 
 import { toStorable, buildDepositPayload, buildDepositPayloadOpReturn } from './payload_utils.js' 
-import { c32addressDecode } from 'c32check';
+import { addInputs, inputAmt } from './wallet_utils.js';
 
 const concat = P.concatBytes;
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 export const revealPayment = 10001
-
-export function buildOpReturnTransaction(network:string, amount:number, btcFeeRates:any, addressInfo:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string) {
+export const dust = 500;
+/**
+ * 
+ * @param network 
+ * @param amount the amount to deposit plus the reveal transaction gas fee
+ * @param btcFeeRates current rates
+ * @param addressInfo the utxos to spend from
+ * @param stacksAddress the stacks address to materialise sBTC
+ * @param sbtcWalletAddress the sBTC peg wallet address where funds are revealed to
+ * @param cardinal a change address
+ * @param userPaymentPubKey pubkey needed to spend script hash inputs
+ * @returns 
+ */
+export function buildOpReturnDepositTransaction(network:string, amount:number, btcFeeRates:any, addressInfo:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string, userPaymentPubKey:string) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	if (!stacksAddress) throw new Error('Stacks address required!');
-	const utxos = addressInfo.utxos;
-	const txFees = calculateFees(network, amount, btcFeeRates.feeInfo, utxos, sbtcWalletAddress, cardinal)
-	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
-	addInputs(amount, tx, false, utxos);
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
+	const txFees = calculateDepositFees(network, false, amount, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
+	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
 	tx.addOutputAddress(sbtcWalletAddress, BigInt(amount), net);
 	const changeAmount = inputAmt(tx) - (amount + txFees[1]); 
@@ -26,22 +37,28 @@ export function buildOpReturnTransaction(network:string, amount:number, btcFeeRa
 	return tx;
 }
 
-export function buildOpDropTransaction (network:string, revealFeeWithGas:number, commitKeys:any, btcFeeRates:any, addressInfo:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string, ordinal:string) {
-	const amount = revealFeeWithGas;
+/**
+ * @param network 
+ * @param amount the amount to deposit plus the reveal transaction gas fee
+ * @param btcFeeRates current rates
+ * @param addressInfo the utxos to spend from
+ * @param commitTxAddress the commitment address - contains the taproot data and the payload
+ * @param cardinal the change address
+ * @param userPaymentPubKey pubkey needed to spend script hash inputs
+ * @returns transaction object
+ */
+export function buildOpDropDepositTransaction (network:string, amount:number, btcFeeRates:any, addressInfo:any, commitTxAddress:string, cardinal:string, userPaymentPubKey:string) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const utxos = addressInfo.utxos;
-	const txFees = calculateFees(network, amount, btcFeeRates.feeInfo, utxos, ordinal, cardinal)
+	const txFees = calculateDepositFees(network, true, amount, btcFeeRates.feeInfo, addressInfo, commitTxAddress, undefined)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
-	addInputs(amount, tx, false, utxos);
-	const peginReqest = getOpDropPeginRequest(network, amount, commitKeys, stacksAddress, sbtcWalletAddress, cardinal);
-	if (!peginReqest.commitTxScript || !peginReqest.commitTxScript.address ) throw new Error('Address required!');
-	tx.addOutputAddress(peginReqest.commitTxScript.address, BigInt(amount), net );
+	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
+	tx.addOutputAddress(commitTxAddress, BigInt(amount), net );
 	const changeAmount = inputAmt(tx) - (amount + txFees[1]); 
 	if (changeAmount > 0) tx.addOutputAddress(cardinal, BigInt(changeAmount), net);
-	return { peginReqest, tx };
+	return tx;
 }
 
-export function getOpReturnPeginRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
+export function getOpReturnDepositRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	if (!stacksAddress) throw new Error('Stacks address missing')
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
 	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPub)
@@ -64,7 +81,7 @@ export function getOpReturnPeginRequest(network:string, amount:number, commitKey
 	return req;
 }
 
-export function getOpDropPeginRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
+export function getOpDropDepositRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	if (!stacksAddress) throw new Error('Address needed')
 	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPub)
@@ -108,17 +125,22 @@ export function maxCommit(addressInfo:any) {
 	return summ || 0;
 }
 
-export function calculateFees (network:string, amount:number, feeInfo:{ low_fee_per_kb:number, medium_fee_per_kb:number, high_fee_per_kb:number }, utxos:Array<UTXO>, commitTxScriptAddress:string, changeAddress:string) {
+export function calculateDepositFees (network:string, opDrop:boolean, amount:number, feeInfo:any, addressInfo:any, commitTxScriptAddress:string, data:Uint8Array|undefined) {
 	try {
 		const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 		let vsize = 0;
 		const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
-		addInputs(amount, tx, true, utxos);
-		tx.addOutputAddress(commitTxScriptAddress, BigInt(amount), net );
+		addInputs(network, amount, revealPayment, tx, true, addressInfo.utxos, hex.encode(secp.getPublicKey(privKey, true)));
+		if (!opDrop) {
+			if (data) tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
+			tx.addOutputAddress(commitTxScriptAddress, BigInt(amount), net);
+		} else {
+			tx.addOutputAddress(commitTxScriptAddress, BigInt(amount), net );
+		}
 		const changeAmount = inputAmt(tx) - (amount); 
-		if (changeAmount > 0) tx.addOutputAddress(changeAddress, BigInt(changeAmount), net);
-		tx.sign(privKey);
-		tx.finalize();
+		if (changeAmount > 0) tx.addOutputAddress(addressInfo.address, BigInt(changeAmount), net);
+		//tx.sign(privKey);
+		//tx.finalize();
 		vsize = tx.vsize;
 		const fees = [
 			Math.floor(vsize * feeInfo['low_fee_per_kb'] / 1024),
@@ -129,44 +151,4 @@ export function calculateFees (network:string, amount:number, feeInfo:{ low_fee_
 	} catch (err:any) {
 		return [ 850, 1000, 1150]
 	}
-}
-
-function addInputs (amount:number, tx:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>) {
-	const bar = revealPayment + amount;
-	let amt = 0;
-	for (const utxo of utxos) {
-		const hexy = (utxo.tx.hex) ? utxo.tx.hex : utxo.tx 
-		const script = btc.RawTx.decode(hex.decode(hexy))
-		if (amt < bar && isUTXOConfirmed(utxo)) {
-			amt += utxo.value;
-			let witnessUtxo = {
-				script: script.outputs[utxo.vout].script,
-				amount: BigInt(utxo.value)
-			}
-			if (feeCalc) {
-				witnessUtxo = {
-					amount: BigInt(utxo.value),
-					script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
-				}		
-			}
-			const nextI:btc.TransactionInput = {
-				txid: hex.decode(utxo.txid),
-				index: utxo.vout,
-				witnessUtxo
-			}
-			tx.addInput(nextI);
-		}
-	}
-}
-
-function isUTXOConfirmed (utxo:any) {
-	return utxo.tx.confirmations >= 3;
-};
-
-function inputAmt (tx:btc.Transaction) {
-	let amt = 0;
-	for (let idx = 0; idx < tx.inputsLength; idx++) {
-		amt += Number(tx.getInput(idx).witnessUtxo?.amount)
-	}
-	return amt;
 }
