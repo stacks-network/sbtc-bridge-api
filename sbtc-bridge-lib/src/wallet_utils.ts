@@ -179,7 +179,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 				const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 				let p2shObj;
 				// p2tr cannont be wrapped in p2sh !!!
-				const txTypes = ['witness_v0_keyhash', 'pubkeyhash', 'witness_v0_scripthash']
+				const txTypes = ['witness_v0_keyhash', 'pubkeyhash', 'witness_v0_scripthash1', 'witness_v0_scripthash2', 'multi']
 				for (const txType of txTypes) {
 					try {
 						if (txType === 'witness_v0_keyhash') {
@@ -190,8 +190,10 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 							p2shObj = btc.p2sh(btc.p2ms(1, [hex.decode(userPaymentPubKey)]), net)
 						} else if (txType.indexOf('pubkeyhash') > -1) {
 							p2shObj = btc.p2sh(btc.p2pkh(hex.decode(userPaymentPubKey)), net)
-						} else if (txType.indexOf('witness_v0_scripthash') > -1) {
+						} else if (txType.indexOf('witness_v0_scripthash1') > -1) {
 							p2shObj = btc.p2sh(btc.p2wsh(btc.p2wpkh(hex.decode(userPaymentPubKey))), net)
+						} else if (txType.indexOf('witness_v0_scripthash2') > -1) {
+							p2shObj = btc.p2sh(btc.p2wsh(btc.p2pkh(hex.decode(userPaymentPubKey))), net)
 						}
 						const nextI = redeemScriptAddInput(utxo, p2shObj, hexy)
 						tx.addInput(nextI);

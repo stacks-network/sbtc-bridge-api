@@ -29,7 +29,8 @@ export function buildOpReturnDepositTransaction(network:string, amount:number, b
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
 	const txFees = calculateDepositFees(network, false, amount, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
-	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
+	// no reveal fee for op_return
+	addInputs(network, amount, 0, tx, false, addressInfo.utxos, userPaymentPubKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
 	tx.addOutputAddress(sbtcWalletAddress, BigInt(amount), net);
 	const changeAmount = inputAmt(tx) - (amount + txFees[1]); 
@@ -61,14 +62,14 @@ export function buildOpDropDepositTransaction (network:string, amount:number, bt
 export function getOpReturnDepositRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	if (!stacksAddress) throw new Error('Stacks address missing')
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
-	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPub)
-	console.log('revealAddr.pubkey: ' + commitKeys.revealPub)
+	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
+	console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
 	
 	const req:PeginRequestI = {
 		originator: stacksAddress,
 		fromBtcAddress: cardinal,
-		revealPub: commitKeys.revealPub,
-		reclaimPub: commitKeys.reclaimPub,
+		revealPub: commitKeys.revealPubKey,
+		reclaimPub: commitKeys.reclaimPubKey,
 		status: 1,
 		tries: 0,
 		mode: 'op_return',
@@ -84,20 +85,20 @@ export function getOpReturnDepositRequest(network:string, amount:number, commitK
 export function getOpDropDepositRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	if (!stacksAddress) throw new Error('Address needed')
-	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPub)
-	console.log('revealAddr.pubkey: ' + commitKeys.revealPub)
+	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
+	console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
 	
 	const data = buildData(network, stacksAddress, revealFee, true);
 	const scripts =  [
-		{ script: btc.Script.encode([data, 'DROP', hex.decode(commitKeys.revealPub), 'CHECKSIG']) },
-		{ script: btc.Script.encode([hex.decode(commitKeys.reclaimPub), 'CHECKSIG']) }
+		{ script: btc.Script.encode([data, 'DROP', hex.decode(commitKeys.revealPubKey), 'CHECKSIG']) },
+		{ script: btc.Script.encode(['IF', 144, 'CHECKSEQUENCEVERIFY', 'DROP', hex.decode(commitKeys.reclaimPubKey), 'CHECKSIG', 'ENDIF']) },
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
 	const req:PeginRequestI = {
 		originator: stacksAddress,
 		fromBtcAddress: cardinal,
-		revealPub: commitKeys.revealPub,
-		reclaimPub: commitKeys.reclaimPub,
+		revealPub: commitKeys.revealPubKey,
+		reclaimPub: commitKeys.reclaimPubKey,
 		status: 1,
 		tries: 0,
 		mode: 'op_drop',
