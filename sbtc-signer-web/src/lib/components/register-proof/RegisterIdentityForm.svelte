@@ -7,10 +7,12 @@ import { dnsValidate } from '$lib/utils'
 import FileIcon from '$lib/components/shared/FileIcon.svelte';
 import { sbtcConfig } from '$stores/stores'
 import EditIcon from '$lib/components/shared/EditIcon.svelte';
-import { truncate } from '$lib/utils'
+import { truncate } from 'sbtc-bridge-lib'
 import CopyClipboard from '$lib/components/common/CopyClipboard.svelte';
-import { verifyStacksPricipal, getDidWeb } from "$lib/stacks_connect";
+import { getDidWeb } from "$lib/webdid";
+import { verifyStacksPricipal } from "$lib/stacks_connect";
 import { fetchWebDid } from '$lib/signers_api'
+import { CONFIG } from '$lib/config'
 
 const dispatch = createEventDispatcher();
 let mine = true;
@@ -36,8 +38,8 @@ const input1Data = {
   label: 'Stacks Address',
   hint: undefined,
   placeholder: 'my stacks address',
-  resetValue: $sbtcConfig.addressObject.stxAddress,
-  value: $sbtcConfig.addressObject.stxAddress
+  resetValue: $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress,
+  value: $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress
 }
 
 const fieldUpdated = async (event:any) => {
@@ -46,7 +48,7 @@ const fieldUpdated = async (event:any) => {
     try {
       verifyStacksPricipal(input.value)
     } catch (err) {
-      makeFlash(document.getElementById(input.field), 1)
+      makeFlash(document.getElementById(input.field))
     }
   } else {
     if (dnsValidate(input0Data.value)) {
@@ -64,16 +66,16 @@ const copy = (ele:string) => {
     }
     const app = new CopyClipboard(clippy);
     app.$destroy();
-    makeFlash(document.getElementById(ele), 1)
+    makeFlash(document.getElementById(ele))
     copied = true;
   }
 
 const getAddress = (full:boolean):string => {
     if (full) {
-      return $sbtcConfig?.addressObject?.stxAddress;
+      return $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress;
     }
     try {
-      return truncate($sbtcConfig?.addressObject?.stxAddress, 10).toUpperCase();
+      return truncate($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress, 10).toUpperCase();
     } catch (err) {
       return 'not connected'
     }
@@ -84,18 +86,18 @@ const doClicked = async (event:any) => {
   try {
     verifyStacksPricipal(input1Data.value)
   } catch (err:any) {
-    makeFlash(document.getElementById(input1Data.field), 1);
+    makeFlash(document.getElementById(input1Data.field));
     errored = err.message;
   }
 
   if (!input0Data.value) {
     const ele = document.getElementById(input0Data.field);
-    makeFlash(ele, undefined);
+    makeFlash(ele);
     errored = 'domain name is required';
   }
   if (!dnsValidate(input0Data.value)) {
     const ele = document.getElementById(input0Data.field);
-    makeFlash(ele, undefined);
+    makeFlash(ele);
     errored = 'domain name is required';
   }
   if (errored) return;

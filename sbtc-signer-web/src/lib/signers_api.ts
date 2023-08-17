@@ -1,21 +1,7 @@
 import { CONFIG } from '$lib/config';
 import type { BlockchainInfo } from 'sbtc-bridge-lib' 
+import { addNetSelector } from './bridge_api'
 
-function addNetSelector (path:string) {
-  if (CONFIG.VITE_NETWORK === 'testnet' || CONFIG.VITE_NETWORK === 'devnet') {
-    if (path.indexOf('bridge-api') > -1) {
-      return path.replace('bridge-api', 'bridge-api/testnet');
-    } else {
-      return path.replace('signer-api', 'signer-api/testnet');
-    }
-  } else {
-    if (path.indexOf('bridge-api') > -1) {
-      return path.replace('bridge-api', 'bridge-api/mainnet');
-    } else {
-      return path.replace('signer-api', 'signer-api/mainnet');
-    }
-  }
-}
 /**
 export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
   const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/info');
@@ -62,8 +48,8 @@ export async function fetchWebDid(domain:string):Promise<BlockchainInfo|undefine
   }
 }
 
-export async function fetchStatelessInfo():Promise<any> {
-  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/info');
+export async function fetchDashboardInfo():Promise<any> {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/sbtc/info');
   try {
     const response = await fetch(path);
     const res = await response.json();

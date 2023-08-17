@@ -31,7 +31,7 @@ const TESTNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Testnet API',
+  publicAppName: 'sBTC Signer Dashboard Testnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -63,7 +63,7 @@ const MAINNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
+  publicAppName: 'sBTC Signer Dashboard Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -92,12 +92,12 @@ const DEVNET_CONFIG = {
   },
   //stacksApi: 'http://devnet.stx.eco',
   //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
-  stacksApi: 'http://localhost:3999',
+  stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'http://localhost:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Devnet API',
+  publicAppName: 'sBTC Signer Dashboard Devnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -132,7 +132,7 @@ const LINODE_TESTNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Staging API',
+  publicAppName: 'sBTC Signer Dashboard Staging API',
   publicAppVersion: '1.0.0',
 }
 
@@ -164,7 +164,7 @@ const LINODE_MAINNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
+  publicAppName: 'sBTC Signer Dashboard Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -230,7 +230,7 @@ function setOverrides() {
     console.log('dev env.. process.env.SIG_BTC_NODE = ' + CONFIG.btcNode)
     CONFIG.port = 4000
     CONFIG.mongoDbUrl = 'cluster0.eayhmli.mongodb.net'
-    CONFIG.mongoDbName = 'sbtc-signer-db'
+    CONFIG.mongoDbName = 'sbtc-signer-stag-db'
     CONFIG.mongoUser = 'stagsigner1'
     CONFIG.mongoPwd = 'p2ASvMaKZS2GZuPj'
     //CONFIG.btcNode = '127.0.0.1:18332'

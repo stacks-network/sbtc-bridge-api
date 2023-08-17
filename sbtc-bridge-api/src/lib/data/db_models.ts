@@ -4,7 +4,7 @@ import { getConfig } from '../config.js';
 import { ExchangeRate } from 'sbtc-bridge-lib';
 
 let exchangeRates:Collection;
-let sbtcContractEvent:Collection;
+let sbtcAlphaEvents:Collection;
 let peginRequest:Collection;
 let commitments:Collection;
   
@@ -32,8 +32,8 @@ export async function connect() {
 	// Create references to the database and collection in order to run
 	// operations on them.
 	const database = client.db(getConfig().mongoDbName);
-	sbtcContractEvent = database.collection('sbtcContractEvent');
-	await sbtcContractEvent.createIndex({'bitcoinTxid': 1}, { unique: true })
+	sbtcAlphaEvents = database.collection('sbtcAlphaEvents');
+	await sbtcAlphaEvents.createIndex({'bitcoinTxid': 1}, { unique: true })
 	peginRequest = database.collection('peginRequest');
 	await peginRequest.createIndex({status: 1, amount: 1, fromBtcAddress: 1, stacksAddress: 1, sbtcWalletAddress: 1}, { unique: true })
 	commitments = database.collection('commitments');
@@ -73,17 +73,17 @@ export async function updateExchangeRate (exchangeRate:any, changes: any) {
 
 
 // Compile model from schema 
-export async function countSbtcEvents () {
-	return await sbtcContractEvent.countDocuments();
+export async function countAlphaEvents () {
+	return await sbtcAlphaEvents.countDocuments();
 }
 
-export async function saveNewSbtcEvent (newEvent:any) {
-	const result = await sbtcContractEvent.insertOne(newEvent);
+export async function saveNewAlphaEvent (newEvent:any) {
+	const result = await sbtcAlphaEvents.insertOne(newEvent);
 	return result;
 }
 
-export async function findSbtcEventsByFilter(filter:any|undefined) {
-	return await sbtcContractEvent.find(filter).sort({'pegData.burnBlockHeight': -1}).toArray();
+export async function findAlphaEventsByFilter(filter:any|undefined) {
+	return await sbtcAlphaEvents.find(filter).sort({'pegData.burnBlockHeight': -1}).toArray();
 }
 
 export async function saveNewPeginRequest (pegin:any) {

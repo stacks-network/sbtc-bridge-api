@@ -171,6 +171,14 @@ export type UTXO = {
   value: number;
 };
 
+export type SbtcAlphaEvent = {
+  contractId: string;
+  eventIndex: string;
+  txid: string;
+  bitcoinTxid: string;
+  payloadData:payloadType;
+}
+
 export type payloadType = {
   sbtcWallet:string;
   burnBlockHeight?:number;
@@ -180,7 +188,6 @@ export type withdrawalPayloadType = {
   opcode: string;
   stacksAddress: string;
   signature: string;
-  compression: number,
   amountSats: number;
   dustAmount?: number;
 };

@@ -2,6 +2,9 @@
   import { Icon, ArrowSmallRight } from "svelte-hero-icons"
   import { CONFIG } from '$lib/config';
   import { a_primary } from '$lib/css_utils';
+	import { goto } from "$app/navigation";
+
+  goto('/dashboard')
 </script>
 
 <div class="mx-auto flex flex-col justify-start w-full sm:max-w-4xl py-6 px-6 lg:px-8">

@@ -7,10 +7,10 @@ export class ConfigController {
   @Get("/")
   public getAllParam(): any {
     const config = getConfig();
-    config.mongoDbUrl = '*****'
-    config.mongoDbName = '*****'
+    //config.mongoDbUrl = '*****'
+    //config.mongoDbName = '*****'
     config.mongoPwd = '*****'
-    config.mongoUser = '*****'
+    //config.mongoUser = '*****'
     config.btcRpcPwd = '*****'
     config.btcRpcUser = '*****'
     return config;

@@ -26,7 +26,7 @@ const register = async () => {
     return;
   }
   error = undefined;
-  const cardinalAddress = $sbtcConfig.addressObject.btcPubkeySegwit0
+  const cardinalAddress = $sbtcConfig.keySets[CONFIG.VITE_NETWORK].btcPubkeySegwit0
   await registerToSign(cardinalAddress!, amount, resultOf);
 }
 const resultOf = async (data:any) => {
@@ -35,7 +35,7 @@ const resultOf = async (data:any) => {
 onMount(async () => {
 		try {
       untilBlock = ($sbtcConfig.bcInfo?.stacksInfo?.burn_block_height || 0) + 400
-			delegationInfo = await getAllowanceContractCallers($sbtcConfig.addressObject.stxAddress);
+			delegationInfo = await getAllowanceContractCallers($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress);
       if (delegationInfo.untilBlockHeight === 0) delegationInfo = undefined;
       inited = true;
 		} catch (err) {

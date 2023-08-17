@@ -6,6 +6,8 @@
     import { Icon, InformationCircle } from "svelte-hero-icons"
     import type { BlockchainInfo } from 'sbtc-bridge-lib';
     import JSONTree from 'svelte-json-tree'
+    import Headlines from "$lib/components/dashboard/Headlines.svelte";
+    import TransactionAlphaTable from "$lib/components/dashboard/TransactionAlphaTable.svelte";
 
     const getNextCycleBurnchainBlock = () => {
       const bcInfo:BlockchainInfo = $sbtcConfig.bcInfo!;
@@ -27,6 +29,12 @@
       Current pox cycle - click for more infomation.
     </Tooltip>
     
+    <div class="flex flex-col gap-y-5">
+      <div><Headlines /></div>
+      <div><TransactionAlphaTable /></div>
+    </div>
+    <!--
+
         <div>
           <div class="w-full bg-primary-03 p-10 md:p-10 rounded-2xl ">
             <div class="pb-10 w-full flex justify-between align-baseline items-baseline">
@@ -64,4 +72,5 @@
           <div class="bg-white border rounded-lg p-5 text-2xl my-10" style="--json-tree-string-color: blue; --json-tree-font-size: 18px;">
             <JSONTree value={$sbtcConfig.bcInfo}/>
           </div>
-            </div>
+        </div>
+    -->

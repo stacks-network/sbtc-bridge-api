@@ -2,7 +2,7 @@
 import { CONFIG } from '$lib/config';
 import { AppConfig, UserSession, openStructuredDataSignatureRequestPopup } from '@stacks/connect';
 import { stringUtf8CV, tupleCV, uintCV, stringAsciiCV } from '@stacks/transactions';
-
+import { appDetails } from '$lib/stacks_connect'
 export const txtRecordPrecis = 'sBTC Signer: ';
 const appConfig = new AppConfig(['store_write', 'publish_data']);
 export const userSession = new UserSession({ appConfig }); // we will use this export from other files

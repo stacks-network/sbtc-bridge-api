@@ -2,7 +2,7 @@ const TESTNET_CONFIG = {
     VITE_PUBLIC_APP_NAME: 'sBTC Signers Dashboard',
     VITE_PUBLIC_APP_VERSION: '1.0.0',
     VITE_URI_BRIDGE: 'https://bridge.stx.eco',
-    VITE_URI_SIGN: 'https://sign.stx.eco',
+    VITE_URI_SIGN: 'https://bridge.stx.eco',
     VITE_URI_VOTE: 'https://vote.stx.eco',
     VITE_ORIGIN: 'https://sbtc.world',
     VITE_NETWORK: 'testnet',
@@ -28,7 +28,7 @@ const MAINNET_CONFIG = {
     VITE_PUBLIC_APP_NAME: 'sBTC Signers Dashboard',
     VITE_PUBLIC_APP_VERSION: '1.0.0',
     VITE_URI_BRIDGE: 'https://bridge.stx.eco',
-    VITE_URI_SIGN: 'https://sign.stx.eco',
+    VITE_URI_SIGN: 'https://bridge.stx.eco',
     VITE_URI_VOTE: 'https://vote.stx.eco',
     VITE_ORIGIN: 'https://sbtc.world',
     VITE_NETWORK: 'mainnet',
@@ -94,8 +94,8 @@ export function setConfig(search:string) {
         CONFIG.VITE_URI_VOTE = 'http://localhost:8082'
     
         // toggle depending on location / ip address etc
-        CONFIG.VITE_BRIDGE_API = 'http://localhost:3030/bridge-api/v1'
-        CONFIG.VITE_SIGNER_API = 'http://localhost:4030/signer-api/v1'
+        //CONFIG.VITE_BRIDGE_API = 'http://localhost:3030/bridge-api/v1'
+        CONFIG.VITE_SIGNER_API = 'http://localhost:4000/signer-api/v1'
     }
     //console.log('CONFIG.VITE_BRIDGE_API: ' + CONFIG.VITE_BRIDGE_API);
 }

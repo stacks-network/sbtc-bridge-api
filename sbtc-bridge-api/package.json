@@ -14,7 +14,10 @@
     "test": "vitest",
     "watch": "vitest watch",
     "coverage": "vitest run --coverage",
+    "predev": "npm run swagger",
+    "prebuild": "npm run swagger",
     "dev": "concurrently \"NODE_ENV=test nodemon \" \"NODE_ENV=test nodemon -x tsoa spec\"",
+    "sim": "concurrently \"NODE_ENV=simnet nodemon \" \"NODE_ENV=simnet nodemon -x tsoa spec\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
@@ -69,7 +72,7 @@
     "morgan": "^1.10.0",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.9",
-    "sbtc-bridge-lib": "^1.0.50",
+    "sbtc-bridge-lib": "^1.0.57",
     "swagger-ui-express": "^4.6.3",
     "tsoa": "^5.1.1",
     "uninstall": "^0.0.0",

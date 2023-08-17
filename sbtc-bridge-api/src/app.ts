@@ -1,15 +1,20 @@
 import { setConfigOnStart, getConfig } from './lib/config.js';
-import { swagger } from './lib/swagger.js'
+import bodyParser from "body-parser";
+import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
 import morgan from "morgan";
-import Router from "./routes/index.js";
-import { serve, setup } from 'swagger-ui-express';
 import { sbtcEventJob, peginRequestJob, revealCheckJob } from './controllers/JobScheduler.js';
 import cors from "cors";
 import { connect, getExchangeRates } from './lib/data/db_models.js'
 import { MAGIC_BYTES_TESTNET } from 'sbtc-bridge-lib' 
-import http from 'http'
 import { WebSocketServer } from 'ws'
+import { configRoutes } from './routes/configRoutes.js'
+import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
+import { stacksRoutes } from './routes/stacksRoutes.js'
+import { createRequire } from 'node:module';
+const r = createRequire(import.meta.url);
+// - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
+const swaggerDocument = r('./swagger.json');
 
 const app = express();
 
@@ -18,25 +23,23 @@ const app = express();
 //  socket.on('message', message => console.log(message));
 //});
 
+app.use('/api-docs', swaggerUi.serve);
 app.use(express.json());
 app.use(morgan("tiny"));
 app.use(express.static("public"));
 app.use(cors());
+app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 setConfigOnStart();
-
-
 app.use(
-  "/bridge-api/docs",
-  serve,
-  setup(undefined, {
-    swaggerOptions: {
-      spec: swagger,
-      //url: "/swagger.json",
-    },
+  bodyParser.urlencoded({
+    extended: true,
   })
 );
+app.use(bodyParser.json());
 
-app.use(Router);
+app.use(configRoutes);
+app.use(bitcoinRoutes);
+app.use(stacksRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \n\nsBTC Wallet: ${getConfig().sbtcContractId}`);
 console.log('\n\nStartup Environment: ', process.env.TARGET_ENV);

@@ -82,10 +82,28 @@ export {
 } 
 
 import {
-    approxTxFees,
-} from './transaction_utils.js'
+    satsToBitcoin,
+    bitcoinToSats,
+    fmtAmount,
+    fmtSatoshiToBitcoin,
+    fmtMicroToStx,
+    tsToDate,
+    convertDatToBH,
+    fmtNumber,
+    truncate,
+    truncateId,
+} from './formatting.js'
 export {
-    approxTxFees,
+    satsToBitcoin,
+    bitcoinToSats,
+    fmtAmount,
+    fmtSatoshiToBitcoin,
+    fmtMicroToStx,
+    tsToDate,
+    convertDatToBH,
+    fmtNumber,
+    truncate,
+    truncateId,
 }
 
 import {
@@ -119,6 +137,7 @@ import type {
     AddressValidationI,
     SbtcBalance,
     UTXO,
+    SbtcAlphaEvent,
     payloadType,
     withdrawalPayloadType,
     depositPayloadType,
@@ -143,6 +162,7 @@ export type {
     AddressValidationI,
     SbtcBalance,
     UTXO,
+    SbtcAlphaEvent,
     payloadType,
     withdrawalPayloadType,
     depositPayloadType,
@@ -158,12 +178,14 @@ import type {
     PoxInfo,
     StacksInfo,
     BlockchainInfo,
-    PoxCycleInfo
+    PoxCycleInfo,
+    DashboardInfoI
 } from './types/pox_types.js'
 
 export type {
     PoxInfo,
     StacksInfo,
     BlockchainInfo,
-    PoxCycleInfo
+    PoxCycleInfo,
+    DashboardInfoI
 }

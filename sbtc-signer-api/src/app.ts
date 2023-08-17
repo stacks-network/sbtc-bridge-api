@@ -5,11 +5,13 @@ import morgan from "morgan";
 import cors from "cors";
 import { configRoutes } from './routes/config.js'
 import { signerRoutes } from './routes/signers.js'
+import { alphaEventRoutes } from './routes/alphaEvents.js'
+import { dashboardRoutes } from './routes/dashboard.js'
 import { setConfigOnStart, getConfig } from './lib/config.js';
 import { updateEventLogJob } from './routes/controllers/JobScheduler.js';
 import { connect } from './lib/database/db_models.js'
 import { WebSocketServer } from 'ws'
-import { EventsController } from "./routes/controllers/EventsController.js"
+import { AlphaEventsController } from "./routes/controllers/AlphaEventsController.js"
 
 import { createRequire } from 'node:module';
 const r = createRequire(import.meta.url);
@@ -36,6 +38,8 @@ app.use(bodyParser.json());
 
 app.use(signerRoutes);
 app.use(configRoutes);
+app.use(dashboardRoutes);
+app.use(alphaEventRoutes);
 
 const PORT = getConfig().port;
 //app.listen(PORT);
@@ -52,14 +56,14 @@ async function connectToMongoCloud() {
   });
   const wss = new WebSocketServer({ server })
   updateEventLogJob.start();
-  const controller = new EventsController();
+  const controller = new AlphaEventsController();
   console.log(`Running on ${getConfig().host}:${PORT}\n\n`);
   //const server = http.createServer(app)
   wss.on('connection', function connection(ws) {
     //console.log('new client connected');
-    ws.send(JSON.stringify(controller.findSbtcEvents(0)))
+    ws.send(JSON.stringify(controller.findAlphaEvents(0)))
     setInterval(async function () {
-      ws.send(JSON.stringify(controller.findSbtcEvents(0)))
+      ws.send(JSON.stringify(controller.findAlphaEvents(0)))
     }, (60 * 5 * 1000)) // 5 mins.
     ws.on('message', function incoming(message) {
       //console.log('received %s', message);

@@ -41,9 +41,9 @@ const resultOfDelegate = async (data:any) => {
 }
 onMount(async () => {
 		try {
-      stxAddress = $sbtcConfig.addressObject.stxAddress
+      stxAddress = $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress
       untilBlock = bbHeight + 10000
-			delegationInfo = await getAllowanceContractCallers($sbtcConfig.addressObject.stxAddress);
+			delegationInfo = await getAllowanceContractCallers($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress);
       if (delegationInfo.untilBlockHeight === 0) delegationInfo = undefined;
       inited = true;
 		} catch (err) {

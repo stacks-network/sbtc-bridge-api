@@ -57,15 +57,15 @@ export class TransactionController {
         oraclePubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrOracle))
       }
     }
-}
-  
-@Get("/rates")
-public getRates() {
-  const rates = getExchangeRates();
-  return rates;
-}
+  }
+    
+  //@Get("/rates")
+  public async getRates() {
+    const rates = await getExchangeRates();
+    return rates;
+  }
 
-public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
+  public async sign(wrappedPsbt:WrappedPSBT): Promise<WrappedPSBT> {
     if (!wrappedPsbt?.stxSignature || !wrappedPsbt?.stxSignature.message) {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'No signature data found.' }
       return wrappedPsbt;

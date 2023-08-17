@@ -1,7 +1,10 @@
 import fetch from 'node-fetch';
 import { getConfig } from '../../../lib/config.js';
-import { payloadType, readDepositValue, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
+//import { parseSbtcWalletAddress, parseOutputsBitcoinCore } from './payload_helper.js'
+import { payloadType, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
 import { fetchTransaction, fetchTransactionHex } from './MempoolApi.js';
+import { hex } from '@scure/base';
+import { c32address, c32addressDecode } from 'c32check';
 
 async function handleError (response:any, message:string) {
   if (response?.status !== 200) {
@@ -33,11 +36,67 @@ export async function getAddressInfo(address:string) {
 
 export async function fetchPegTxData(txid:string, verbose:boolean) {
   const res = await fetchRawTx(txid, true);
-  //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
-  const sbtcWalletAddress = parseSbtcWalletAddress(getConfig().network, res.vout);
-  const pegInAmountSats = readDepositValue(res.vout);
-  const parsed:payloadType = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress, pegInAmountSats);
-  parsed.burnBlockHeight = res.block.height;
+  const struc = parseSbtcWalletAddress(getConfig().network, res.vout);
+  const sbtcWalletAddress = struc.bitcoinAddress;
+  const pegInAmountSats = struc.amountSats;
+  let parsed:payloadType = {
+    sbtcWallet: sbtcWalletAddress,
+    burnBlockHeight: (res.status) ? res.status.block_height : 0,
+  };
+  //console.log('fetchPegTxData: output stacksAddress: ', parsed)
+  /**
+ */
+  let stacksAddress;
+  let opcode;
+  try {
+    console.log('fetchPegTxData: opcode: ' + res.vout[0].scriptpubkey_asm)
+    const raw = res.vout[0].scriptpubkey_asm.split(' ')[2]
+    const d0 = hex.decode(raw)
+    const d1 = d0.subarray(2)
+    console.log('fetchPegTxData: d1: ', hex.encode(d1))
+    opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
+    console.log('fetchPegTxData: opcode: ', opcode)
+    const prinType = parseInt(hex.encode(d1.subarray(1,2)), 8);
+    console.log('fetchPegTxData prinType: ', prinType)
+  
+    //if (opcode !== '3C') throw new Error('Wrong opcode for deposit: should be 3C was ' + opcode)
+    //const prinType = parseInt(hex.encode(d1.subarray(1,2)), 16);
+    //console.log('fetchPegTxData: prinType: ', prinType)
+    const addr0 = parseInt(hex.encode(d1.subarray(1,2)), 8);
+    console.log('fetchPegTxData: addr0: ', addr0)
+    const addr1 = hex.encode(d1.subarray(2,22));
+    console.log('fetchPegTxData: addr1: ', addr1)
+    stacksAddress = c32address(addr0, addr1);
+    console.log('fetchPegTxData: output stacksAddress: ', stacksAddress)
+  } catch (e:any) {
+    //console.log('fetchPegTxData: err: ' + e.message)
+    //return parsed
+  }
+  //return parsed
+
+  try {
+    //console.log('fetchPegTxData: output 0: ', d1)
+    if (!stacksAddress) {
+      parsed.payload = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress, pegInAmountSats);
+    } else {
+      parsed.payload = {
+        opcode,
+        prinType: 0,
+        stacksAddress,
+        lengthOfCname: 0,
+        cname: undefined,
+        lengthOfMemo: 0,
+        memo: undefined,
+        revealFee: 0,
+        amountSats: pegInAmountSats
+      }
+    }
+    console.log('fetchPegTxData: parseOutputs: ' + 'parsedparsedparsedparsedparsedparsedparsed' + ' ' + res.vout[0].scriptpubkey_asm)
+  } catch (err:any) {
+    console.log('fetchPegTxData: parseOutputs: ' + err.message + ' ' + res.vout[0].scriptpubkey_asm)
+    //parsed.payload = parseOutputsBitcoinCore(getConfig().network, res.vout[0], sbtcWalletAddress, pegInAmountSats);
+  }
+  //console.log('fetchPegTxData parsed: ', parsed);
   return parsed;
 }
 
@@ -56,13 +115,15 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     res = await fetchTransaction(txid);
     res.hex = await fetchTransactionHex(txid);
   }
+  /**
   if (res && verbose) {
     try {
       res.block = await getBlock(res.blockhash, 1)
     } catch (err) {
-      console.log('Unable to get block info')
+      console.log('Unable to get block info', err)
     }
   }
+   */
   return res;
 }
  

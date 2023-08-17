@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Button, Dropdown, DropdownItem } from 'flowbite-svelte'
+	import { CONFIG } from '$lib/config';
 	import { Icon, ClipboardDocument } from "svelte-hero-icons"
 	import SBtcIcon from '$lib/components/shared/sBTCIcon.svelte';
 	import BitcoinIcon from '$lib/components/shared/BitcoinIcon.svelte';
@@ -8,9 +9,9 @@
 	import { makeFlash } from "$lib/stacks_connect";
 
 	import { createEventDispatcher } from "svelte";
-	import { truncate } from '$lib/utils'
+	import { fmtSatoshiToBitcoin, fmtMicroToStx, truncate } from 'sbtc-bridge-lib'
 	import { sbtcConfig } from '$stores/stores'
-	import { fmtSatoshiToBitcoin, fmtMicroToStx, bitcoinBalanceFromMempool } from '$lib/utils'
+	import { bitcoinBalanceFromMempool } from '$lib/utils'
 	const dispatch = createEventDispatcher();
 
 	let copied = false;
@@ -27,7 +28,7 @@
 		}
 		const app = new CopyClipboard(clippy);
 		app.$destroy();
-		makeFlash(document.getElementById(ele), 1)
+		makeFlash(document.getElementById(ele))
 		copied = true;
 		return false;
 	}
@@ -53,7 +54,7 @@
 	</svg>
 </Button>
 <Dropdown
-	frameClass="z-30 rounded-lg !bg-black !border py-2 !border-gray-900"
+	class="z-30 rounded-lg !bg-black !border py-1 !border-gray-900"
 	ulClass="py-1 w-full"
 	placement='bottom-end'>
 	<div slot="header" class="bg-gray-1000 overflow-hidden py-1 text-white">
@@ -63,10 +64,10 @@
 				<div class="px-4 py-1 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-6 items-center">
 					<div id="icon-stacks" class="flex items-center gap-3 text-sm">
 						<StacksIcon clazz={'w-5 h-5'}/>
-						<span>{transformAddress($sbtcConfig.addressObject.stxAddress)}</span>
+						<span>{transformAddress($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.stxAddress)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon on:keyup on:click={(event) => handleClick(event)} src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
@@ -75,10 +76,10 @@
 					<div id="bitcoin-c-stacks" class="flex items-center gap-3 text-sm">
 						<BitcoinIcon clazz={'w-5 h-5'}/>
 
-						<span><span class="font-bold">Cardinal:</span>{' '}{transformAddress($sbtcConfig.addressObject.cardinal)}</span>
+						<span><span class="font-bold">Cardinal:</span>{' '}{transformAddress($sbtcConfig.keySets[CONFIG.VITE_NETWORK].cardinal)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.cardinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.keySets[CONFIG.VITE_NETWORK].cardinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
@@ -87,10 +88,10 @@
 					<div id="bitcoin-o-stacks" class="flex items-center gap-3 text-sm">
 						<BitcoinIcon clazz={'w-5 h-5'}/>
 
-						<span><span class="font-bold">Ordinal:</span>{' '}{transformAddress($sbtcConfig.addressObject.ordinal)}</span>
+						<span><span class="font-bold">Ordinal:</span>{' '}{transformAddress($sbtcConfig.keySets[CONFIG.VITE_NETWORK].ordinal)}</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.addressObject.ordinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
+						<button on:click|preventDefault={(event) => copy(event, 'icon-stacks', $sbtcConfig.keySets[CONFIG.VITE_NETWORK].ordinal)} class="h-8 w-8 rounded-md bg-black flex items-center justify-center border border-transparent hover:border-gray-900 transition duration-200">
 							<Icon src="{ClipboardDocument}" class="-mr-0.5 h-5 w-5 text-white" aria-hidden="true" />
 						</button>
 					</div>
@@ -104,7 +105,7 @@
 						<span class="font-bold">STX</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						{fmtMicroToStx($sbtcConfig?.addressObject?.stacksTokenInfo?.stx?.balance || 0.000000)}
+						{fmtMicroToStx($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stacksTokenInfo?.stx?.balance || 0.000000)}
 					</div>
 				</div>
 
@@ -114,7 +115,7 @@
 						<span class="font-bold">BTC (Cardinal)</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						{fmtSatoshiToBitcoin(bitcoinBalanceFromMempool($sbtcConfig?.addressObject?.cardinalInfo) || 0.00000000)}
+						{fmtSatoshiToBitcoin(bitcoinBalanceFromMempool($sbtcConfig.keySets[CONFIG.VITE_NETWORK].cardinalInfo) || 0.00000000)}
 					</div>
 				</div>
 				<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-4 items-center">
@@ -123,7 +124,7 @@
 						<span class="font-bold">BTC (Ordinal)</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						{fmtSatoshiToBitcoin(bitcoinBalanceFromMempool($sbtcConfig?.addressObject?.ordinalInfo) || 0.00000000)}
+						{fmtSatoshiToBitcoin(bitcoinBalanceFromMempool($sbtcConfig.keySets[CONFIG.VITE_NETWORK].ordinalInfo) || 0.00000000)}
 					</div>
 				</div>
 				<div class="px-4 py-2 bg-gray-1000 grid grid-flow-col auto-cols-auto gap-4 items-center">
@@ -133,7 +134,7 @@
 						<span class="font-bold">sBTC</span>
 					</div>
 					<div class="ml-auto flex items-center">
-						{fmtSatoshiToBitcoin($sbtcConfig?.addressObject?.sBTCBalance || 0.00000000)}
+						{fmtSatoshiToBitcoin($sbtcConfig.keySets[CONFIG.VITE_NETWORK].sBTCBalance || 0.00000000)}
 
 					</div>
 				</div>

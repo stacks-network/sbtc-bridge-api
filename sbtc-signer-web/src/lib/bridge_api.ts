@@ -1,12 +1,18 @@
 import { CONFIG } from '$lib/config';
 import type { AddressObject } from 'sbtc-bridge-lib' 
 
-function addNetSelector (path:string) {
+export function addNetSelector (path:string) {
   if (CONFIG.VITE_NETWORK === 'testnet' || CONFIG.VITE_NETWORK === 'devnet') {
     if (path.indexOf('bridge-api') > -1) {
       return path.replace('bridge-api', 'bridge-api/testnet');
     } else {
       return path.replace('signer-api', 'signer-api/testnet');
+    }
+  } else if (CONFIG.VITE_NETWORK === 'simnet') {
+    if (path.indexOf('bridge-api') > -1) {
+      return path.replace('bridge-api', 'bridge-api/simnet');
+    } else {
+      return path.replace('signer-api', 'signer-api/simnet');
     }
   } else {
     if (path.indexOf('bridge-api') > -1) {
@@ -16,6 +22,7 @@ function addNetSelector (path:string) {
     }
   }
 }
+
 async function fetchCatchErrors(path:string) {
   try {
     const response = await fetch(path);
@@ -38,6 +45,26 @@ async function extractResponse(response:any) {
       console.log('error fetching response.. ', err)
     }
   }
+}
+
+export async function fetchExchangeRates() {
+  const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/btc/tx/rates');
+  const response = await fetchCatchErrors(path);
+  if (response.status !== 200) {
+    return [{
+      currency: "USD",
+      fifteen:0,
+      last:0,
+      buy:0,
+      sell:0,
+      symbol:"$",
+      name:"US Dollor",
+      _id:"64c236634b5e0bdea234cb0e"
+    },
+  ]
+  }
+  const txs = await response.json();
+  return txs;
 }
 
 export async function fetchSbtcData() {

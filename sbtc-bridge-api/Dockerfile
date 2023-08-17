@@ -15,7 +15,9 @@ RUN npm install
 
 # Bundle app source
 COPY . .
+RUN npm run swagger
 RUN npm run build
+COPY src/swagger.json dist/src/
 
 EXPOSE $PORT
 

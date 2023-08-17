@@ -9,7 +9,7 @@ import { fetchPegTxData } from './bitcoin/rpc_transaction.js';
 import { fetchAddress } from './bitcoin/mempool_api.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
-import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from './data/db_models.js';
+import { findAlphaEventsByFilter, countAlphaEvents, saveNewAlphaEvent } from './data/db_models.js';
 import util from 'util'
 import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 import { checkAddressForNetwork } from 'sbtc-bridge-lib';
@@ -127,7 +127,7 @@ export async function indexSbtcEvent(txid:string) {
 
 export async function saveAllSbtcEvents() {
   try {
-    let offset = await countSbtcEvents();
+    let offset = await countAlphaEvents();
     let events:Array<any>;
     do {
       events = await saveSbtcEvents(offset);
@@ -167,7 +167,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
         bitcoinTxid: edata.value,
         payloadData,
       };
-      const result = await saveNewSbtcEvent(newEvent);
+      const result = await saveNewAlphaEvent(newEvent);
       console.log('saveSbtcEvents: saved one: ' + result, newEvent.payloadData);
       
     } catch (err:any) {
@@ -178,7 +178,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
 }
 
 export async function findSbtcEvents(offset:number):Promise<any> {
-  return findSbtcEventsByFilter({});
+  return findAlphaEventsByFilter({});
 }
 
 export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {

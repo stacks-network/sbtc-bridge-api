@@ -8,7 +8,7 @@ import { getConfig } from '../../../lib/config.js';
 import { fetchPegTxData } from './BitcoinRpc.js';
 import { fetchAddress } from './MempoolApi.js';
 import fetch from 'node-fetch';
-import { findSbtcEventsByFilter, countSbtcEvents, saveNewSbtcEvent } from '../../../lib/database/db_models.js';
+import { findAlphaEventsByFilter, countAlphaEvents, saveNewAlphaEvent } from '../../../lib/database/db_models.js';
 import util from 'util'
 import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
@@ -102,75 +102,6 @@ function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
     default:
       break;
   }
-}
-
-export async function indexSbtcEvent(txid:string) {
-  try {
-    const url = getConfig().stacksApi + '/extended/v1/tx/events?tx_id=' + txid;
-    const response = await fetch(url);
-    const result:any = await response.json();
-    //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
-    return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
-  } catch (err) {
-    console.log('err indexSbtcEvent: ', util.inspect(err, false, null, true /* enable colors */));
-    return [];
-  }
-}
-
-export async function saveAllSbtcEvents() {
-  try {
-    let offset = await countSbtcEvents();
-    let events:Array<any>;
-    do {
-      events = await saveSbtcEvents(offset);
-      offset += limit;
-    } while (events.length === limit);
-  } catch (err) {
-    console.log('err saveAllSbtcEvents: ', util.inspect(err, false, null, true /* enable colors */));
-    return [];
-  }
-}
-
-export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
-  try {
-    const contractId = getConfig().sbtcContractId;
-    const url = getConfig().stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + offset;
-    const response = await fetch(url);
-    const result:any = await response.json();
-    //console.log('Sbtc Events: : offset=' + offset + ' limit=' + limit + ' results=' + result.results.length);
-    return await indexEvents(result.results);
-  } catch (err) {
-    console.log('err - saveSbtcEvents2: ', util.inspect(err, false, null, true /* enable colors */));
-    return [];
-  }
-}
-
-async function indexEvents(sbtcEvents:Array<any>) {
-  for (const event of sbtcEvents) {
-    try {
-      const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
-      const payloadData:payloadType = await fetchPegTxData(edata.value, true);
-      console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
-
-      let newEvent = {
-        contractId: event.contract_log.contract_id,
-        eventIndex: event.event_index,
-        txid: event.tx_id, 
-        bitcoinTxid: edata.value,
-        payloadData,
-      };
-      const result = await saveNewSbtcEvent(newEvent);
-      console.log('saveSbtcEvents: saved one: ' + result, newEvent.payloadData);
-      
-    } catch (err:any) {
-      console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
-    }
-  }
-  return sbtcEvents;
-}
-
-export async function findSbtcEvents(offset:number):Promise<any> {
-  return findSbtcEventsByFilter({});
 }
 
 export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {
