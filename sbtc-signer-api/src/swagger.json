@@ -6,50 +6,34 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"AddressValidationI": {
+			"SbtcMiniWalletI": {
 				"properties": {
-					"witness_program": {
+					"hashbytes": {
 						"type": "string"
 					},
-					"witness_version": {
+					"version": {
+						"type": "string"
+					},
+					"cycle": {
 						"type": "number",
 						"format": "double"
-					},
-					"iswitness": {
-						"type": "boolean"
-					},
-					"isscript": {
-						"type": "boolean"
-					},
-					"scriptPubKey": {
-						"type": "string"
-					},
-					"address": {
-						"type": "string"
-					},
-					"isvalid": {
-						"type": "boolean"
 					}
 				},
 				"required": [
-					"witness_program",
-					"witness_version",
-					"iswitness",
-					"isscript",
-					"scriptPubKey",
-					"address",
-					"isvalid"
+					"hashbytes",
+					"version",
+					"cycle"
 				],
 				"type": "object"
 			},
-			"SbtcContractDataI": {
+			"SbtcMiniContractDataI": {
 				"properties": {
-					"addressValidation": {
-						"$ref": "#/components/schemas/AddressValidationI"
-					},
 					"burnHeight": {
 						"type": "number",
 						"format": "double"
+					},
+					"symbol": {
+						"type": "string"
 					},
 					"name": {
 						"type": "string"
@@ -69,25 +53,31 @@
 					"tokenUri": {
 						"type": "string"
 					},
-					"tradingHalted": {
-						"type": "boolean"
-					},
-					"numParties": {
+					"currentCyclePool": {},
+					"currentWindow": {
 						"type": "number",
 						"format": "double"
-					},
-					"numKeys": {
-						"type": "number",
-						"format": "double"
-					},
-					"sbtcWalletPublicKey": {
-						"type": "string"
-					},
-					"sbtcWalletAddress": {
-						"type": "string"
 					},
 					"contractOwner": {
 						"type": "string"
+					},
+					"protocolOwner": {
+						"properties": {
+							"value": {
+								"type": "boolean"
+							},
+							"stacksAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"value",
+							"stacksAddress"
+						],
+						"type": "object"
+					},
+					"wallet": {
+						"$ref": "#/components/schemas/SbtcMiniWalletI"
 					},
 					"coordinator": {
 						"properties": {
@@ -114,9 +104,9 @@
 					}
 				},
 				"required": [
-					"sbtcWalletPublicKey",
-					"sbtcWalletAddress",
-					"contractOwner"
+					"contractOwner",
+					"protocolOwner",
+					"wallet"
 				],
 				"type": "object"
 			}
@@ -221,6 +211,42 @@
 				"parameters": []
 			}
 		},
+		"/signer-api/{network}/v1/sbtc/meta-data": {
+			"get": {
+				"operationId": "FetchSbtcMiniContractData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SbtcMiniContractDataI"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/signer-api/{network}/v1/sbtc/wallet-address": {
+			"get": {
+				"operationId": "FetchSbtcWalletAddress",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/signer-api/{network}/v1/signers/fetch-delegation-info/{stxAddress}": {
 			"get": {
 				"operationId": "GetDelegationInfo",
@@ -245,25 +271,6 @@
 						}
 					}
 				]
-			}
-		},
-		"/signer-api/{network}/v1/signers/fetch-contract-data": {
-			"get": {
-				"operationId": "FetchSbtcContractData",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/SbtcContractDataI"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
 			}
 		},
 		"/signer-api/{network}/v1/events/alpha/read-all": {

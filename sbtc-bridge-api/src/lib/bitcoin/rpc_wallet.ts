@@ -1,8 +1,18 @@
 import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
 import fetch from 'node-fetch';
 import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController.js'
-//import { checkAddressForNetwork } from 'sbtc-bridge-lib';
-import { getConfig } from '../../lib/config.js';
+
+export async function createWallet(wallet:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"createwallet","params":["${wallet}", false, true, "devnet", false, true, true, false]}`;
+  OPTIONS.body = dataString;
+  console.log('listWallets: ' + BASE_URL)
+  console.log('listWallets: OPTIONS:', OPTIONS)
+  const response = await fetch(BASE_URL, OPTIONS);
+  console.log('listWallets: response', response)
+  await handleError(response, 'createWallet internal error');
+  const result = await response.json();
+  return result;
+}
 
 export async function listUnspent() {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"listunspent","params":[3, 6, []]}`;
@@ -51,8 +61,9 @@ export async function listReceivedByAddress() {
 export async function listWallets() {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"listwallets","params":[]}`;
   OPTIONS.body = dataString;
+  console.log('listWallets: ' + BASE_URL)
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'loadWallet internal error');
+  await handleError(response, 'listWallets internal error');
   const result = await response.json();
   return result;
 }
@@ -61,16 +72,27 @@ export async function unloadWallet(name:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"unloadwallet","params":["${name}"]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
-  await handleError(response, 'loadWallet internal error');
+  await handleError(response, 'unloadWallet internal error');
   const result = await response.json();
   return result;
 }
 
 export async function loadWallet(name:string) {
-  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"loadwallet","params":["${name}"]}`;
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"loadwallet","params":["${name}", true]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
+  console.log('loadWallet: ', response)
   await handleError(response, 'loadWallet internal error');
+  const result = await response.json();
+  return result.result;
+}
+
+export async function generateNewAddress(addressType:string) {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getnewaddress","params":["${addressType}"]}`;
+  OPTIONS.body = dataString;
+  const response = await fetch(BASE_URL, OPTIONS);
+  console.log('generateNewAddress: ', response)
+  await handleError(response, 'generateNewAddress internal error');
   const result = await response.json();
   return result.result;
 }

@@ -5,6 +5,35 @@ export type SigData = {
   outputsForDisplay: any;
   inputsForDisplay: any;
 }
+export type SbtcMiniContractsI = {
+  [key: string]: string
+}
+
+export type SbtcMiniWalletI = {
+  cycle:number, version: string, hashbytes: string
+}
+
+export type SbtcMiniContractDataI = {
+  coordinator?: {
+      addr: {
+          value: string;
+      };
+      key: string;
+  };
+  wallet: SbtcMiniWalletI;
+  protocolOwner: { stacksAddress: string, value: boolean }
+  contractOwner: string;
+  currentWindow?: number;
+  currentCyclePool?: any;
+  tokenUri?: string;
+  threshold?: number;
+  totalSupply?: number;
+  decimals?: number;
+  name?: string;
+  symbol?: string;
+  burnHeight?: number;
+};
+
 export type SbtcContractDataI = {
   coordinator?: { addr: { value: string }, key:string };
   contractOwner: string;

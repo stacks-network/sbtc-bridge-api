@@ -3,7 +3,7 @@ import { DashboardController } from "./controllers/DashboardController.js";
 import express from 'express';
 const router = express.Router();
 
-router.get("/signer-api/:network/v1/alpha/dashboard/info", async (req, res, next) => {
+router.get("/alpha/info", async (req, res, next) => {
   try {
     console.log('v1/dashboard/info ')
     const controller = new DashboardController();
@@ -15,7 +15,7 @@ router.get("/signer-api/:network/v1/alpha/dashboard/info", async (req, res, next
   }
 });
 
-router.get("/signer-api/:network/v1/alpha/dashboard/events", async (req, res, next) => {
+router.get("/alpha/events", async (req, res, next) => {
   try {
     console.log('v1/dashboard/info ')
     const controller = new DashboardController();
@@ -26,6 +26,5 @@ router.get("/signer-api/:network/v1/alpha/dashboard/events", async (req, res, ne
     next('An error occurred fetching sbtc data.')
   }
 });
-
 
 export { router as dashboardRoutes }

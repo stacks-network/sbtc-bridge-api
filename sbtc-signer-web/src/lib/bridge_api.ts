@@ -67,16 +67,6 @@ export async function fetchExchangeRates() {
   return txs;
 }
 
-export async function fetchSbtcData() {
-  const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/sbtc/data');
-  try {
-    const response = await fetchCatchErrors(path);
-    return await extractResponse(response);
-  } catch(err) {
-    return {}
-  }
-}
-
 export async function fetchUserSbtcBalance(stxAddress:string) {
   try {
     const path = addNetSelector(CONFIG.VITE_BRIDGE_API + '/sbtc/address/' + stxAddress + '/balance');

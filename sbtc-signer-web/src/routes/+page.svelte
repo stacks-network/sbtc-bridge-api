@@ -31,7 +31,7 @@
         </p>
         <ul>
             <li>For deposits and withdrawals visit the <a class={a_primary} href={CONFIG.VITE_URI_BRIDGE}>sBTC Bridge</a>.</li>
-            <li>For signer voting visit <a class={a_primary} href={CONFIG.VITE_URI_VOTE}>sBTC Signer Management Console</a>.</li>
+            <li>For signer voting visit <a class={a_primary} href={CONFIG.VITE_URI_BRIDGE}>sBTC Signer Management Console</a>.</li>
         </ul>
       </div>
       <div class="flex items-center gap-2">

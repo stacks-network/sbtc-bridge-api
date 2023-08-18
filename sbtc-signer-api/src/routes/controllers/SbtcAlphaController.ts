@@ -5,11 +5,11 @@ import type { PoxCycleInfo } from 'sbtc-bridge-lib'
 import type { AddressObject, SbtcContractDataI } from 'sbtc-bridge-lib';
 import { deserializeCV, cvToJSON } from 'micro-stacks/clarity';
 import { getBlockCount, validateAddress } from './utils/BitcoinRpc.js'
-import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './utils/StacksApi.js';
+import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './utils/StacksAlphaApi.js';
 
 @Route("/signer-api/{network}/v1/signers")
 
-export class SignersController extends Router {
+export class SbtcAlphaController extends Router {
   
   @Get("/fetch-delegation-info/{stxAddress}")
   public async getDelegationInfo(stxAddress:string): Promise<any> {
@@ -17,8 +17,7 @@ export class SignersController extends Router {
     return result;
   }
 
-  @Get("/fetch-contract-data")
-  public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
+  public async fetchSbtcAlphaContractData(): Promise<SbtcContractDataI> {
     let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
     try {
       sbtcContractData = await fetchNoArgsReadOnly();

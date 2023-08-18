@@ -3,11 +3,7 @@
 	import "../sbtc.css";
 	import Header from "$lib/header/Header.svelte";
 	import Footer from "$lib/header/Footer.svelte";
-	import { fetchDashboardInfo } from "$lib/signers_api";
-	import { fetchSbtcData } from "$lib/bridge_api";
-	import { fetchSbtcBalance, userSession, isLegal,getStacksNetwork } from "$lib/stacks_connect";
 	import { setConfig } from '$lib/config';
-	import { afterNavigate, beforeNavigate, goto } from "$app/navigation";
 	import { page } from "$app/stores";
 	import { onMount, onDestroy } from 'svelte';
 	import { sbtcConfig } from '$stores/stores'
@@ -15,9 +11,9 @@
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'
-	import { initApplication, loginStacksJs } from "$lib/stacks_connect";
+	import { initApplication } from "$lib/stacks_connect";
+	import Bootstrap from '$lib/components/settings/Bootstrap.svelte';
 
-	export let data:{ sbtcContractData: SbtcContractDataI, keys: KeySet, sbtcWalletAddressInfo: any, btcFeeRates: any } ;
 	const unsubscribe = sbtcConfig.subscribe((conf) => {});
 	onDestroy(unsubscribe);
 	let inited = false;
@@ -26,7 +22,6 @@
 	let componentKey = 0;
 	console.log('process.env: ', import.meta.env);
 	setConfig('?net=devnet')   //($page.url.search);
-	const search = $page.url.search;
 	/**
 	if (!isLegal(location.href)) {
 		//componentKey++;
@@ -62,7 +57,7 @@
 	onMount(async () => {
 		try {
 			await initApp();
-			//await tick();
+			
 		} catch (err) {
 			errorReason = COMMS_ERROR
 			console.log(err)
@@ -78,6 +73,7 @@
 			<Header on:init_application={initApp} />
 			{/key}
 		</div>
+		{#if $sbtcConfig.sbtcContractData.protocolOwner?.value}<div><Bootstrap /> </div>{/if}
 		<div class="flex min-h-[calc(100vh-160px)] mx-auto lg:px-8 align-middle justify-center flex-grow">
 			<div class="mx-auto flex flex-col justify-start w-full sm:max-w-4xl py-6 px-6 lg:px-8">
 				<div class="sm:grid sm:grid-cols-1 sm:gap-2 space-y-2 sm:space-y-0">

@@ -3,7 +3,7 @@ import { ConfigController } from "./controllers/ConfigController.js"
 import express from 'express';
 const router = express.Router();
 
-router.get("/signer-api/:network/v1/config", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getAllParam();
@@ -14,7 +14,7 @@ router.get("/signer-api/:network/v1/config", async (req, res, next) => {
   }
 });
 
-router.get("/signer-api/:network/v1/config/:param", async (req, res, next) => {
+router.get("/:param", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getParam(req.params.param);

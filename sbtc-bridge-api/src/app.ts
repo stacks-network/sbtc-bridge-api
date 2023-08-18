@@ -1,4 +1,4 @@
-import { setConfigOnStart, getConfig } from './lib/config.js';
+import { isSimnet, setConfigOnStart, getConfig } from './lib/config.js';
 import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
@@ -6,7 +6,6 @@ import morgan from "morgan";
 import { sbtcEventJob, peginRequestJob, revealCheckJob } from './controllers/JobScheduler.js';
 import cors from "cors";
 import { connect, getExchangeRates } from './lib/data/db_models.js'
-import { MAGIC_BYTES_TESTNET } from 'sbtc-bridge-lib' 
 import { WebSocketServer } from 'ws'
 import { configRoutes } from './routes/configRoutes.js'
 import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
@@ -14,7 +13,7 @@ import { stacksRoutes } from './routes/stacksRoutes.js'
 import { createRequire } from 'node:module';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
-const swaggerDocument = r('./swagger.json');
+const swaggerDocument = r('../public/swagger.json');
 
 const app = express();
 
@@ -37,14 +36,10 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(configRoutes);
-app.use(bitcoinRoutes);
-app.use(stacksRoutes);
+app.use('/bridge-api/:network/v1/config', configRoutes);
+app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
+app.use('/bridge-api/:network/v1/sbtc', stacksRoutes);
 
-console.log(`Express is listening at http://localhost:${getConfig().port} \n\nsBTC Wallet: ${getConfig().sbtcContractId}`);
-console.log('\n\nStartup Environment: ', process.env.TARGET_ENV);
-console.log(`\n\nBitcoin connection at ${getConfig().btcNode} \nBitcoin Wallet Path: ${getConfig().walletPath} ... ${MAGIC_BYTES_TESTNET}`);
-console.log(`\n\nMongo connection at ${getConfig().mongoDbUrl}`);
 async function connectToMongoCloud() {
   await connect();
   const server = app.listen(getConfig().port, () => {
@@ -55,8 +50,14 @@ async function connectToMongoCloud() {
   sbtcEventJob.start();
   peginRequestJob.start();
   let rates = await getExchangeRates()
-  console.log(`Running on ${getConfig().host}:${getConfig().port}\n\n`);
-  //const server = http.createServer(app)
+
+  console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
+  console.log('Startup Environment: ', process.env.NODE_ENV);
+  console.log(`Bitcoin connection at ${getConfig().btcNode} \nWallet Path: ${getConfig().walletPath}`);
+  console.log(`Mongo connection at ${getConfig().mongoDbUrl}`);
+  if (isSimnet()) {
+    console.log(`Bitcoin ${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}`);
+  }
   wss.on('connection', function connection(ws) {
     //console.log('new client connected');
     ws.send(JSON.stringify(rates))

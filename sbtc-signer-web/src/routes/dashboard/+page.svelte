@@ -2,10 +2,8 @@
     import { CONFIG } from "$lib/config";
     import { sbtcConfig } from '$stores/stores';
     import { Tooltip } from 'flowbite-svelte';
-    import { fmtNumber } from '$lib/utils';
-    import { Icon, InformationCircle } from "svelte-hero-icons"
+    import { onMount } from 'svelte';
     import type { BlockchainInfo } from 'sbtc-bridge-lib';
-    import JSONTree from 'svelte-json-tree'
     import Headlines from "$lib/components/dashboard/Headlines.svelte";
     import TransactionAlphaTable from "$lib/components/dashboard/TransactionAlphaTable.svelte";
 

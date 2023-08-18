@@ -44,8 +44,10 @@ export async function fetchPegTxData(txid:string, verbose:boolean) {
   //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
   const sbtcWalletAddress = parseSbtcWalletAddress(getConfig().network, res.vout);
   const pegInAmountSats = readDepositValue(res.vout);
-  const parsed:payloadType = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress, pegInAmountSats);
-  parsed.burnBlockHeight = res.block.height;
-  return parsed;
+  const payload = {} as payloadType;
+  payload.payload = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress.bitcoinAddress, pegInAmountSats);
+  payload.sbtcWallet = sbtcWalletAddress.bitcoinAddress;
+  payload.burnBlockHeight = res.block.height;
+  return payload;
 }
 

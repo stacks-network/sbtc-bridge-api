@@ -3,7 +3,7 @@ import { AlphaEventsController } from "./controllers/AlphaEventsController.js"
 import express from 'express';
 const router = express.Router();
 
-router.get("/signer-api/:network/v1/events/alpha/read/:page", async (req, res, next) => {
+router.get("/alpha/read/:page", async (req, res, next) => {
   try {
     const controller = new AlphaEventsController();
     const response = await controller.saveAlphaEvents(Number(req.params.page));
@@ -14,7 +14,7 @@ router.get("/signer-api/:network/v1/events/alpha/read/:page", async (req, res, n
   }
 });
 
-router.get("/signer-api/:network/v1/events/alpha/read-all", async (req, res, next) => {
+router.get("/alpha/read-all", async (req, res, next) => {
   try {
     const controller = new AlphaEventsController();
     controller.saveAllAlphaEvents();
@@ -26,7 +26,7 @@ router.get("/signer-api/:network/v1/events/alpha/read-all", async (req, res, nex
   }
 });
 
-router.get("/signer-api/:network/v1/events/alpha/index/stacks/:txid", async (req, res, next) => {
+router.get("/alpha/index/stacks/:txid", async (req, res, next) => {
   try {
     const controller = new AlphaEventsController();
     const response = await controller.indexAlphaEvent(req.params.txid);
@@ -38,7 +38,7 @@ router.get("/signer-api/:network/v1/events/alpha/index/stacks/:txid", async (req
   }
 });
 
-router.get("/signer-api/:network/v1/events/alpha/count", async (req, res, next) => {
+router.get("/alpha/count", async (req, res, next) => {
   try {
     const controller = new AlphaEventsController();
     const response = await controller.countEvents();
@@ -49,7 +49,7 @@ router.get("/signer-api/:network/v1/events/alpha/count", async (req, res, next) 
   }
 });
 
-router.get("/signer-api/:network/v1/events/alpha/:page", async (req, res, next) => {
+router.get("/alpha/:page", async (req, res, next) => {
   try {
     const controller = new AlphaEventsController();
     const response = await controller.findAlphaEvents(Number(req.params.page));

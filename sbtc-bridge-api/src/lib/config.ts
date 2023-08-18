@@ -3,7 +3,7 @@ import { env } from "process";
 const PORT = parseInt(env.PORT || '3010');
 
 const SIMNNET_CONFIG = {
-  environment: 'staging',
+  environment: 'simnet',
   mongoDbUrl: '',
   mongoDbName: '',
   mongoUser: '',
@@ -17,15 +17,11 @@ const SIMNNET_CONFIG = {
   host: 'http://localhost', 
   port: PORT,
   network: 'simnet',
-  walletPath: '/wallet/SBTC-0003',
+  walletPath: '/wallet/TBTC-0001',
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
   stacksApi: 'http://localhost:3999',
   stacksExplorerUrl: 'http://localhost:8000',
   bitcoinExplorerUrl: 'http://localhost:3002',
@@ -54,11 +50,7 @@ const TESTNET_CONFIG = {
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -86,11 +78,7 @@ const MAINNET_CONFIG = {
   walletPath: '/wallet/descwallet',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -118,11 +106,7 @@ const DEVNET_CONFIG = {
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   stacksApi: 'http://devnet.stx.eco',
   stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -149,15 +133,8 @@ const LINODE_TESTNET_CONFIG = {
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  //poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
-  //stacksApi: 'http://devnet.stx.eco',
-  //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -185,11 +162,7 @@ const LINODE_MAINNET_CONFIG = {
   walletPath: '/wallet/SBTC-0003',
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -216,11 +189,7 @@ let CONFIG: {
   network: string; 
   poxContractId: string; 
   sbtcContractId: string; 
-  sbtcDeployer: string; 
-  sbtcContracts: {
-      pool: string; 
-      registry: string;
-  },
+  sbtcMiniDeployer: string; 
   stacksApi: string; 
   stacksExplorerUrl: string; 
   bitcoinExplorerUrl: string; 
@@ -242,8 +211,8 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   //console.log('process.env: ', process.env)
-  if (isDev() || isLinodeTestnet() || isLinodeMainnet() || isSimnet()) {
-    console.log('================================================ >>' + process.env.TARGET_ENV)
+  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
+    console.log('================================================ >> ' + process.env.NODE_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
     CONFIG.mongoDbName = process.env.mongoDbName || '';
@@ -257,8 +226,9 @@ function setOverrides() {
     CONFIG.btcSchnorrOracle = process.env.btcSchnorrOracle || '';
   }
   if (isSimnet() || isDev()) {
-    // setup access to services - mongo, bitocin etc running outside of docker 
-    // without risking leaking testnet/mainnet configuration variables
+    // below are injected from the server environment but overridden  
+    // with non secure values for local development. The mongo db 
+    // database is shared by simnet users.
     CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
     CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
     CONFIG.mongoUser = 'dockerdev1'
@@ -270,7 +240,7 @@ function setOverrides() {
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
     CONFIG.btcSchnorrOracle = '0d7b49bc4864057b087108f81a57da7178cfbeb85a09c8957b64b9840e368b42'    
   }
-  if (isLinodeTestnet() || isLinodeMainnet() || isDev() || isSimnet()) {
+  if (isLinodeTestnet() || isLinodeMainnet() || isDev()) {
     console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
     console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
     console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
@@ -287,23 +257,23 @@ function setOverrides() {
   }
 }
 
-function isSimnet() {
-  const environ = process.env.TARGET_ENV;
+export function isSimnet() {
+  const environ = process.env.NODE_ENV;
   return (environ && environ === 'simnet')
 }
 
 function isDev() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
 }
 
 function isLinodeTestnet() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (environ && environ.indexOf('linode-staging') > -1)
 }
 
 function isLinodeMainnet() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (environ && environ.indexOf('linode-production') > -1)
 }
 

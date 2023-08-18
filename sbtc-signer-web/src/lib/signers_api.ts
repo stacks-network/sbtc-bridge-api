@@ -49,7 +49,18 @@ export async function fetchWebDid(domain:string):Promise<BlockchainInfo|undefine
 }
 
 export async function fetchDashboardInfo():Promise<any> {
-  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/sbtc/info');
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/mini/sbtc/application/meta-data');
+  try {
+    const response = await fetch(path);
+    const res = await response.json();
+    return res;
+  } catch(err) {
+    return undefined;
+  }
+}
+
+export async function fetchSbtcData() {
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/mini/sbtc/data');
   try {
     const response = await fetch(path);
     const res = await response.json();

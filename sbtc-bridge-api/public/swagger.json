@@ -174,10 +174,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"compression": {
-						"type": "number",
-						"format": "double"
-					},
 					"signature": {
 						"type": "string"
 					},
@@ -190,7 +186,6 @@
 				},
 				"required": [
 					"amountSats",
-					"compression",
 					"signature",
 					"stacksAddress",
 					"opcode"
@@ -624,6 +619,32 @@
 				]
 			}
 		},
+		"/bridge-api/{network}/v1/btc/wallet/wallet/create/{wallet}": {
+			"get": {
+				"operationId": "CreateWallet",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "wallet",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/bridge-api/{network}/v1/btc/wallet/address/{address}/txs": {
 			"get": {
 				"operationId": "FetchAddressTransactions",
@@ -642,6 +663,32 @@
 					{
 						"in": "path",
 						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/wallet/getnewaddress/{addressType}": {
+			"get": {
+				"operationId": "GenerateNewAddress",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "addressType",
 						"required": true,
 						"schema": {
 							"type": "string"

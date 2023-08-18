@@ -3,10 +3,11 @@ import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
 import morgan from "morgan";
 import cors from "cors";
-import { configRoutes } from './routes/config.js'
-import { signerRoutes } from './routes/signers.js'
-import { alphaEventRoutes } from './routes/alphaEvents.js'
-import { dashboardRoutes } from './routes/dashboard.js'
+import { configRoutes } from './routes/configRoutes.js'
+import { sbtcMiniRoutes } from './routes/sbtcMiniRoutes.js'
+import { sbtcAlphaRoutes } from './routes/sbtcAlphaRoutes.js'
+import { dashboardRoutes } from './routes/dashboardRoutes.js'
+import { alphaEventRoutes } from './routes/alphaEventRoutes.js'
 import { setConfigOnStart, getConfig } from './lib/config.js';
 import { updateEventLogJob } from './routes/controllers/JobScheduler.js';
 import { connect } from './lib/database/db_models.js'
@@ -36,10 +37,11 @@ app.use(
 );
 app.use(bodyParser.json());
 
-app.use(signerRoutes);
-app.use(configRoutes);
-app.use(dashboardRoutes);
-app.use(alphaEventRoutes);
+app.use('/signer-api/:network/v1/mini', sbtcMiniRoutes);
+app.use('/signer-api/:network/v1/dashboard', dashboardRoutes);
+app.use('/signer-api/:network/v1/alpha', sbtcAlphaRoutes);
+app.use('/signer-api/:network/v1/events', alphaEventRoutes);
+app.use('/signer-api/:network/v1/config', configRoutes);
 
 const PORT = getConfig().port;
 //app.listen(PORT);

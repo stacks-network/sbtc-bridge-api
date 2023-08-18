@@ -1,6 +1,6 @@
 import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
-import { validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
+import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
@@ -38,7 +38,7 @@ export async function handleError (response:any, message:string) {
   }
 }
 
-export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode}${getConfig().walletPath}`;
+export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode.substring(7)}${getConfig().walletPath}`;
 
 export const OPTIONS = {
   method: "POST",
@@ -80,7 +80,7 @@ export class TransactionController {
       return wrappedPsbt;
     }
     const msgHash = hashMessage(wrappedPsbt.stxSignature.message);
-    const stxAddresses = await getStacksAddressFromSignature(msgHash, wrappedPsbt.stxSignature.signature, 0);
+    const stxAddresses = await getStacksAddressFromSignature(msgHash, wrappedPsbt.stxSignature.signature);
     const stacksAddress = (getConfig().network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
   
     console.log('sign: ', wrappedPsbt);
@@ -249,7 +249,7 @@ export class TransactionController {
   
   @Get("/commit-withdrawal/:data/:sbtcWallet/:compression")
   public commitWithdrawal(data:string, sbtcWallet:string, compression:number): withdrawalPayloadType {
-    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet, compression);
+    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
 		return payload;
   }
   
@@ -300,6 +300,13 @@ export class WalletController {
     return result;
   }
 
+  @Get("/wallet/create/:wallet")
+  public async createWallet(wallet:string): Promise<any> {
+    //checkAddressForNetwork(getConfig().network, address)
+    const result = await createWallet(wallet);
+    return result;
+  }
+
   @Get("/address/:address/txs")
   public async fetchAddressTransactions(address:string): Promise<any> {
     //checkAddressForNetwork(getConfig().network, address)
@@ -337,17 +344,26 @@ export class WalletController {
     }
     return result;
   }
+  @Get("/getnewaddress/:addressType")
+  public async generateNewAddress(addressType:string): Promise<any> {
+    //const wallets = await loadWallet("TBTC-0001");
+    await generateNewAddress(addressType);
+    const result = await loadWallet(addressType);
+    return result;
+  }
   @Get("/loadwallet/:name")
   public async loadWallet(name:string): Promise<any> {
     const wallets = await listWallets();
     for (const wallet in wallets) {
       try {
-        await unloadWallet(name);
+        //await unloadWallet(wallet);
+        console.log('wallet: unloaded: ' + wallet)
       } catch(err:any) {
         console.error('wallet: ' + name + ' : ' + err.message)
       }
     }
     const result = await loadWallet(name);
+    console.error('wallet: loaded: ' + name)
     return result;
   }
   @Get("/listwallets")

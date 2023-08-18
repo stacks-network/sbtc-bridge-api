@@ -107,6 +107,7 @@ export {
 }
 
 import {
+    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
@@ -116,6 +117,7 @@ import {
     toXOnly
 } from './wallet_utils.js'
 export {
+    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
@@ -133,6 +135,9 @@ import type {
     CommitKeysI,
     Message,
     SigData,
+    SbtcMiniContractsI,
+    SbtcMiniWalletI,
+    SbtcMiniContractDataI,
     SbtcContractDataI,
     AddressValidationI,
     SbtcBalance,
@@ -158,6 +163,9 @@ export type {
     CommitKeysI,
     Message,
     SigData,
+    SbtcMiniContractsI,
+    SbtcMiniWalletI,
+    SbtcMiniContractDataI,
     SbtcContractDataI,
     AddressValidationI,
     SbtcBalance,

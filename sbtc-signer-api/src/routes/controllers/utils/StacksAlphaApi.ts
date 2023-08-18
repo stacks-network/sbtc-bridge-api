@@ -5,11 +5,11 @@ import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
 import { principalCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
 import { getConfig } from '../../../lib/config.js';
-import { fetchPegTxData } from './BitcoinRpc.js';
 import { fetchAddress } from './MempoolApi.js';
 import fetch from 'node-fetch';
 import type { SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
+import { callContractReadOnly } from './StacksMiniApi.js'
 
 const limit = 10;
 
@@ -190,24 +190,4 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
     console.log('fetchUserBalances: ordinalInfo: ', err)
   }
   return userBalances;
-}
-
-export async function callContractReadOnly(data:any) {
-  const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
-  let val;
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        arguments: data.functionArgs,
-        sender: data.contractAddress,
-      })
-    });
-    val = await response.json();
-  } catch (err) {
-    console.log('callContractReadOnly4: ', err);
-  }
-  const result = cvToJSON(deserializeCV(val.result));
-  return result;
 }

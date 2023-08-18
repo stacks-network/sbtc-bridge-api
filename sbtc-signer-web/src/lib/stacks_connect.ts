@@ -10,7 +10,7 @@ import type { AddressObject, SbtcContractDataI } from 'sbtc-bridge-lib'
 import { verifyMessageSignature } from '@stacks/encryption';
 import { defaultSbtcConfig } from '$lib/sbtc';
 import { fetchExchangeRates } from "$lib/bridge_api"
-import { fetchSbtcData } from "$lib/bridge_api";
+import { fetchSbtcData } from "$lib/signers_api";
 import { hex } from '@scure/base';
 import type { ExchangeRate } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
@@ -41,6 +41,7 @@ export function isAllowed(address:string) {
 export function getStacksNetwork() {
 	const network = CONFIG.VITE_NETWORK;
 	let stxNetwork:StacksMainnet|StacksTestnet;
+	if (CONFIG.VITE_ENVIRONMENT === 'simnet') return new StacksMocknet();
 	if (network === 'testnet') stxNetwork = new StacksTestnet();
 	else if (network === 'mainnet') stxNetwork = new StacksMainnet();
 	else stxNetwork = new StacksMocknet();
@@ -290,11 +291,10 @@ export function verifySBTCAmount(amount:number, balance:number, fee:number) {
   
 export async function initApplication(conf:SbtcConfig, fromLogin:boolean|undefined) {
 	if (!conf) conf = defaultSbtcConfig as SbtcConfig
-	let data = {} as any;
+	let dashboardInfo = {} as any;
 	try {
-		data = await fetchSbtcData();
-		if (!data) data = {} as any;
-		const dashboardInfo = await fetchDashboardInfo();
+		//data = await fetchSbtcData();
+		dashboardInfo = await fetchDashboardInfo();
 		conf.bcInfo = dashboardInfo?.bcInfo;
 		conf.sbtcContractData = dashboardInfo?.sbtcContractData;
 		conf.poxCycleInfo = dashboardInfo?.poxCycleInfo;
@@ -306,7 +306,7 @@ export async function initApplication(conf:SbtcConfig, fromLogin:boolean|undefin
 			conf.loggedIn = true;
 		}
 	} catch (err) {
-		data = {} as any;
+		dashboardInfo = {} as any;
 	}
 	const exchangeRates = await fetchExchangeRates();
 	conf.exchangeRates = exchangeRates;
@@ -317,11 +317,11 @@ export async function initApplication(conf:SbtcConfig, fromLogin:boolean|undefin
 			conf.keySets = { 'mainnet': {} as AddressObject };
 		}
 	}
-	const revealAddress = checkWalletAddress(data.sbtcContractData);
-	data.sbtcContractData.sbtcWalletAddress = revealAddress;
+	//const revealAddress = checkWalletAddress(data.sbtcContractData);
+	//data.sbtcContractData.sbtcWalletAddress = revealAddress;
 	//conf.walletAddress = revealAddress;
-	conf.sbtcContractData = data.sbtcContractData;
-	conf.sbtcWalletAddressInfo = data.sbtcWalletAddressInfo;
+	conf.sbtcContractData = dashboardInfo.sbtcContractData;
+	conf.sbtcWalletAddressInfo = dashboardInfo.sbtcWalletAddressInfo;
 	const currency = conf.userSettings.currency?.myFiatCurrency?.currency;
 	const rateNow = exchangeRates.find((o:any) => o.currency === currency)
 	if (rateNow) conf.userSettings.currency.myFiatCurrency = rateNow

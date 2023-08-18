@@ -2,7 +2,7 @@ import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { schnorr } from '@noble/curves/secp256k1';
-import type { CommitKeysI, UTXO } from './types/sbtc_types.js';
+import type { SbtcMiniContractsI, CommitKeysI, UTXO } from './types/sbtc_types.js';
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 const priv = secp.utils.randomPrivateKey()
@@ -18,6 +18,19 @@ keySetForFeeCalculation.push({
   schnorrPub: secp.getPublicKey(priv, false)
 })
 
+export const sbtcMiniContracts:SbtcMiniContractsI = {
+	token: 'sbtc-token',
+	controller: 'sbtc-controller',
+	pool: 'sbtc-stacking-pool',
+	registry: 'sbtc-registry',
+	btcTxHelper: 'sbtc-btc-tx-helper',
+	depositProcessor: 'sbtc-deposit-processor',
+	handOff: 'sbtc-hand-off',
+	walletVote: 'sbtc-wallet-vote',
+	withdrawalProcessor: 'sbtc-withdrawal-processor',
+  }
+  
+  
 const testWallets = [
 	{
 		"privateKey": "ad1195070a559967782fb6eaa622a2baeaed9d9d254880059f9fbf781cf7852c",

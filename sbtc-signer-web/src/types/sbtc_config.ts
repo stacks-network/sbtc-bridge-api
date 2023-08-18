@@ -1,11 +1,11 @@
-import type { AddressObject, PoxCycleInfo, BlockchainInfo, SbtcContractDataI, ExchangeRate } from 'sbtc-bridge-lib';
+import type { SbtcMiniContractDataI, AddressObject, PoxCycleInfo, BlockchainInfo, ExchangeRate } from 'sbtc-bridge-lib';
 
 export type SbtcConfig = {
   exchangeRates?: Array<ExchangeRate>;
   sbtcWalletAddressInfo?: any;
   loggedIn: boolean;
   userSettings:SbtcUserSettingI;
-  sbtcContractData: SbtcContractDataI;
+  sbtcContractData: SbtcMiniContractDataI;
   dashboard: DashboardInfoI;
   bcInfo?: BlockchainInfo;
   poxCycleInfo?: PoxCycleInfo;

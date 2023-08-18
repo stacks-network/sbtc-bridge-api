@@ -18,7 +18,7 @@ router.get('/', (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/:network/v1/config", async (req, res, next) => {
+router.get("", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getAllParam();
@@ -29,7 +29,7 @@ router.get("/bridge-api/:network/v1/config", async (req, res, next) => {
   }
 });
 
-router.get("/bridge-api/:network/v1/config/:param", async (req, res, next) => {
+router.get("/:param", async (req, res, next) => {
   try {
     const controller = new ConfigController();
     const response = await controller.getParam(req.params.param);

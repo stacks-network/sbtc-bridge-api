@@ -1,9 +1,10 @@
 import { contractPrincipalCV, deserializeCV, cvToJSON, serializeCV, principalCV } from "micro-stacks/clarity";
 import fetch from 'node-fetch';
-import type { BlockchainInfo, PoxInfo, StacksInfo } from 'sbtc-bridge-lib';
+import { sbtcMiniContracts, type BlockchainInfo, type PoxInfo, type StacksInfo } from 'sbtc-bridge-lib';
 import { uintCV } from 'micro-stacks/clarity';
 import { bytesToHex } from "micro-stacks/common";
 import { getConfig } from '../../../lib/config.js';
+import { callContractReadOnly } from './StacksMiniApi.js'
 
 function getData(contractId:string, functionName:string) {
   return {
@@ -33,7 +34,7 @@ export async function fetchDelegationInfo(stxAddress:string):Promise<any> {
  
 export async function fetchAllowanceContractCallers(stxAddress:string):Promise<any> {
   try {
-    const delegateTo = getConfig().sbtcDeployer + '.' + getConfig().sbtcContracts.pool;
+    const delegateTo = getConfig().sbtcMiniDeployer + '.' + sbtcMiniContracts.pool;
     const contractId = getConfig().poxContractId;    console.log('fetchAllowanceContractCallers: contractId: ', contractId)
     const data = getData(contractId, 'get-allowance-contract-callers');
     data.functionArgs = [`0x${bytesToHex(serializeCV(principalCV(stxAddress)))}`, `0x${bytesToHex(serializeCV(contractPrincipalCV(delegateTo)))}`];
@@ -91,11 +92,11 @@ export async function fetchPoxInfo(contractId:string):Promise<BlockchainInfo> {
 
 export async function fetchCurrentWindow():Promise<string> {
   try {
-    const data = getData(getConfig().sbtcDeployer + '.' + getConfig().sbtcContracts.pool, 'get-current-window');
+    const data = getData(getConfig().sbtcMiniDeployer + '.' + sbtcMiniContracts.pool, 'get-current-window');
     data.functionArgs = [];
     const response = await callContractReadOnly(data);
     console.log('fetchCurrentWindow: ', response)
-    if (response.okay) {
+    if (response.hasOwnProperty('okay')) {
       return response.value;
     }
     return 'unknown';
@@ -209,29 +210,6 @@ export async function getStackingMinimum(contractId:string):Promise<any> {
     console.log(err.message)
     return 0;
   }
-}
-
-export async function callContractReadOnly(data:any) {
-  const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
-  console.log('callContractReadOnly: ' + url)
-  let val;
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        arguments: data.functionArgs,
-        sender: data.contractAddress,
-      })
-    });
-    val = await response.json();
-    console.log('callContractReadOnly: ', val)
-    const result = cvToJSON(deserializeCV(val.result));
-    return result;
-  } catch (err:any) {
-    console.log('callContractReadOnly4: error: ', err.message);
-  }
-  return val;
 }
 
 export async function callContractMap(data:any) {
