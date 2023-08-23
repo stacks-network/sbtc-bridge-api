@@ -1,6 +1,6 @@
-# sbtc-bridge-api
+# sbtc-signer-api
 
-![ci](https://github.com/Trust-Machines/sbtc-bridge-api)
+![ci](https://github.com/Trust-Machines/sbtc-signer-api)
 
 ## Introduction
 

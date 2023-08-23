@@ -1,6 +1,41 @@
 import { env } from "process";
 
-const PORT = parseInt(env.PORT || '4030');
+const PORT = parseInt(env.PORT || '4010');
+
+const SIMNNET_CONFIG = {
+  environment: 'simnet',
+  mongoDbUrl: '',
+  mongoDbName: '',
+  mongoUser: '',
+  mongoPwd: '',
+  btcNode: 'http://localhost:18443',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  btcSchnorrReveal: '',
+  btcSchnorrReclaim: '',
+  btcSchnorrOracle: '',
+  host: 'http://localhost', 
+  port: PORT,
+  network: 'simnet',
+  walletPath: '/wallet/SBTC-0001',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
+  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
+  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  stacksApi: 'http://localhost:3999',
+  stacksExplorerUrl: 'http://localhost:8000',
+  bitcoinExplorerUrl: 'http://localhost:3002',
+  mempoolUrl: 'http://localhost:18443',
+  blockCypherUrl: 'http://localhost:18443',
+  publicAppName: 'sBTC Bridge Simnet API',
+  publicAppVersion: '1.0.0',
+}
 
 const TESTNET_CONFIG = {
   environment: 'staging',
@@ -18,20 +53,21 @@ const TESTNET_CONFIG = {
   port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
-  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Testnet API',
+  publicAppName: 'sBTC Signer Dashboard Testnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -51,19 +87,21 @@ const MAINNET_CONFIG = {
   port: PORT,
   network: 'mainnet',
   walletPath: '/wallet/descwallet',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
+  publicAppName: 'sBTC Signer Dashboard Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -82,22 +120,24 @@ const DEVNET_CONFIG = {
   host: 'http://localhost',
   port: PORT,
   walletPath: '/wallet/descwallet',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   //stacksApi: 'http://devnet.stx.eco',
   //stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
-  stacksApi: 'http://localhost:3999',
+  stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'http://localhost:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Devnet API',
+  publicAppName: 'sBTC Signer Dashboard Devnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -116,15 +156,17 @@ const LINODE_TESTNET_CONFIG = {
   host: 'http://localhost',
   port: 4010,
   walletPath: '/wallet/SBTC-0003',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   //poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
   stacksApi: 'http://devnet.stx.eco',
   stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
   //stacksApi: 'https://api.testnet.hiro.so',
@@ -132,7 +174,7 @@ const LINODE_TESTNET_CONFIG = {
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Staging API',
+  publicAppName: 'sBTC Signer Dashboard Staging API',
   publicAppVersion: '1.0.0',
 }
 
@@ -152,19 +194,21 @@ const LINODE_MAINNET_CONFIG = {
   port: 4020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  sbtcContracts: {
-      pool: 'sbtc-stacking-pool',
-      registry: 'sbtc-registry',
-  },
+  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
   mempoolUrl: 'https://mempool.space/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
+  publicAppName: 'sBTC Signer Dashboard Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -182,14 +226,17 @@ let CONFIG: {
   host: string; 
   port: number; 
   walletPath: string; 
+  nextWalletProposal: {
+    cycle:number;
+    version: string;
+    hashbytes:  string;
+    address:  string;
+    pubkey:  string;
+  },
   network: string; 
   poxContractId: string; 
   sbtcContractId: string; 
-  sbtcDeployer: string; 
-  sbtcContracts: {
-      pool: string; 
-      registry: string;
-  },
+  sbtcMiniDeployer: string; 
   stacksApi: string; 
   stacksExplorerUrl: string; 
   bitcoinExplorerUrl: string; 
@@ -201,6 +248,7 @@ let CONFIG: {
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
+	else if (isSimnet()) CONFIG = SIMNNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
 	else if (isTMTestnet()) CONFIG = TESTNET_CONFIG;
@@ -210,8 +258,8 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   //console.log('process.env: ', process.env)
-  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
-    console.log('================================================ >>' + process.env.TARGET_ENV)
+  if (isDev() || isLinodeTestnet() || isLinodeMainnet() || isSimnet()) {
+    console.log('================================================ >>' + process.env.NODE_ENV)
     // Not Trust Machines Kit - so override the btc connection params with platform values;
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
     CONFIG.mongoDbName = process.env.mongoDbName || '';
@@ -224,22 +272,23 @@ function setOverrides() {
     CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
     CONFIG.btcSchnorrOracle = process.env.btcSchnorrOracle || '';
   }
-  if (isDev()) {
-    /**
-     */
-    console.log('dev env.. process.env.SIG_BTC_NODE = ' + CONFIG.btcNode)
-    CONFIG.port = 4000
-    CONFIG.mongoDbUrl = 'cluster0.eayhmli.mongodb.net'
-    CONFIG.mongoDbName = 'sbtc-signer-db'
-    CONFIG.mongoUser = 'stagsigner1'
-    CONFIG.mongoPwd = 'p2ASvMaKZS2GZuPj'
-    //CONFIG.btcNode = '127.0.0.1:18332'
-    CONFIG.btcNode = 'http://localhost:18443'
-    CONFIG.btcRpcUser = 'bob'
-    CONFIG.btcRpcPwd = 'theraininspainstaysmainlyontheplane'
+  if (isSimnet() || isDev()) {
+    // below are injected from the server environment but overridden  
+    // with non secure values for local development. The mongo db 
+    // database is shared by simnet users.
+    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
+    CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
+    CONFIG.mongoUser = 'dockerdev1'
+    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
+    CONFIG.btcNode = 'http://localhost:18443' // ie not via docker network
+    CONFIG.btcRpcUser = 'devnet'
+    CONFIG.btcRpcPwd = 'devnet'
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
     CONFIG.btcSchnorrOracle = '0d7b49bc4864057b087108f81a57da7178cfbeb85a09c8957b64b9840e368b42'    
+  }
+  if (isSimnet()) {
+    console.log('Simnet Configuration = ', CONFIG)
   }
   if (isLinodeTestnet() || isLinodeMainnet()) {
     console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
@@ -258,18 +307,23 @@ function setOverrides() {
   }
 }
 
+export function isSimnet() {
+  const environ = process.env.NODE_ENV;
+  return (environ && environ === 'simnet')
+}
+
 function isDev() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
 }
 
 function isLinodeTestnet() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (environ && environ.indexOf('linode-staging') > -1)
 }
 
 function isLinodeMainnet() {
-  const environ = process.env.TARGET_ENV;
+  const environ = process.env.NODE_ENV;
   return (environ && environ.indexOf('linode-production') > -1)
 }
 

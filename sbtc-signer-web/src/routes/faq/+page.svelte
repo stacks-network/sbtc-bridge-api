@@ -10,8 +10,8 @@ const toggleAnswer = (index:number) => {
 let questions = [
 	{
 		hidden: true,
-		question: 'What is the purpose of the sBTC bridge?',
-		answer: 'The sBTB bridge supports a trustless two-way peg between BTC and sBTC. sBTC is a SIP-010 fungible token on the Stacks Blockchain that can be used in DeFi protocols, NFT marketplaces, governance and many more applications.'
+		question: 'What is the sBTC Signer Dashboard?',
+		answer: 'The sBTC Signer Dashboard provides a health check of the sBTC protocol.'
 	},
 	{
 		hidden: true,

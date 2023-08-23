@@ -5,6 +5,36 @@ export type SigData = {
   outputsForDisplay: any;
   inputsForDisplay: any;
 }
+export type SbtcMiniContractsI = {
+  [key: string]: string
+}
+
+export type SbtcMiniWalletI = {
+  cycle:number, version: string, hashbytes: string, address: string, pubkey: string
+}
+
+export type SbtcMiniContractDataI = {
+  coordinator?: {
+      addr: {
+          value: string;
+      };
+      key: string;
+  };
+  currentPegWallet: SbtcMiniWalletI;
+  nextPegWallet: SbtcMiniWalletI;
+  protocolOwner: { stacksAddress: string, value: boolean }
+  contractOwner: string;
+  currentWindow?: number;
+  currentCyclePool?: any;
+  tokenUri?: string;
+  threshold?: number;
+  totalSupply?: number;
+  decimals?: number;
+  name?: string;
+  symbol?: string;
+  burnHeight?: number;
+};
+
 export type SbtcContractDataI = {
   coordinator?: { addr: { value: string }, key:string };
   contractOwner: string;
@@ -171,6 +201,14 @@ export type UTXO = {
   value: number;
 };
 
+export type SbtcAlphaEvent = {
+  contractId: string;
+  eventIndex: string;
+  txid: string;
+  bitcoinTxid: string;
+  payloadData:payloadType;
+}
+
 export type payloadType = {
   sbtcWallet:string;
   burnBlockHeight?:number;
@@ -180,7 +218,6 @@ export type withdrawalPayloadType = {
   opcode: string;
   stacksAddress: string;
   signature: string;
-  compression: number,
   amountSats: number;
   dustAmount?: number;
 };

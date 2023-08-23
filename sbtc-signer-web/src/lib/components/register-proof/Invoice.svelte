@@ -2,7 +2,8 @@
 import { createEventDispatcher, onMount } from "svelte";
 import Button from '$lib/components/shared/Button.svelte';
 import CopyClipboard from '$lib/components/common/CopyClipboard.svelte';
-import { makeFlash, txtRecordPrecis } from "$lib/stacks_connect";
+import { makeFlash } from "$lib/stacks_connect";
+import { txtRecordPrecis } from "$lib/webdid";
 
 let copied = false;
 export let signature:string;
@@ -16,7 +17,7 @@ const copy = (ele:string) => {
   }
   const app = new CopyClipboard(clippy);
   app.$destroy();
-  makeFlash(document.getElementById(ele), 1)
+  makeFlash(document.getElementById(ele))
   copiedMsg = 'Copied signature'
   copied = true;
 }

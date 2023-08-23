@@ -69,6 +69,8 @@ export class DepositsController {
 
 @Route("/bridge-api/:network/v1/sbtc")
 export class SbtcWalletController {
+
+  /**
   @Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {
     return await saveAllSbtcEvents();
@@ -88,6 +90,7 @@ export class SbtcWalletController {
   public async findSbtcEvents(page:number): Promise<any> {
     return await findSbtcEvents(page);
   }
+   */
 
   @Get("/address/:address/balance")
   public async fetchUserSbtcBalance(address:string): Promise<BalanceI> {

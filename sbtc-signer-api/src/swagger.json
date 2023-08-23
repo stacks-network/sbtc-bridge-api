@@ -6,50 +6,42 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"AddressValidationI": {
+			"SbtcMiniWalletI": {
 				"properties": {
-					"witness_program": {
-						"type": "string"
-					},
-					"witness_version": {
-						"type": "number",
-						"format": "double"
-					},
-					"iswitness": {
-						"type": "boolean"
-					},
-					"isscript": {
-						"type": "boolean"
-					},
-					"scriptPubKey": {
+					"pubkey": {
 						"type": "string"
 					},
 					"address": {
 						"type": "string"
 					},
-					"isvalid": {
-						"type": "boolean"
+					"hashbytes": {
+						"type": "string"
+					},
+					"version": {
+						"type": "string"
+					},
+					"cycle": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
-					"witness_program",
-					"witness_version",
-					"iswitness",
-					"isscript",
-					"scriptPubKey",
+					"pubkey",
 					"address",
-					"isvalid"
+					"hashbytes",
+					"version",
+					"cycle"
 				],
 				"type": "object"
 			},
-			"SbtcContractDataI": {
+			"SbtcMiniContractDataI": {
 				"properties": {
-					"addressValidation": {
-						"$ref": "#/components/schemas/AddressValidationI"
-					},
 					"burnHeight": {
 						"type": "number",
 						"format": "double"
+					},
+					"symbol": {
+						"type": "string"
 					},
 					"name": {
 						"type": "string"
@@ -69,25 +61,34 @@
 					"tokenUri": {
 						"type": "string"
 					},
-					"tradingHalted": {
-						"type": "boolean"
-					},
-					"numParties": {
+					"currentCyclePool": {},
+					"currentWindow": {
 						"type": "number",
 						"format": "double"
-					},
-					"numKeys": {
-						"type": "number",
-						"format": "double"
-					},
-					"sbtcWalletPublicKey": {
-						"type": "string"
-					},
-					"sbtcWalletAddress": {
-						"type": "string"
 					},
 					"contractOwner": {
 						"type": "string"
+					},
+					"protocolOwner": {
+						"properties": {
+							"value": {
+								"type": "boolean"
+							},
+							"stacksAddress": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"value",
+							"stacksAddress"
+						],
+						"type": "object"
+					},
+					"nextPegWallet": {
+						"$ref": "#/components/schemas/SbtcMiniWalletI"
+					},
+					"currentPegWallet": {
+						"$ref": "#/components/schemas/SbtcMiniWalletI"
 					},
 					"coordinator": {
 						"properties": {
@@ -114,9 +115,10 @@
 					}
 				},
 				"required": [
-					"sbtcWalletPublicKey",
-					"sbtcWalletAddress",
-					"contractOwner"
+					"contractOwner",
+					"protocolOwner",
+					"nextPegWallet",
+					"currentPegWallet"
 				],
 				"type": "object"
 			}
@@ -187,7 +189,86 @@
 				]
 			}
 		},
-		"/signer-api/{network}/v1/signers/fetch-delegation-info/{stxAddress}": {
+		"/signer-api/{network}/v1/alpha/dashboard/info": {
+			"get": {
+				"operationId": "GetAlphaDashboardInfo",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/signer-api/{network}/v1/alpha/dashboard/events": {
+			"get": {
+				"operationId": "GetAlphaDashboardEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/signer-api/{network}/v1/mini/sbtc/data": {
+			"get": {
+				"operationId": "FetchSbtcMiniContractData",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SbtcMiniContractDataI"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/signer-api/{network}/v1/mini/sbtc/stacking/get-allowance-contract-callers/{stxAddress}": {
+			"get": {
+				"operationId": "GetAllowanceContractCallers",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/signer-api/{network}/v1/mini/sbtc/stacking/fetch-delegation-info/{stxAddress}": {
 			"get": {
 				"operationId": "GetDelegationInfo",
 				"responses": {
@@ -213,17 +294,15 @@
 				]
 			}
 		},
-		"/signer-api/{network}/v1/signers/fetch-contract-data": {
+		"/signer-api/{network}/v1/mini/wallet-address": {
 			"get": {
-				"operationId": "FetchSbtcContractData",
+				"operationId": "FetchSbtcMiniWalletAddress",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/SbtcContractDataI"
-								}
+								"schema": {}
 							}
 						}
 					}
@@ -232,7 +311,77 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/events/count": {
+		"/signer-api/{network}/v1/events/alpha/read-all": {
+			"get": {
+				"operationId": "SaveAllAlphaEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/signer-api/{network}/v1/events/alpha/read/{page}": {
+			"get": {
+				"operationId": "SaveAlphaEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/signer-api/{network}/v1/events/alpha/index/stacks/{txid}": {
+			"get": {
+				"operationId": "IndexAlphaEvent",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txid",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/signer-api/{network}/v1/events/alpha/count": {
 			"get": {
 				"operationId": "CountEvents",
 				"responses": {
@@ -249,9 +398,9 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/events/{page}": {
+		"/signer-api/{network}/v1/events/alpha/{page}": {
 			"get": {
-				"operationId": "FindSbtcEvents",
+				"operationId": "FindAlphaEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",

@@ -1,7 +1,17 @@
   //(ok (tuple (current-rejection-votes u0) (first-burnchain-block-height u2000000) 
   //(min-amount-ustx u5177084703462) (prepare-cycle-length u50) (rejection-fraction u12) 
   //(reward-cycle-id u416) (reward-cycle-length u1050) (total-liquid-supply-ustx u41416677627699654)))}
-  export type PoxInfo = {
+export type DashboardInfoI = {
+    poxCycle: number;
+    totalDeposited: number;
+    totalWithdrawn: number;
+    countTotal: number;
+    countDeposits: number;
+    countWithdrawals: number;
+    countHandoffs: number;
+}
+  
+export type PoxInfo = {
     currentRejectionVotes: number;
     firstBurnchainBlockHeight: number;
     minAmountUstx?: number;

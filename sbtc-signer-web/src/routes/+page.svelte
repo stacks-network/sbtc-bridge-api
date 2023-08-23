@@ -2,6 +2,9 @@
   import { Icon, ArrowSmallRight } from "svelte-hero-icons"
   import { CONFIG } from '$lib/config';
   import { a_primary } from '$lib/css_utils';
+	import { goto } from "$app/navigation";
+
+  goto('/dashboard')
 </script>
 
 <div class="mx-auto flex flex-col justify-start w-full sm:max-w-4xl py-6 px-6 lg:px-8">
@@ -28,7 +31,7 @@
         </p>
         <ul>
             <li>For deposits and withdrawals visit the <a class={a_primary} href={CONFIG.VITE_URI_BRIDGE}>sBTC Bridge</a>.</li>
-            <li>For signer voting visit <a class={a_primary} href={CONFIG.VITE_URI_VOTE}>sBTC Signer Management Console</a>.</li>
+            <li>For signer voting visit <a class={a_primary} href={CONFIG.VITE_URI_BRIDGE}>sBTC Signer Management Console</a>.</li>
         </ul>
       </div>
       <div class="flex items-center gap-2">

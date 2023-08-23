@@ -8,6 +8,7 @@ import { principalCV } from '@stacks/transactions/dist/esm/clarity/types/princip
 import { openContractCall } from '@stacks/connect';
 import { getStacksNetwork } from './stacks_connect.js'
 import { hex } from '@scure/base';
+import { sbtcMiniContracts } from 'sbtc-bridge-lib';
 
 export const coordinators = [
   { stxAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM', btcAddress: 'tb1q6ue638m4t5knwxl4kwhwyuffttlp0ffee3zn3e' }, // devnet + electrum bob
@@ -32,8 +33,8 @@ export async function registerToSignTest(callback:any) {
     network: getStacksNetwork(),
     postConditions: [],
     postConditionMode: PostConditionMode.Deny,
-    contractAddress: CONFIG.VITE_SBTC_DEPLOYER,
-    contractName: CONFIG.VITE_SBTC_CONTRACTS.pool,
+    contractAddress: CONFIG.VITE_SBTC_MINI_DEPLOYER,
+    contractName: sbtcMiniContracts.pool,
     functionName: 'signer-pre-register-test',
     functionArgs: [],
     onFinish: (data: any) => {
@@ -61,8 +62,8 @@ export async function registerToSign(btcPubKey:string, amount:number, callback:a
     network: getStacksNetwork(),
     postConditions: [],
     postConditionMode: PostConditionMode.Deny,
-    contractAddress: CONFIG.VITE_SBTC_DEPLOYER,
-    contractName: CONFIG.VITE_SBTC_CONTRACTS.pool,
+    contractAddress: CONFIG.VITE_SBTC_MINI_DEPLOYER,
+    contractName: sbtcMiniContracts.pool,
     functionName: 'signer-pre-register',
     functionArgs: functionArgs,
     onFinish: (data: any) => {
@@ -77,14 +78,14 @@ export async function registerToSign(btcPubKey:string, amount:number, callback:a
 
 export async function revokeDelegate(callback:any) {
   //data {addr: principal, key: (buff 33)}
-  const delegateTo = contractPrincipalCV(CONFIG.VITE_SBTC_DEPLOYER, CONFIG.VITE_SBTC_CONTRACTS.pool);
+  const delegateTo = contractPrincipalCV(CONFIG.VITE_SBTC_MINI_DEPLOYER, sbtcMiniContracts.pool);
   const functionArgs = [delegateTo]
   await openContractCall({
     network: getStacksNetwork(),
     postConditions: [],
     postConditionMode: PostConditionMode.Deny,
-    contractAddress: CONFIG.VITE_POX_CONTRACT.split('.')[0],
-    contractName: CONFIG.VITE_POX_CONTRACT.split('.')[1],
+    contractAddress: CONFIG.VITE_POX_MINI_CONTRACT.split('.')[0],
+    contractName: CONFIG.VITE_POX_MINI_CONTRACT.split('.')[1],
     functionName: 'disallow-contract-caller',
     functionArgs: functionArgs,
     onFinish: (data: any) => {
@@ -99,15 +100,15 @@ export async function revokeDelegate(callback:any) {
 
 export async function allowDelegate(callback:any, burnHeight:number) {
   //data {addr: principal, key: (buff 33)}
-  const delegateTo = contractPrincipalCV(CONFIG.VITE_SBTC_DEPLOYER, CONFIG.VITE_SBTC_CONTRACTS.pool);
+  const delegateTo = contractPrincipalCV(CONFIG.VITE_SBTC_MINI_DEPLOYER, sbtcMiniContracts.pool);
   const until = someCV(uintCV(burnHeight * 2));
   const functionArgs = [delegateTo, until]
   await openContractCall({
     network: getStacksNetwork(),
     postConditions: [],
     postConditionMode: PostConditionMode.Deny,
-    contractAddress: CONFIG.VITE_POX_CONTRACT.split('.')[0],
-    contractName: CONFIG.VITE_POX_CONTRACT.split('.')[1],
+    contractAddress: CONFIG.VITE_POX_MINI_CONTRACT.split('.')[0],
+    contractName: CONFIG.VITE_POX_MINI_CONTRACT.split('.')[1],
     functionName: 'allow-contract-caller',
     functionArgs: functionArgs,
     onFinish: (data: any) => {

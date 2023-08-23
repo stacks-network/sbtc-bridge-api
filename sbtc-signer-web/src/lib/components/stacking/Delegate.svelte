@@ -6,6 +6,7 @@ import Button from "../shared/Button.svelte";
 import { onMount } from 'svelte';
 import { sbtcConfig } from '$stores/stores'
 import RegisterToSign from './RegisterToSign.svelte';
+	import { sbtcMiniContracts } from 'sbtc-bridge-lib';
 
 let untilBlock = 0;
 let bbHeight = $sbtcConfig.bcInfo?.stacksInfo?.burn_block_height || 0;
@@ -41,9 +42,9 @@ const resultOfDelegate = async (data:any) => {
 }
 onMount(async () => {
 		try {
-      stxAddress = $sbtcConfig.addressObject.stxAddress
+      stxAddress = $sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress
       untilBlock = bbHeight + 10000
-			delegationInfo = await getAllowanceContractCallers($sbtcConfig.addressObject.stxAddress);
+			delegationInfo = await getAllowanceContractCallers($sbtcConfig.keySets[CONFIG.VITE_NETWORK].stxAddress);
       if (delegationInfo.untilBlockHeight === 0) delegationInfo = undefined;
       inited = true;
 		} catch (err) {
@@ -58,7 +59,7 @@ onMount(async () => {
 {#if canRegister() }
 <div>
   <div class="pb-5">
-    {CONFIG.VITE_SBTC_DEPLOYER + '.' + CONFIG.VITE_SBTC_CONTRACTS.pool}
+    {CONFIG.VITE_SBTC_MINI_DEPLOYER + '.' + sbtcMiniContracts.pool}
   </div>
   <div class="pb-5">
     Stacking Contract has permission until {delegationInfo.untilBlockHeight}, 

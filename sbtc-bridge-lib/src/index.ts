@@ -82,13 +82,32 @@ export {
 } 
 
 import {
-    approxTxFees,
-} from './transaction_utils.js'
+    satsToBitcoin,
+    bitcoinToSats,
+    fmtAmount,
+    fmtSatoshiToBitcoin,
+    fmtMicroToStx,
+    tsToDate,
+    convertDatToBH,
+    fmtNumber,
+    truncate,
+    truncateId,
+} from './formatting.js'
 export {
-    approxTxFees,
+    satsToBitcoin,
+    bitcoinToSats,
+    fmtAmount,
+    fmtSatoshiToBitcoin,
+    fmtMicroToStx,
+    tsToDate,
+    convertDatToBH,
+    fmtNumber,
+    truncate,
+    truncateId,
 }
 
 import {
+    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
@@ -98,6 +117,7 @@ import {
     toXOnly
 } from './wallet_utils.js'
 export {
+    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
@@ -115,10 +135,14 @@ import type {
     CommitKeysI,
     Message,
     SigData,
+    SbtcMiniContractsI,
+    SbtcMiniWalletI,
+    SbtcMiniContractDataI,
     SbtcContractDataI,
     AddressValidationI,
     SbtcBalance,
     UTXO,
+    SbtcAlphaEvent,
     payloadType,
     withdrawalPayloadType,
     depositPayloadType,
@@ -139,10 +163,14 @@ export type {
     CommitKeysI,
     Message,
     SigData,
+    SbtcMiniContractsI,
+    SbtcMiniWalletI,
+    SbtcMiniContractDataI,
     SbtcContractDataI,
     AddressValidationI,
     SbtcBalance,
     UTXO,
+    SbtcAlphaEvent,
     payloadType,
     withdrawalPayloadType,
     depositPayloadType,
@@ -158,12 +186,14 @@ import type {
     PoxInfo,
     StacksInfo,
     BlockchainInfo,
-    PoxCycleInfo
+    PoxCycleInfo,
+    DashboardInfoI
 } from './types/pox_types.js'
 
 export type {
     PoxInfo,
     StacksInfo,
     BlockchainInfo,
-    PoxCycleInfo
+    PoxCycleInfo,
+    DashboardInfoI
 }
