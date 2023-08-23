@@ -17,7 +17,13 @@ const SIMNNET_CONFIG = {
   host: 'http://localhost', 
   port: PORT,
   network: 'simnet',
-  walletPath: '/wallet/SBTC-0003',
+  walletPath: '/wallet/SBTC-0001',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
@@ -47,7 +53,12 @@ const TESTNET_CONFIG = {
   port: PORT,
   network: 'testnet',
   walletPath: '/wallet/SBTC-0003',
-  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
@@ -76,6 +87,12 @@ const MAINNET_CONFIG = {
   port: PORT,
   network: 'mainnet',
   walletPath: '/wallet/descwallet',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
   sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
@@ -103,6 +120,12 @@ const DEVNET_CONFIG = {
   host: 'http://localhost',
   port: PORT,
   walletPath: '/wallet/descwallet',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
@@ -133,6 +156,12 @@ const LINODE_TESTNET_CONFIG = {
   host: 'http://localhost',
   port: 4010,
   walletPath: '/wallet/SBTC-0003',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   network: 'testnet',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   //poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
@@ -165,6 +194,12 @@ const LINODE_MAINNET_CONFIG = {
   port: 4020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
+  nextWalletProposal: {
+    cycle:0, version: '0x06',
+    hashbytes: undefined,
+    address: 'bcrt1pt5xstye67r3nrs4fjwc53efrjndmul7kfkmjk89fmvsl22r4nulqmtz97w',
+    pubkey: '01fb87dfc54ff92257f90df4011444e1784111d1362b4113ec505806ed055ff8'
+  },
   poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
   sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
@@ -191,6 +226,13 @@ let CONFIG: {
   host: string; 
   port: number; 
   walletPath: string; 
+  nextWalletProposal: {
+    cycle:number;
+    version: string;
+    hashbytes:  string;
+    address:  string;
+    pubkey:  string;
+  },
   network: string; 
   poxContractId: string; 
   sbtcContractId: string; 

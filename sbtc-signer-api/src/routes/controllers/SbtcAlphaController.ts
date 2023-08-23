@@ -5,18 +5,12 @@ import type { PoxCycleInfo } from 'sbtc-bridge-lib'
 import type { AddressObject, SbtcContractDataI } from 'sbtc-bridge-lib';
 import { deserializeCV, cvToJSON } from 'micro-stacks/clarity';
 import { getBlockCount, validateAddress } from './utils/BitcoinRpc.js'
-import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './utils/StacksAlphaApi.js';
+import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcAlphaWalletAddress } from './utils/StacksAlphaApi.js';
 
 @Route("/signer-api/{network}/v1/signers")
 
 export class SbtcAlphaController extends Router {
   
-  @Get("/fetch-delegation-info/{stxAddress}")
-  public async getDelegationInfo(stxAddress:string): Promise<any> {
-    const result = await fetchDelegationInfo(stxAddress);
-    return result;
-  }
-
   public async fetchSbtcAlphaContractData(): Promise<SbtcContractDataI> {
     let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
     try {
@@ -47,11 +41,6 @@ export class SbtcAlphaController extends Router {
       sbtcContractData.burnHeight = -1;
     }
     return sbtcContractData;
-  }
-
-  public async getAllowanceContractCallers(stxAddress:string): Promise<any> {
-    const result = await fetchAllowanceContractCallers(stxAddress);
-    return result;
   }
 
   public async fetchWebDid(domain:string): Promise<any> {
@@ -99,8 +88,8 @@ export class SbtcAlphaController extends Router {
   }
 
   //@Get("/wallet-address")
-  public async fetchSbtcWalletAddress(): Promise<any> {
-    return await fetchSbtcWalletAddress();
+  public async fetchSbtcAlphaWalletAddress(): Promise<any> {
+    return await fetchSbtcAlphaWalletAddress();
   }
 
 }

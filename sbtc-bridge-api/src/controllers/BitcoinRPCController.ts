@@ -316,7 +316,7 @@ export class WalletController {
 
   //@Get("/address/:address/utxos?verbose=true")
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
-    let result;
+    let result:any = {};
     //checkAddressForNetwork(getConfig().network, address);
     try {
       if (address) {

@@ -8,6 +8,12 @@
 		"schemas": {
 			"SbtcMiniWalletI": {
 				"properties": {
+					"pubkey": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
 					"hashbytes": {
 						"type": "string"
 					},
@@ -20,6 +26,8 @@
 					}
 				},
 				"required": [
+					"pubkey",
+					"address",
 					"hashbytes",
 					"version",
 					"cycle"
@@ -76,7 +84,10 @@
 						],
 						"type": "object"
 					},
-					"wallet": {
+					"nextPegWallet": {
+						"$ref": "#/components/schemas/SbtcMiniWalletI"
+					},
+					"currentPegWallet": {
 						"$ref": "#/components/schemas/SbtcMiniWalletI"
 					},
 					"coordinator": {
@@ -106,7 +117,8 @@
 				"required": [
 					"contractOwner",
 					"protocolOwner",
-					"wallet"
+					"nextPegWallet",
+					"currentPegWallet"
 				],
 				"type": "object"
 			}
@@ -211,7 +223,7 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/sbtc/meta-data": {
+		"/signer-api/{network}/v1/mini/sbtc/data": {
 			"get": {
 				"operationId": "FetchSbtcMiniContractData",
 				"responses": {
@@ -230,9 +242,9 @@
 				"parameters": []
 			}
 		},
-		"/signer-api/{network}/v1/sbtc/wallet-address": {
+		"/signer-api/{network}/v1/mini/sbtc/stacking/get-allowance-contract-callers/{stxAddress}": {
 			"get": {
-				"operationId": "FetchSbtcWalletAddress",
+				"operationId": "GetAllowanceContractCallers",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -244,10 +256,19 @@
 					}
 				},
 				"security": [],
-				"parameters": []
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
-		"/signer-api/{network}/v1/signers/fetch-delegation-info/{stxAddress}": {
+		"/signer-api/{network}/v1/mini/sbtc/stacking/fetch-delegation-info/{stxAddress}": {
 			"get": {
 				"operationId": "GetDelegationInfo",
 				"responses": {
@@ -271,6 +292,23 @@
 						}
 					}
 				]
+			}
+		},
+		"/signer-api/{network}/v1/mini/wallet-address": {
+			"get": {
+				"operationId": "FetchSbtcMiniWalletAddress",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
 			}
 		},
 		"/signer-api/{network}/v1/events/alpha/read-all": {

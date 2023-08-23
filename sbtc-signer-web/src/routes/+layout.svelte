@@ -11,8 +11,9 @@
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'
-	import { initApplication } from "$lib/stacks_connect";
+	import { initApplication, isLegal, loginStacksJs } from "$lib/stacks_connect";
 	import Bootstrap from '$lib/components/settings/Bootstrap.svelte';
+	import { beforeNavigate, goto } from '$app/navigation';
 
 	const unsubscribe = sbtcConfig.subscribe((conf) => {});
 	onDestroy(unsubscribe);
@@ -22,9 +23,14 @@
 	let componentKey = 0;
 	console.log('process.env: ', import.meta.env);
 	setConfig('?net=devnet')   //($page.url.search);
-	/**
+
+	const initApp = async () => {
+		await initApplication(($sbtcConfig) ? $sbtcConfig : defaultSbtcConfig as SbtcConfig, undefined);
+	}
+
 	if (!isLegal(location.href)) {
 		//componentKey++;
+		loginStacksJs(initApp, $sbtcConfig)
 		goto('/' + '?net=devnet')
 	}
 	if (location.href.indexOf('devnet') === -1) {
@@ -45,14 +51,11 @@
 			//window.onbeforeunload = null;
 		}
 	})
+	/**
 	afterNavigate((nav) => {
 		componentKey++;
 	})
 	*/
-
-	const initApp = async () => {
-		await initApplication(($sbtcConfig) ? $sbtcConfig : defaultSbtcConfig as SbtcConfig, undefined);
-	}
 
 	onMount(async () => {
 		try {

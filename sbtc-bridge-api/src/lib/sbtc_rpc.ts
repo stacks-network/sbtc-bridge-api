@@ -49,8 +49,8 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err:any) {
-      console.log('Error fetching data from sbtc contrcat')
-      //throw new Error('Error fetching data from sbtc contrcat: ' + err.message)
+      console.log('Error fetching sbtc alpha data from sbtc contrcat')
+      //throw new Error('Error fetching sbtc alpha data from sbtc contrcat: ' + err.message)
     }
   }
   return result;
@@ -119,8 +119,8 @@ export async function indexSbtcEvent(txid:string) {
     const result:any = await response.json();
     //console.log(' indexSbtcEvent: ', util.inspect(result, false, null, true /* enable colors */));
     return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
-  } catch (err) {
-    console.log('err indexSbtcEvent: ', util.inspect(err, false, null, true /* enable colors */));
+  } catch (err:any) {
+    console.log('err indexSbtcEvent: ' + err);
     return [];
   }
 }
@@ -133,8 +133,8 @@ export async function saveAllSbtcEvents() {
       events = await saveSbtcEvents(offset);
       offset += limit;
     } while (events.length === limit);
-  } catch (err) {
-    console.log('err saveAllSbtcEvents: ', util.inspect(err, false, null, true /* enable colors */));
+  } catch (err:any) {
+    console.log('err saveAllSbtcEvents: ' + err);
     return [];
   }
 }
@@ -147,8 +147,8 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
     const result:any = await response.json();
     //console.log('Sbtc Events: : offset=' + offset + ' limit=' + limit + ' results=' + result.results.length);
     return await indexEvents(result.results);
-  } catch (err) {
-    console.log('err - saveSbtcEvents2: ', util.inspect(err, false, null, true /* enable colors */));
+  } catch (err:any) {
+    console.log('err - saveSbtcEvents2: ' + err);
     return [];
   }
 }

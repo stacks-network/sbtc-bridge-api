@@ -44,7 +44,7 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err) {
-      console.log('Error fetching data from sbtc contrcat: ' + funcname + ' : ', response)
+      console.log('Error fetching sbtc alpha data from sbtc contrcat: ' + funcname + ' : ', response)
     }
   }
   return result;
@@ -113,7 +113,7 @@ export async function fetchDataVar(contractAddress:string, contractName:string, 
   }
 }
 
-export async function fetchSbtcWalletAddress() {
+export async function fetchSbtcAlphaWalletAddress() {
   try {
     const contractId = getConfig().sbtcContractId;
     const data = {

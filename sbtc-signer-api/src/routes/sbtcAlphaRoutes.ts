@@ -51,28 +51,6 @@ router.get("/signer-api/:network/v1/sbtc/info", async (req, res, next) => {
     next('An error occurred fetching sbtc data.')
   }
 });
-router.get("/signer-api/:network/v1/pox/get-delegation-info/:stxAddress", async (req, res, next) => {
-  try {
-    const controller = new SbtcAlphaController();
-    const result = await controller.getDelegationInfo(req.params.stxAddress);
-    return res.send(result);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching vouching/domain/:domain.')
-  }
-});
-
-router.get("/signer-api/:network/v1/pox/get-allowance-contract-callers/:stxAddress", async (req, res, next) => {
-  try {
-    const controller = new SbtcAlphaController();
-    const result = await controller.getAllowanceContractCallers(req.params.stxAddress);
-    return res.send(result);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching vouching/domain/:domain.')
-  }
-});
-
 router.get("/signer-api/:network/v1/pox/info", async (req, res, next) => {
   try {
     console.log('v1/pox/info: ')

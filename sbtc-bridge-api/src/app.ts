@@ -13,7 +13,7 @@ import { stacksRoutes } from './routes/stacksRoutes.js'
 import { createRequire } from 'node:module';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
-const swaggerDocument = r('../public/swagger.json');
+const swaggerDocument = r('./swagger.json');
 
 const app = express();
 
@@ -40,6 +40,21 @@ app.use('/bridge-api/:network/v1/config', configRoutes);
 app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
 app.use('/bridge-api/:network/v1/sbtc', stacksRoutes);
 
+console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
+console.log('Startup Environment: ', process.env.NODE_ENV);
+console.log(`Bitcoin connection at ${getConfig().btcNode} \nWallet Path: ${getConfig().walletPath}`);
+console.log(`Mongo connection at ${getConfig().mongoDbUrl}`);
+console.log(`Mongo connection at ${getConfig().mongoDbName}`);
+console.log(`App ${getConfig().publicAppName}`);
+console.log(`Stacks connection at ${getConfig().stacksApi}`);
+console.log(`Stacks explorer at ${getConfig().stacksExplorerUrl}`);
+console.log(`sBTC contract at ${getConfig().sbtcContractId}`);
+if (isSimnet()) {
+  console.log(`Mongo connection at ${getConfig().mongoUser}`);
+  console.log(`Mongo connection at ${getConfig().mongoPwd}`);
+  console.log(`Bitcoin ${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}`);
+}
+
 async function connectToMongoCloud() {
   await connect();
   const server = app.listen(getConfig().port, () => {
@@ -51,13 +66,6 @@ async function connectToMongoCloud() {
   peginRequestJob.start();
   let rates = await getExchangeRates()
 
-  console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
-  console.log('Startup Environment: ', process.env.NODE_ENV);
-  console.log(`Bitcoin connection at ${getConfig().btcNode} \nWallet Path: ${getConfig().walletPath}`);
-  console.log(`Mongo connection at ${getConfig().mongoDbUrl}`);
-  if (isSimnet()) {
-    console.log(`Bitcoin ${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}`);
-  }
   wss.on('connection', function connection(ws) {
     //console.log('new client connected');
     ws.send(JSON.stringify(rates))

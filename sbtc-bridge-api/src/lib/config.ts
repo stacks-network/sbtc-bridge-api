@@ -17,7 +17,7 @@ const SIMNNET_CONFIG = {
   host: 'http://localhost', 
   port: PORT,
   network: 'simnet',
-  walletPath: '/wallet/TBTC-0001',
+  walletPath: '/wallet/SBTC-0001',
   //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
@@ -200,7 +200,7 @@ let CONFIG: {
 };
 
 export function setConfigOnStart() {
-	if (isDev()) CONFIG = DEVNET_CONFIG;
+	if (isDev()) CONFIG = LINODE_TESTNET_CONFIG; //DEVNET_CONFIG;
 	else if (isSimnet()) CONFIG = SIMNNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;

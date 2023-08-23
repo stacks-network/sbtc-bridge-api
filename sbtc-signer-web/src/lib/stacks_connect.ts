@@ -191,10 +191,10 @@ export function makeFlash(el1:HTMLElement|null) {
 export function isLegal(routeId:string):boolean {
 	if (userSession.isUserSignedIn()) return true;
 	if (routeId.startsWith('http')) {
-		if (routeId.indexOf('/deposit') > -1 || routeId.indexOf('/withdraw') > -1 || routeId.indexOf('/admin') > -1 || routeId.indexOf('/transactions') > -1) {
+		if (routeId.indexOf('/voting') > -1 || routeId.indexOf('/withdraw') > -1 || routeId.indexOf('/admin') > -1 || routeId.indexOf('/transactions') > -1) {
 			return false;
 		}
-	} else if (['/deposit', '/withdraw', '/admin', '/transactions'].includes(routeId)) {
+	} else if (['/voting', '/withdraw', '/admin', '/transactions'].includes(routeId)) {
 		return false;
 	}
 	return true;

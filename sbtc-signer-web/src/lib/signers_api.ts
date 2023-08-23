@@ -16,7 +16,7 @@ export async function fetchPoxInfo():Promise<BlockchainInfo|undefined> {
  */
 
 export async function getAllowanceContractCallers(stxAddress:string):Promise<BlockchainInfo|undefined> {
-  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/get-allowance-contract-callers/' + stxAddress);
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/sbtc/stacking/get-allowance-contract-callers/' + stxAddress);
   try {
     const response = await fetch(path);
     const res = await response.json();
@@ -27,7 +27,7 @@ export async function getAllowanceContractCallers(stxAddress:string):Promise<Blo
 }
 
 export async function getDelegationInfo(stxAddress:string):Promise<BlockchainInfo|undefined> {
-  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/pox/get-delegation-info/' + stxAddress);
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/sbtc/stacking/get-delegation-info/' + stxAddress);
   try {
     const response = await fetch(path);
     const res = await response.json();
@@ -49,7 +49,7 @@ export async function fetchWebDid(domain:string):Promise<BlockchainInfo|undefine
 }
 
 export async function fetchDashboardInfo():Promise<any> {
-  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/mini/sbtc/application/meta-data');
+  const path = addNetSelector(CONFIG.VITE_SIGNER_API + '/mini/sbtc/application/data');
   try {
     const response = await fetch(path);
     const res = await response.json();

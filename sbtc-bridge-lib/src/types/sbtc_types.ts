@@ -10,7 +10,7 @@ export type SbtcMiniContractsI = {
 }
 
 export type SbtcMiniWalletI = {
-  cycle:number, version: string, hashbytes: string
+  cycle:number, version: string, hashbytes: string, address: string, pubkey: string
 }
 
 export type SbtcMiniContractDataI = {
@@ -20,7 +20,8 @@ export type SbtcMiniContractDataI = {
       };
       key: string;
   };
-  wallet: SbtcMiniWalletI;
+  currentPegWallet: SbtcMiniWalletI;
+  nextPegWallet: SbtcMiniWalletI;
   protocolOwner: { stacksAddress: string, value: boolean }
   contractOwner: string;
   currentWindow?: number;

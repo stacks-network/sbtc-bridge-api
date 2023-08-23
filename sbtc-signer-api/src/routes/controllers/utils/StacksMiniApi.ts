@@ -8,6 +8,7 @@ import { type SbtcMiniWalletI, type SbtcMiniContractDataI, type AddressObject, t
 import * as btc from '@scure/btc-signer';
 
 export let statelessMiniData;
+const nullWallet = { cycle: 1, version: undefined, hashbytes: undefined, address: undefined, pubkey: undefined }
 
 const noArgMethods = [
   { contract: sbtcMiniContracts.token, method: 'get-total-supply' },
@@ -19,7 +20,7 @@ const noArgMethods = [
   { contract: sbtcMiniContracts.pool, method: 'get-current-cycle-pool' },
 ]
 
-export async function readStatelessSbtcData():Promise<SbtcMiniContractDataI> {
+export async function readMiniSbtcData():Promise<SbtcMiniContractDataI> {
   const result = {} as SbtcMiniContractDataI
   const contractAddress = getConfig().sbtcMiniDeployer;
   const data = {
@@ -38,7 +39,7 @@ export async function readStatelessSbtcData():Promise<SbtcMiniContractDataI> {
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err) {
-      console.log('Error fetching data from sbtc contrcat: ' + funcname + ' : ', response)
+      console.log('Error fetching sbtc mini data from sbtc contrcat: ' + funcname + ' : ', response)
     }
   }
   return result;
@@ -86,7 +87,7 @@ export async function fetchDataVar(contractAddress:string, contractName:string, 
   }
 }
 
-export async function fetchSbtcWalletAddress(cycleId:number|undefined):Promise<SbtcMiniWalletI> {
+export async function fetchSbtcMiniWalletAddress(cycleId:number|undefined):Promise<SbtcMiniWalletI> {
   try {
     const contractAddress = getConfig().sbtcMiniDeployer;
     const arg = uintCV(cycleId || 1)
@@ -98,13 +99,13 @@ export async function fetchSbtcWalletAddress(cycleId:number|undefined):Promise<S
       network: getConfig().network
     }
     const result = await callContractReadOnly(data);
-    console.log('fetchSbtcWalletAddress: ', result)
+    console.log('fetchSbtcMiniWalletAddress: ', result)
     if (result && result.hasOwnProperty('type') && result.type === '(optional none)') {
-      return { cycle: 1, version: undefined, hashbytes: undefined }
+      return nullWallet
     }
-    return { cycle: cycleId, version: result.value.value.version, hashbytes: result.value.value.hashbytes }
+    return { cycle: cycleId, version: result.value.value.version, hashbytes: result.value.value.hashbytes, address: undefined, pubkey: undefined }
   } catch (err) {
-    return { cycle: 1, version: undefined, hashbytes: undefined }
+    return nullWallet
   }
 }
 
@@ -201,9 +202,10 @@ export async function callContractReadOnly(data:any) {
     });
     val = await response.json();
   } catch (err) {
-    console.log('callContractReadOnly: Error: ', data);
     console.log('callContractReadOnly: Error: ', err);
   }
+  console.log('callContractReadOnly: ', url);
+  console.log('callContractReadOnly: ', val)
   const result = cvToJSON(deserializeCV(val.result));
   return result;
 }

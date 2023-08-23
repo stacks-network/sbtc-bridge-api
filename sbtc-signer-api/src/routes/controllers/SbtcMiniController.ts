@@ -4,16 +4,16 @@ import { getConfig } from '../../lib/config.js';
 import type { SbtcMiniContractDataI, PoxCycleInfo, AddressObject } from 'sbtc-bridge-lib';
 import { deserializeCV, cvToJSON } from 'micro-stacks/clarity';
 import { getBlockCount, validateAddress } from './utils/BitcoinRpc.js'
-import { isProtocolCaller, fetchDataVar, readStatelessSbtcData, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './utils/StacksMiniApi.js';
-@Route("/signer-api/{network}/v1/sbtc")
+import { isProtocolCaller, readMiniSbtcData, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcMiniWalletAddress } from './utils/StacksMiniApi.js';
+@Route("/signer-api/{network}/v1/mini")
 
 export class SbtcMiniController extends Router {
   
-  @Get("/meta-data")
+  @Get("/sbtc/data")
   public async fetchSbtcMiniContractData(): Promise<SbtcMiniContractDataI> {
     let sbtcContractData:SbtcMiniContractDataI = {} as SbtcMiniContractDataI;
     try {
-      sbtcContractData = await readStatelessSbtcData();
+      sbtcContractData = await readMiniSbtcData();
     } catch (err:any) {
       sbtcContractData = {} as SbtcMiniContractDataI;
       console.log(err.message)
@@ -30,11 +30,12 @@ export class SbtcMiniController extends Router {
       console.log(err.message)
     }
     try {
-      const wallet = await fetchSbtcWalletAddress(1);
-      sbtcContractData.wallet = wallet
+      const wallet = await fetchSbtcMiniWalletAddress(1);
+      sbtcContractData.currentPegWallet = wallet
+      sbtcContractData.nextPegWallet = getConfig().nextWalletProposal
     } catch (err:any) {
       console.log(err.message)
-      sbtcContractData.wallet = { cycle: 1, version: undefined, hashbytes: undefined }
+      sbtcContractData.currentPegWallet = { cycle: 1, version: undefined, hashbytes: undefined, address: undefined, pubkey: undefined }
     }
     try {
       const bc = await getBlockCount();
@@ -46,10 +47,18 @@ export class SbtcMiniController extends Router {
     return sbtcContractData;
   }
 
+  @Get("/sbtc/stacking/get-allowance-contract-callers/{stxAddress}")
   public async getAllowanceContractCallers(stxAddress:string): Promise<any> {
     const result = await fetchAllowanceContractCallers(stxAddress);
     return result;
   }
+
+  @Get("/sbtc/stacking/fetch-delegation-info/{stxAddress}")
+  public async getDelegationInfo(stxAddress:string): Promise<any> {
+    const result = await fetchDelegationInfo(stxAddress);
+    return result;
+  }
+
 
   public async fetchWebDid(domain:string): Promise<any> {
     const path = 'https://' + domain + '/.well-known/did.json';
@@ -96,8 +105,8 @@ export class SbtcMiniController extends Router {
   }
 
   @Get("/wallet-address")
-  public async fetchSbtcWalletAddress(): Promise<any> {
-    return await fetchSbtcWalletAddress(undefined);
+  public async fetchSbtcMiniWalletAddress(): Promise<any> {
+    return await fetchSbtcMiniWalletAddress(undefined);
   }
 
 }
