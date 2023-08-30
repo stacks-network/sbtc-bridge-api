@@ -176,7 +176,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 	}
 }
  */
-export function addInputs (network:string, amount:number, revealPayment:number, tx:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>, userPaymentPubKey:string) {
+export function addInputs (network:string, amount:number, revealPayment:number, transaction:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>, userPaymentPubKey:string) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const bar = revealPayment + amount;
 	let amt = 0;
@@ -218,10 +218,10 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 						}
 						if (i < 3) {
 							const nextI = redeemAndWitnessScriptAddInput(utxo, p2shObj, hexy)
-							tx.addInput(nextI);
+							transaction.addInput(nextI);
 						} else {
 							const nextI = redeemScriptAddInput(utxo, p2shObj, hexy)
-							tx.addInput(nextI);
+							transaction.addInput(nextI);
 						}
 						console.log('Tx type: ' + i + ' --> input added')
 						break;
@@ -247,7 +247,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					witnessUtxo
 				}
-				tx.addInput(nextI);
+				transaction.addInput(nextI);
 			} else if (txType === 'v0_p2wsh') {
 				//const p2shObj = btc.p2wsh(btc.p2wpkh(hex.decode(userPaymentPubKey), net))
 				let witnessUtxo = {
@@ -266,7 +266,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					witnessUtxo
 				}
-				tx.addInput(nextI);
+				transaction.addInput(nextI);
 			} else if (txType === 'v0_p2pkh') {
 				//const p2shObj = btc.p2pkh(hex.decode(userPaymentPubKey), net)
 				let witnessUtxo = {
@@ -285,7 +285,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					witnessUtxo
 				}
-				tx.addInput(nextI);
+				transaction.addInput(nextI);
 			} else {
 				//const p2shObj = btc.p2wpkh(hex.decode(userPaymentPubKey), net)
 				let witnessUtxo = {
@@ -304,7 +304,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					witnessUtxo
 				}
-				tx.addInput(nextI);
+				transaction.addInput(nextI);
 			}
 		}
 	}
@@ -329,8 +329,7 @@ function redeemAndWitnessScriptAddInput (utxo:any, p2shObj:any, hexy:any) {
 		  amount: BigInt(utxo.value),
 		},
 		redeemScript: p2shObj.redeemScript,
-}
-
+	}
 }
 
 function isUTXOConfirmed (utxo:any) {
