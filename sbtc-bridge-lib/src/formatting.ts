@@ -15,6 +15,7 @@ export function satsToBitcoin(amountSats:number) {
 
 export function bitcoinToSats(amountBtc:number) {
   return  Math.round(amountBtc * btcPrecision)
+  //  return btc.Decimal.decode(amountBtc)
 }
 
 
