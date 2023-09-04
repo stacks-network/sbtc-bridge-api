@@ -185,18 +185,12 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 		const script = btc.RawTx.decode(hex.decode(hexy))
 		if (amt < bar && utxo.status.confirmed) {
 			amt += utxo.value;
-			//const pubkey = '0248159447374471c5a6cfa18c296e6e297dbf125a9e6792435a87e80c4f771493'
-			//const script1 = (btc.p2ms(1, [hex.decode(pubkey)]))
-			const output = utxo.tx.vout[utxo.vout]
-			let txType;
-			// eslint-disable-next-line no-prototype-builtins
-			if (output.hasOwnProperty('scriptpubkey_type')) {
-				txType = output.scriptpubkey_type;
-			} else {
-				txType = output.scriptPubKey.type;
-			}
-			if (txType === 'scripthash' || txType === 'p2sh') {
-				// educated guess at the p2sh wrapping based on the type of the other (non change) output...
+			const txFromUtxo = btc.Transaction.fromRaw(hex.decode(hexy), {allowUnknowInput:true, allowUnknowOutput: true})
+			const outputToSpend = txFromUtxo.getOutput(utxo.vout)
+			if (!outputToSpend || !outputToSpend.script) throw new Error('no script passed ?')
+			const spendScr = btc.OutScript.decode(outputToSpend.script)
+			//const addr = getAddressFromOutScript(output.script)
+			if (spendScr.type === 'sh') {
 				let p2shObj;
 				// p2tr cannont be wrapped in p2sh !!!
 				for (let i = 0; i < 10; i++) {
@@ -229,26 +223,20 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 						console.log('Error: not tx type: ' + i);
 					}
 				}
-			} else if (txType === 'v0_p2wpkh') {
-				//const p2shObj = btc.p2wpkh(hex.decode(userPaymentPubKey), net)
-				let witnessUtxo = {
-					script: script.outputs[utxo.vout].script,
-					amount: BigInt(utxo.value)
-				}
-				if (feeCalc) {
-					witnessUtxo = {
-						amount: BigInt(utxo.value),
-						script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
-					}
-				}
+			} else if (spendScr.type === 'wpkh') {
+				const spendAddr = getAddressFromOutScript(network, outputToSpend.script)
+				console.log('spendAddr: ' + spendAddr)
 				const nextI:btc.TransactionInput = {
 					txid: hex.decode(utxo.txid),
 					index: utxo.vout,
-					nonWitnessUtxo: hexy,
-					witnessUtxo
+					...outputToSpend,
+					witnessUtxo: {
+					  script: outputToSpend.script,
+					  amount: BigInt(utxo.value),
+					},
 				}
 				transaction.addInput(nextI);
-			} else if (txType === 'v0_p2wsh') {
+			} else if (spendScr.type === 'wsh') {
 				//const p2shObj = btc.p2wsh(btc.p2wpkh(hex.decode(userPaymentPubKey), net))
 				let witnessUtxo = {
 					script: script.outputs[utxo.vout].script,
@@ -267,48 +255,63 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					witnessUtxo
 				}
 				transaction.addInput(nextI);
-			} else if (txType === 'v0_p2pkh') {
+			} else if (spendScr.type === 'pkh') {
 				//const p2shObj = btc.p2pkh(hex.decode(userPaymentPubKey), net)
-				let witnessUtxo = {
-					script: script.outputs[utxo.vout].script,
-					amount: BigInt(utxo.value)
-				}
-				if (feeCalc) {
-					witnessUtxo = {
-						amount: BigInt(utxo.value),
-						script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
-					}
-				}
 				const nextI:btc.TransactionInput = {
 					txid: hex.decode(utxo.txid),
 					index: utxo.vout,
 					nonWitnessUtxo: hexy,
-					witnessUtxo
+					//witnessUtxo
 				}
 				transaction.addInput(nextI);
 			} else {
 				//const p2shObj = btc.p2wpkh(hex.decode(userPaymentPubKey), net)
-				let witnessUtxo = {
-					script: script.outputs[utxo.vout].script,
-					amount: BigInt(utxo.value)
-				}
-				if (feeCalc) {
-					witnessUtxo = {
-						amount: BigInt(utxo.value),
-						script: btc.p2wpkh(secp.getPublicKey(privKey, true)).script,
-					}
-				}
 				const nextI:btc.TransactionInput = {
 					txid: hex.decode(utxo.txid),
 					index: utxo.vout,
 					nonWitnessUtxo: hexy,
-					witnessUtxo
+					//witnessUtxo
 				}
 				transaction.addInput(nextI);
 			}
 		}
 	}
 }
+
+export function getAddressFromOutScript(network:string, script: Uint8Array) {
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const outputScript = btc.OutScript.decode(script);
+  
+	if (outputScript.type === 'pk' || outputScript.type === 'tr') {
+	  return btc.Address(net).encode({
+		type: outputScript.type,
+		pubkey: outputScript.pubkey,
+	  });
+	}
+	if (outputScript.type === 'ms' || outputScript.type === 'tr_ms') {
+	  return btc.Address(net).encode({
+		type: outputScript.type,
+		pubkeys: outputScript.pubkeys,
+		m: outputScript.m,
+	  });
+	}
+	if (outputScript.type === 'tr_ns') {
+	  return btc.Address(net).encode({
+		type: outputScript.type,
+		pubkeys: outputScript.pubkeys,
+	  });
+	}
+	if (outputScript.type === 'unknown') {
+	  return btc.Address(net).encode({
+		type: outputScript.type,
+		script,
+	  });
+	}
+	return btc.Address(net).encode({
+	  type: outputScript.type,
+	  hash: outputScript.hash,
+	});
+  }
 
 function redeemScriptAddInput (utxo:any, p2shObj:any, hexy:any) {
 	return {
