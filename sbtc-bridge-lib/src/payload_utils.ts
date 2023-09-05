@@ -200,7 +200,6 @@ export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array 
 		const cnameBuf = new TextEncoder().encode(address.split('.')[1]);
 		buf1 = concat(buf1, cnameBuf);
 	}
-			
 	return concat(magicBuf, buf1)
 }
 
