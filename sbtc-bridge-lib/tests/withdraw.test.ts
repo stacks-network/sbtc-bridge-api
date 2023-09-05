@@ -23,33 +23,33 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
 
   it.concurrent('Check converting numbers to from uint8 arrays works', async () => {
     let s = hex.encode(amountToBigUint64(42, 8))
-    console.log((s))
+    //console.log((s))
     assert(s === '000000000000002a')
     let y = bigUint64ToAmount(hex.decode(s))
-    console.log((y))
+    //console.log((y))
     assert(y === 42)
 
-    console.log(bigUint64ToAmount(hex.decode('000000000000022b')))
+    //console.log(bigUint64ToAmount(hex.decode('000000000000022b')))
 
     // 0000 0000 0000 03ae
     s = hex.encode(amountToBigUint64(942, 8))
     assert((s) === '00000000000003ae')
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 942)
 
     s = hex.encode(amountToBigUint64(5000, 8))
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 5000)
 
     //0000 0000 05f5 e100
     s = hex.encode(amountToBigUint64(100000000, 8))
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 100000000)
     //           100000000 00000000
     /**
@@ -77,7 +77,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
     assert(hex.encode(payload) === data);
     const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
-    console.log('parsedPayload1: ', parsedPayload);
+    //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
     assert(parsedPayload.signature === signature);
@@ -91,9 +91,8 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const data = '54323e00000000000003ae885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
     let signature = '885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
     const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    console.log('payload: ', hex.encode(payload));
     const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
-    console.log('parsedPayload: ', parsedPayload);
+    //console.log('parsedPayload: ', parsedPayload);
     expect(data).equals(hex.encode(payload));
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
@@ -108,10 +107,10 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const data = '54323e00000000000000f221a7ac825846d024fe29d0db9d9b48b0d520d01398dc4edf0aab15f9b38da27718ddce8a5c6f8bf730858d9619455a68c03338d729b1f623aa1ddb84ee383e6a00'
     let signature = '21a7ac825846d024fe29d0db9d9b48b0d520d01398dc4edf0aab15f9b38da27718ddce8a5c6f8bf730858d9619455a68c03338d729b1f623aa1ddb84ee383e6a00'
     const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    console.log('payload: ', hex.encode(payload));
+    //console.log('payload: ', hex.encode(payload));
     const parsedPayload = parseWithdrawalPayload('testnet', hex.decode(data), fromAddress, 0);
-    console.log('parsedPayload: ', parsedPayload);
-    console.log('data         : ', data);
+    //console.log('parsedPayload: ', parsedPayload);
+    //console.log('data         : ', data);
     expect(data).equals(hex.encode(payload));
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
@@ -129,10 +128,10 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const data = '54323e0000000000000064084a912d26cb8f26652efc53d717a6b6dbdb64042cfbaa06e20b60fef67d144f36643bbba7ed178255497a058774e39fe39493f444f5ca3428d821356a6bfcf501'
     let signature = '084a912d26cb8f26652efc53d717a6b6dbdb64042cfbaa06e20b60fef67d144f36643bbba7ed178255497a058774e39fe39493f444f5ca3428d821356a6bfcf501'
     const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    console.log('payload: ', hex.encode(payload));
+    //console.log('payload: ', hex.encode(payload));
     const parsedPayload = parseWithdrawalPayload('testnet', hex.decode(data), fromAddress, 1);
-    console.log('parsedPayload: ', parsedPayload);
-    console.log('data         : ', data);
+    //console.log('parsedPayload: ', parsedPayload);
+    //console.log('data         : ', data);
     expect(data).equals(hex.encode(payload));
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');

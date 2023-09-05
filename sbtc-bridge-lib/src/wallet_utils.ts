@@ -217,7 +217,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 							const nextI = redeemScriptAddInput(utxo, p2shObj, hexy)
 							transaction.addInput(nextI);
 						}
-						console.log('Tx type: ' + i + ' --> input added')
+						//('Tx type: ' + i + ' --> input added')
 						break;
 					} catch (err:any) {
 						console.log('Error: not tx type: ' + i);
@@ -225,7 +225,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 				}
 			} else if (spendScr.type === 'wpkh') {
 				const spendAddr = getAddressFromOutScript(network, outputToSpend.script)
-				console.log('spendAddr: ' + spendAddr)
+				//console.log('spendAddr: ' + spendAddr)
 				const nextI:btc.TransactionInput = {
 					txid: hex.decode(utxo.txid),
 					index: utxo.vout,

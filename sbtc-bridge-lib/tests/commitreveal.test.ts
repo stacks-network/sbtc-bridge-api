@@ -22,7 +22,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const priv = secp.utils.randomPrivateKey()
     const xOnlySchnorrPubComp = (secp.getPublicKey(priv, true)).subarray(1);
     const xOnlySchnorrPubComp1 = (secp.getPublicKey(hex.decode('0d7b49bc4864057b087108f81a57da7178cfbeb85a09c8957b64b9840e368b42'), true)).subarray(1);
-    console.log('xOnlySchnorrPubComp1: ', hex.encode(xOnlySchnorrPubComp1));
+    //console.log('xOnlySchnorrPubComp1: ', hex.encode(xOnlySchnorrPubComp1));
     const oracle = {
       priv: hex.encode(priv),
       ecdsaPub: hex.encode(secp.getPublicKey(priv, true)),
@@ -31,39 +31,39 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     expect(hex.decode(oracle.priv).length).equals(32)
     expect(hex.decode(oracle.ecdsaPub).length).equals(33)
     expect(hex.decode(oracle.schnorrPub).length).equals(32)
-    console.log('oracle: ', oracle);
-    console.log('oracle: ', oracle);
+    //console.log('oracle: ', oracle);
+    //console.log('oracle: ', oracle);
   })
 
   it.concurrent('Check converting numbers to from uint8 arrays works', async () => {
     let s = hex.encode(amountToBigUint64(42, 8))
-    console.log((s))
+   //console.log((s))
     assert(s === '000000000000002a')
     let y = bigUint64ToAmount(hex.decode(s))
-    console.log((y))
+    //console.log((y))
     assert(y === 42)
 
-    console.log(bigUint64ToAmount(hex.decode('000000000000022b')))
+    //console.log(bigUint64ToAmount(hex.decode('000000000000022b')))
 
     // 0000 0000 0000 03ae
     s = hex.encode(amountToBigUint64(942, 8))
     assert((s) === '00000000000003ae')
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 942)
 
     s = hex.encode(amountToBigUint64(5000, 8))
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 5000)
 
     //0000 0000 05f5 e100
     s = hex.encode(amountToBigUint64(100000000, 8))
-    console.log('s: ' + (s));           
+    //console.log('s: ' + (s));           
     y = bigUint64ToAmount(hex.decode(s))
-    console.log('y: ' + y);           
+    //console.log('y: ' + y);           
     assert(y === 100000000)
     //           100000000 00000000
     /**
@@ -91,7 +91,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
     assert(hex.encode(payload) === data);
     const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
-    console.log('parsedPayload1: ', parsedPayload);
+    //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
     assert(parsedPayload.signature === signature);

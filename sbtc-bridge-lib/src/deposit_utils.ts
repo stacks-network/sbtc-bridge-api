@@ -62,8 +62,8 @@ export function buildOpDropDepositTransaction (network:string, amount:number, bt
 export function getOpReturnDepositRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	if (!stacksAddress) throw new Error('Stacks address missing')
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
-	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
-	console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
+	//console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
+	//console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
 	
 	const req:PeginRequestI = {
 		originator: stacksAddress,
@@ -85,8 +85,8 @@ export function getOpReturnDepositRequest(network:string, amount:number, commitK
 export function getOpDropDepositRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	if (!stacksAddress) throw new Error('Address needed')
-	console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
-	console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
+	//console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
+	//console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
 	
 	const data = buildData(network, stacksAddress, revealFee, true);
 	const scripts =  [
