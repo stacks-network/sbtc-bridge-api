@@ -6,118 +6,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"KeySet": {
-				"properties": {
-					"deposits": {
-						"properties": {
-							"oraclePubKey": {
-								"type": "string"
-							},
-							"reclaimPubKey": {
-								"type": "string"
-							},
-							"revealPubKey": {
-								"type": "string"
-							}
-						},
-						"required": [
-							"oraclePubKey",
-							"reclaimPubKey",
-							"revealPubKey"
-						],
-						"type": "object"
-					}
-				},
-				"required": [
-					"deposits"
-				],
-				"type": "object"
-			},
-			"Uint8Array": {
-				"description": "A typed array of 8-bit unsigned integer values. The contents are initialized to 0. If the\r\nrequested number of bytes could not be allocated an exception is raised.",
-				"properties": {},
-				"type": "object",
-				"additionalProperties": false
-			},
-			"PeginScriptI": {
-				"properties": {
-					"tweakedPubkey": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"tapMerkleRoot": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"tapLeafScript": {},
-					"tapInternalKey": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"leaves": {},
-					"wsh": {
-						"type": "string"
-					},
-					"witnessScript": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"redeemScript": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"paymentType": {
-						"type": "string"
-					},
-					"script": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/Uint8Array"
-							}
-						]
-					},
-					"address": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"paymentType"
-				],
-				"type": "object"
-			},
 			"depositPayloadType": {
 				"properties": {
 					"amountSats": {
@@ -192,37 +80,6 @@
 				],
 				"type": "object"
 			},
-			"FeeEstimateResponse": {
-				"properties": {
-					"feeInfo": {
-						"properties": {
-							"high_fee_per_kb": {
-								"type": "number",
-								"format": "double"
-							},
-							"medium_fee_per_kb": {
-								"type": "number",
-								"format": "double"
-							},
-							"low_fee_per_kb": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"high_fee_per_kb",
-							"medium_fee_per_kb",
-							"low_fee_per_kb"
-						],
-						"type": "object"
-					}
-				},
-				"required": [
-					"feeInfo"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"BalanceI": {
 				"properties": {
 					"balance": {
@@ -235,6 +92,185 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"AddressHiroObject": {
+				"properties": {
+					"non_fungible_tokens": {},
+					"fungible_tokens": {},
+					"stx": {
+						"properties": {
+							"burnchain_unlock_height": {
+								"type": "number",
+								"format": "double"
+							},
+							"burnchain_lock_height": {
+								"type": "number",
+								"format": "double"
+							},
+							"lock_height": {
+								"type": "number",
+								"format": "double"
+							},
+							"locked": {
+								"type": "number",
+								"format": "double"
+							},
+							"lock_tx_id": {
+								"type": "string"
+							},
+							"total_received": {
+								"type": "number",
+								"format": "double"
+							},
+							"total_sent": {
+								"type": "number",
+								"format": "double"
+							},
+							"balance": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"burnchain_unlock_height",
+							"burnchain_lock_height",
+							"lock_height",
+							"locked",
+							"lock_tx_id",
+							"total_received",
+							"total_sent",
+							"balance"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"non_fungible_tokens",
+					"fungible_tokens",
+					"stx"
+				],
+				"type": "object"
+			},
+			"AddressMempoolObject": {
+				"properties": {
+					"mempool_stats": {
+						"properties": {
+							"tx_count": {
+								"type": "number",
+								"format": "double"
+							},
+							"spent_txo_sum": {
+								"type": "number",
+								"format": "double"
+							},
+							"spent_txo_count": {
+								"type": "number",
+								"format": "double"
+							},
+							"funded_txo_sum": {
+								"type": "number",
+								"format": "double"
+							},
+							"funded_txo_count": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"tx_count",
+							"spent_txo_sum",
+							"spent_txo_count",
+							"funded_txo_sum",
+							"funded_txo_count"
+						],
+						"type": "object"
+					},
+					"chain_stats": {
+						"properties": {
+							"tx_count": {
+								"type": "number",
+								"format": "double"
+							},
+							"spent_txo_sum": {
+								"type": "number",
+								"format": "double"
+							},
+							"spent_txo_count": {
+								"type": "number",
+								"format": "double"
+							},
+							"funded_txo_sum": {
+								"type": "number",
+								"format": "double"
+							},
+							"funded_txo_count": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"tx_count",
+							"spent_txo_sum",
+							"spent_txo_count",
+							"funded_txo_sum",
+							"funded_txo_count"
+						],
+						"type": "object"
+					},
+					"address": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"mempool_stats",
+					"chain_stats",
+					"address"
+				],
+				"type": "object"
+			},
+			"AddressObject": {
+				"properties": {
+					"btcPubkeySegwit1": {
+						"type": "string"
+					},
+					"btcPubkeySegwit0": {
+						"type": "string"
+					},
+					"ordinalInfo": {
+						"$ref": "#/components/schemas/AddressMempoolObject"
+					},
+					"cardinalInfo": {
+						"$ref": "#/components/schemas/AddressMempoolObject"
+					},
+					"stacksTokenInfo": {
+						"$ref": "#/components/schemas/AddressHiroObject"
+					},
+					"stxBalance": {
+						"type": "number",
+						"format": "double"
+					},
+					"sBTCBalance": {
+						"type": "number",
+						"format": "double"
+					},
+					"ordinal": {
+						"type": "string"
+					},
+					"cardinal": {
+						"type": "string"
+					},
+					"stxAddress": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"stxBalance",
+					"sBTCBalance",
+					"ordinal",
+					"cardinal",
+					"stxAddress"
+				],
+				"type": "object"
 			},
 			"AddressValidationI": {
 				"properties": {
@@ -364,63 +400,7 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
-		"/bridge-api/{network}/v1/btc/tx/keys": {
-			"get": {
-				"operationId": "GetKeys",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/KeySet"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/btc/tx/commitment/{stxAddress}/{revealFee}": {
-			"get": {
-				"operationId": "Commitment",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/PeginScriptI"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "stxAddress",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "path",
-						"name": "revealFee",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/tx/commit-deposit-data/{stxAddress}/{revealFee}": {
+		"/bridge-api/{network}/v1/sbtc/build/deposit/{stxAddress}/{revealFee}": {
 			"get": {
 				"operationId": "CommitDepositData",
 				"responses": {
@@ -457,7 +437,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/btc/tx/commit-deposit/{data}": {
+		"/bridge-api/{network}/v1/sbtc/parse/deposit/{data}": {
 			"get": {
 				"operationId": "CommitDeposit",
 				"responses": {
@@ -485,7 +465,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/btc/tx/commit-withdrawal-data/{signature}/{amount}": {
+		"/bridge-api/{network}/v1/sbtc/build/withdrawal/{signature}/{amount}": {
 			"get": {
 				"operationId": "CommitWithdrawalData",
 				"responses": {
@@ -522,7 +502,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/btc/tx/commit-withdrawal/{data}/{sbtcWallet}/{compression}": {
+		"/bridge-api/{network}/v1/sbtc/parse/withdrawal/{data}/{sbtcWallet}": {
 			"get": {
 				"operationId": "CommitWithdrawal",
 				"responses": {
@@ -554,309 +534,6 @@
 						"schema": {
 							"type": "string"
 						}
-					},
-					{
-						"in": "path",
-						"name": "compression",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/tx/{txid}": {
-			"get": {
-				"operationId": "FetchRawTransaction",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "txid",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/tx/{txid}/hex": {
-			"get": {
-				"operationId": "FetchTransactionHex",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "txid",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/wallet/wallet/create/{wallet}": {
-			"get": {
-				"operationId": "CreateWallet",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "wallet",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/wallet/address/{address}/txs": {
-			"get": {
-				"operationId": "FetchAddressTransactions",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "address",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/wallet/getnewaddress/{addressType}": {
-			"get": {
-				"operationId": "GenerateNewAddress",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "addressType",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/wallet/loadwallet/{name}": {
-			"get": {
-				"operationId": "LoadWallet",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "name",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
-			}
-		},
-		"/bridge-api/{network}/v1/btc/wallet/listwallets": {
-			"get": {
-				"operationId": "ListWallets",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/btc/blocks/fee-estimate": {
-			"get": {
-				"operationId": "GetFeeEstimate",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/FeeEstimateResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/btc/blocks/info": {
-			"get": {
-				"operationId": "GetInfo",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/btc/blocks/count": {
-			"get": {
-				"operationId": "GetCount",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/sbtc/pegins/scan": {
-			"get": {
-				"operationId": "ScanPeginRequests",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/sbtc/pegins/commits/scan/{btcAddress}/{stxAddress}/{sbtcWalletAddress}/{revealFee}": {
-			"get": {
-				"operationId": "ScanCommitments",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "btcAddress",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "path",
-						"name": "stxAddress",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "path",
-						"name": "sbtcWalletAddress",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "path",
-						"name": "revealFee",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
 					}
 				]
 			}
@@ -876,11 +553,56 @@
 						}
 					}
 				},
+				"description": "//@Get(\"/events/save\")\npublic async saveAllSbtcEvents(): Promise<any> {\n  return await saveAllSbtcEvents();\n}\n\n//@Get(\"/events/index/stacks/:txid\")\npublic async indexSbtcEvent(txid:string): Promise<any> {\n  return await indexSbtcEvent(txid);\n}\n\n//@Get(\"/events/save/:page\")\npublic async saveSbtcEvents(page:number): Promise<any> {\n  return await saveSbtcEvents(page);\n}\n\n//@Get(\"/events/:page\")\npublic async findSbtcEvents(page:number): Promise<any> {\n  return await findSbtcEvents(page);\n}",
 				"security": [],
 				"parameters": [
 					{
 						"in": "path",
 						"name": "address",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/sbtc/address/balances/{stxAddress}/{cardinal}/{ordinal}": {
+			"get": {
+				"operationId": "FetchUserBalances",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AddressObject"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "cardinal",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "ordinal",
 						"required": true,
 						"schema": {
 							"type": "string"
@@ -923,59 +645,6 @@
 				},
 				"security": [],
 				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/config": {
-			"get": {
-				"operationId": "GetAllParam",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/bridge-api/{network}/v1/config/{param}": {
-			"get": {
-				"operationId": "GetParam",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"anyOf": [
-										{
-											"type": "string"
-										},
-										{
-											"type": "number",
-											"format": "double"
-										}
-									]
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "param",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					}
-				]
 			}
 		}
 	},

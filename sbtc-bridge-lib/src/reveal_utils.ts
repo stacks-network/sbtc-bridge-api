@@ -21,7 +21,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 				amount: BigInt(peginRequest.amount)
 			}
 		}
-		console.log('nextI: ', nextI)
+		//console.log('nextI: ', nextI)
 		tx.addInput(nextI);
 	} else if (script.paymentType === 'tr') {
 		if (!peginRequest.commitTxScript) throw new Error('Incorrect data passed')
@@ -118,7 +118,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 			//tapInternalKey,
 			tapMerkleRoot: script.tapMerkleRoot as Uint8Array
 		}
-		console.log('nextI: ', nextI)
+		//console.log('nextI: ', nextI)
 		tx.addInput(nextI);
 	}
 
@@ -151,6 +151,6 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 		}
 	}
 	const txBytes = hex.encode(tx.toBytes());
-	console.log('rawTransaction: ' + txBytes);
+	//console.log('rawTransaction: ' + txBytes);
 	return tx;
 }

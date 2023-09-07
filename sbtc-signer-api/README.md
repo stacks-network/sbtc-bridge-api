@@ -6,7 +6,7 @@
 
 Node Server for sBTC Bridge.
 
-[sbtc.world](https://sbtc.world).
+[sbtc.tech](https://sbtc.tech).
 
 ## Build
 

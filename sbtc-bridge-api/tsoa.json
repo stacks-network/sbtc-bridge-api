@@ -7,7 +7,7 @@
   "entryFile": "src/app.ts",
   "noImplicitAdditionalProperties": "throw-on-extras",
   "spec": {
-    "outputDirectory": "public",
+    "outputDirectory": "src",
     "specVersion": 3
   }
 }

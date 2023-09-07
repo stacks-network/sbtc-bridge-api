@@ -1,13 +1,13 @@
 # sbtc-bridge-lib
 
-![ci](https://github.com/Trust-Machines/sbtc-bridge-web)
+![ci](https://github.com/stacks-network/sbtc-bridge-web)
 
 
 ## Introduction
 
 Library and utility functions for the sBTC Bridge.
 
-[sbtc.world](https://sbtc.world).
+[sbtc.tech](https://sbtc.tech).
 
 ## Build
 

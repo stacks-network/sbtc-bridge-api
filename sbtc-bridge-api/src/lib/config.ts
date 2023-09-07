@@ -13,78 +13,17 @@ const SIMNNET_CONFIG = {
   btcRpcPwd: 'devnet',
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
   host: 'http://localhost', 
   port: PORT,
   network: 'simnet',
   walletPath: '/wallet/SBTC-0001',
-  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
+  sbtcContractId: 'ST3SPZXMPYVNHH3KF0RXNXVX1WVJ3QM1ZMD5FKWDN.romeo_mjc-2',
   stacksApi: 'http://localhost:3999',
   stacksExplorerUrl: 'http://localhost:8000',
   bitcoinExplorerUrl: 'http://localhost:3002',
   mempoolUrl: 'http://localhost:18443',
   blockCypherUrl: 'http://localhost:18443',
   publicAppName: 'sBTC Bridge Simnet API',
-  publicAppVersion: '1.0.0',
-}
-
-const TESTNET_CONFIG = {
-  environment: 'staging',
-  mongoDbUrl: '',
-  mongoDbName: '',
-  mongoUser: '',
-  mongoPwd: '',
-  btcNode: 'bitcoind.testnet.stacks.co',
-  btcRpcUser: 'blockstack',
-  btcRpcPwd: 'blockstacksystem',
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
-  host: 'http://localhost', 
-  port: 3010,
-  network: 'testnet',
-  walletPath: '/wallet/SBTC-0003',
-  //poxContractId: 'ST000000000000000000002AMW42H.pox-3',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
-  stacksApi: 'https://api.testnet.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
-  bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
-  mempoolUrl: 'https://mempool.space/testnet/api',
-  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Testnet API',
-  publicAppVersion: '1.0.0',
-}
-
-const MAINNET_CONFIG = {
-  environment: 'production',
-  mongoDbUrl: '',
-  mongoDbName: '',
-  mongoUser: '',
-  mongoPwd: '',
-  btcNode: 'bitcoind.stacks.co',
-  btcRpcUser: 'blockstack',
-  btcRpcPwd: 'blockstacksystem',
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
-  host: 'http://localhost',
-  port: 3020,
-  network: 'mainnet',
-  walletPath: '/wallet/descwallet',
-  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
-  sbtcContractId: 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN.sky-blue-elephant',
-  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
-  stacksApi: 'https://api.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
-  bitcoinExplorerUrl: 'https://mempool.space/api',
-  mempoolUrl: 'https://mempool.space/api',
-  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
   publicAppVersion: '1.0.0',
 }
 
@@ -99,14 +38,11 @@ const DEVNET_CONFIG = {
   btcRpcPwd: 'blockstacksystem', 
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContractId: 'ST3SPZXMPYVNHH3KF0RXNXVX1WVJ3QM1ZMD5FKWDN.romeo_mjc-2',
   stacksApi: 'http://devnet.stx.eco',
   stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -127,14 +63,11 @@ const LINODE_TESTNET_CONFIG = {
   btcRpcPwd: 'blockstacksystem',
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcMiniDeployer: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD',
+  sbtcContractId: 'ST3SPZXMPYVNHH3KF0RXNXVX1WVJ3QM1ZMD5FKWDN.romeo_mjc-2',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -155,14 +88,11 @@ const LINODE_MAINNET_CONFIG = {
   btcRpcPwd: '',
   btcSchnorrReveal: '',
   btcSchnorrReclaim: '',
-  btcSchnorrOracle: '',
   host: 'http://localhost',
   port: 3020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
-  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
-  sbtcContractId: 'ST306HDPY54T81RZ7A9NGA2F03B8NRGW6Y59ZRZSD.faint-tan-cobra',
-  sbtcMiniDeployer: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM',
+  sbtcContractId: 'ST3SPZXMPYVNHH3KF0RXNXVX1WVJ3QM1ZMD5FKWDN.romeo_mjc-2',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -182,14 +112,11 @@ let CONFIG: {
   btcRpcPwd: string; 
   btcSchnorrReveal: string; 
   btcSchnorrReclaim: string; 
-  btcSchnorrOracle: string; 
   host: string; 
   port: number; 
   walletPath: string; 
   network: string; 
-  poxContractId: string; 
   sbtcContractId: string; 
-  sbtcMiniDeployer: string; 
   stacksApi: string; 
   stacksExplorerUrl: string; 
   bitcoinExplorerUrl: string; 
@@ -204,8 +131,7 @@ export function setConfigOnStart() {
 	else if (isSimnet()) CONFIG = SIMNNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
-	else if (isTMTestnet()) CONFIG = TESTNET_CONFIG;
-	else CONFIG = MAINNET_CONFIG;
+	else CONFIG = LINODE_TESTNET_CONFIG;
   setOverrides();
 }
 
@@ -223,7 +149,6 @@ function setOverrides() {
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
     CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
     CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
-    CONFIG.btcSchnorrOracle = process.env.btcSchnorrOracle || '';
   }
   if (isSimnet() || isDev()) {
     // below are injected from the server environment but overridden  
@@ -238,7 +163,6 @@ function setOverrides() {
     CONFIG.btcRpcPwd = 'devnet'
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
-    CONFIG.btcSchnorrOracle = '0d7b49bc4864057b087108f81a57da7178cfbeb85a09c8957b64b9840e368b42'    
   }
   if (isLinodeTestnet() || isLinodeMainnet() || isDev()) {
     console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
@@ -252,8 +176,6 @@ function setOverrides() {
     console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
     console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(0,2))
     console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
-    console.log('linode env.. changing CONFIG.btcSchnorrOracle = ' + CONFIG.btcSchnorrOracle.substring(0,2))
-    console.log('linode env.. changing CONFIG.btcSchnorrOracle = ' + CONFIG.btcSchnorrOracle.substring(CONFIG.btcSchnorrOracle.length-3,CONFIG.btcSchnorrOracle.length))
   }
 }
 
@@ -276,31 +198,6 @@ function isLinodeMainnet() {
   const environ = process.env.NODE_ENV;
   return (environ && environ.indexOf('linode-production') > -1)
 }
-
-function isTMMainnet() {
-  const environ = process.env.NODE_ENV;
-  return ((!isLinodeTestnet() || isDev()) && (environ === 'production' || environ === 'prod'))
-}
-
-function isTMTestnet() {
-  const environ = process.env.NODE_ENV;
-  return ((!isLinodeTestnet() || isDev()) && (environ === 'staging' || environ === 'stag'))
-}
-
-/**
-export function setConfig(search:string) {
-	if (!search) setConfigOnStart();
-	else if (search.indexOf('net=testnet') > -1) {
-
-    if (isDev()) CONFIG = DEVNET_CONFIG;
-    else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
-    else CONFIG = TESTNET_CONFIG;
-  }
-	else if (search.indexOf('net=devnet') > -1) CONFIG = DEVNET_CONFIG;
-	else CONFIG = MAINNET_CONFIG
-  setOverrides();
-}
- */
 
 export function getConfig() {
   if (!CONFIG) setConfigOnStart();

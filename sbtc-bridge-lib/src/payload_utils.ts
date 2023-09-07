@@ -40,9 +40,7 @@ export function parseDepositPayload(d1:Uint8Array, amountSats: number):depositPa
 
 function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):depositPayloadType {
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
-	console.log('parseDepositPayloadNoPrincipal opcode: ', opcode)
 	const addr0 = parseInt(hex.encode(d1.subarray(1,2)), 8);
-	console.log('parseDepositPayloadNoPrincipal addr0: ', addr0)
 	const addr1 = hex.encode(d1.subarray(2,22));
 	const stacksAddress = c32address(addr0, addr1);
 	return {
@@ -63,17 +61,14 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPa
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3C') throw new Error('Wrong opcode for deposit: should be 3C was ' + opcode)
 	const prinType = parseInt(hex.encode(d1.subarray(1,2)), 8);
-	console.log('parseDepositPayloadNoMagic prinType: ', prinType)
 	if (prinType === 22 || prinType === 26) return parseDepositPayloadNoPrincipal(d1, amountSats)
-	const addr0 = parseInt(hex.encode(d1.subarray(2,3)), 8);
-	console.log('parseDepositPayloadNoMagic addr0: ', addr0)
+	const addr0 = parseInt(hex.encode(d1.subarray(2,3)), 16);
 	const addr1 = hex.encode(d1.subarray(3,23));
 	const stacksAddress = c32address(addr0, addr1);
 	const lengthOfCname = parseInt(hex.encode(d1.subarray(23,24)), 8);
 	let cname;
 	if (lengthOfCname > 0) {
 	  cname = new TextDecoder().decode(d1.subarray(24, 24 + lengthOfCname));
-	  console.log('parseDepositPayloadNoMagic cname: ', cname)
 	}
 
 	let current = 24 + lengthOfCname;
@@ -106,15 +101,15 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPa
 	};
 }
 
-/**
 export function amountToUint8(amt:number, size:number):Uint8Array {
 	const buffer = new ArrayBuffer(size);
 	const view = new DataView(buffer);
-	view.setUint32(0, amt); // Max unsigned 32-bit integer
+	view.setUint8(0, amt); // Max unsigned 32-bit integer
 	const res = new Uint8Array(view.buffer);
 	return res;
 }
 
+/**
 export function uint8ToAmount(buf:Uint8Array):number {
 	const hmmm = hex.decode(hex.encode(buf)) // needed to make work ?
 	const view = new DataView(hmmm.buffer);
@@ -188,6 +183,11 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAdd
 	};
 }
 
+export enum PrincipalType {
+	STANDARD = '05',
+	CONTRACT = '06'
+}
+
 export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array {
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
@@ -195,12 +195,19 @@ export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array 
 	const addr0Buf = hex.decode(addr[0].toString(16));
 	const addr1Buf = hex.decode(addr[1]);
 
+	const cnameLength = new Uint8Array(1);
+	const principalType = (address.indexOf('.') > -1) ? hex.decode(PrincipalType.CONTRACT.valueOf()) : hex.decode(PrincipalType.STANDARD.valueOf());
 	let buf1 = concat(opCodeBuf, addr0Buf, addr1Buf);
 	if (address.indexOf('.') > -1) {
 		const cnameBuf = new TextEncoder().encode(address.split('.')[1]);
-		buf1 = concat(buf1, cnameBuf);
+		const cnameLen = hex.decode(cnameBuf.length.toString(8));
+		if (cnameBuf.length > 40) throw new Error('Contract name is too long - max 40 characters')
+		buf1 = concat(buf1, cnameLen, cnameBuf);
+	} else {
+		cnameLength.fill(0);
+		buf1 = concat(buf1, cnameLength);
 	}
-			
+
 	return concat(magicBuf, buf1)
 }
 
@@ -208,9 +215,15 @@ export function buildDepositPayload(net:any, revealFee:number, address:string, o
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
 	const addr = c32addressDecode(address.split('.')[0])
-	const addr0Buf = hex.decode(addr[0].toString(8));
+	//const addr0Buf = hex.encode(amountToUint8(addr[0], 1));
+	const addr0Buf = (hex.decode(addr[0].toString(16)));
 	const addr1Buf = hex.decode(addr[1]);
 
+	console.log(addr)
+	console.log('addr0Buf: ' + hex.encode(addr0Buf))
+	console.log('address: ' + address)
+	console.log('opCodeBuf: ' + hex.encode(opCodeBuf))
+	
 	const cnameLength = new Uint8Array(1);
 	const memoLength = new Uint8Array(1);
 	const principalType = (address.indexOf('.') > -1) ? hex.decode('06') : hex.decode('05');
@@ -233,8 +246,6 @@ export function buildDepositPayload(net:any, revealFee:number, address:string, o
 		buf1 = concat(buf1, memoLength);
 	}
 	const feeBuf = amountToBigUint64(revealFee, 8)
-	console.log('buildDepositPayload: ' + hex.encode(feeBuf))
-	console.log('buildDepositPayload: ' + bigUint64ToAmount(feeBuf))
 	buf1 = concat(buf1, feeBuf)
 	
 	if (!opDrop) return concat(magicBuf, buf1)
@@ -248,7 +259,6 @@ export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Ar
 	//const amountRev = bigUint64ToAmount(amountBuf);
 	let data = concat(opCodeBuf, amountBuf, signature)
 	if (!opDrop) data = concat(magicBuf, opCodeBuf, amountBuf, signature);
-	console.log('buildWithdrawalPayload: ' + hex.encode(data))
 	return data;
 }
 
