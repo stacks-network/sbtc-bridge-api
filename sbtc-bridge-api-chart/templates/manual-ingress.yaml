@@ -4,7 +4,7 @@ metadata:
   name: api-sbtc-world
 spec:
   domains:
-    - api.sbtc.world
+    - api.sbtc.tech
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -14,11 +14,11 @@ metadata:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: "sbtc-bridge-api"
 {{/*    kubernetes.io/ingress.allow-http: "false"*/}}
-    external-dns.alpha.kubernetes.io/hostname: "api.sbtc.world"
-    networking.gke.io/managed-certificates: "api-sbtc-world"
+    external-dns.alpha.kubernetes.io/hostname: "api.sbtc.tech"
+    networking.gke.io/managed-certificates: "api-sbtc-tech"
 spec:
   rules:
-  - host: api.sbtc.world
+  - host: api.sbtc.tech
     http:
       paths:
       - path: /v1/mainnet/*

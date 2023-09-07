@@ -164,51 +164,6 @@ router.get("/tx/keys", async (req, res, next) => {
   }
 });
 
-router.get("/tx/commit-deposit-data/:stxAddress/:revealFee", async (req, res, next) => {
-  try {
-    const controller = new TransactionController();
-    const response = await controller.commitDepositData(req.params.stxAddress, Number(req.params.revealFee));
-    return res.send(response);
-  } catch (error) { 
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
-router.get("/tx/commit-deposit/:data", async (req, res, next) => {
-  try {
-    const controller = new TransactionController();
-    const response = await controller.commitDeposit(req.params.data);
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
-
-router.get("/tx/commit-withdrawal-data/:signature/:amount", async (req, res, next) => {
-  try {
-    const controller = new TransactionController();
-    const response = await controller.commitWithdrawalData(req.params.signature, Number(req.params.amount));
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.')
-  }
-});
-
-router.get("/tx/commit-withdrawal/:data/:sbtcWallet/:compression", async (req, res, next) => {
-  try {
-    const controller = new TransactionController();
-    const response = await controller.commitWithdrawal(req.params.data, req.params.sbtcWallet, Number(req.params.compression));
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
 router.get("/tx/commitment/:stxAddress/:revealFee", async (req, res, next) => {
   try {
     const controller = new TransactionController();

@@ -1,6 +1,6 @@
 # sbtc-signers
 
-![ci](https://github.com/Trust-Machines/sbtc-bridge-api)
+![ci](https://github.com/stacks-network/sbtc-bridge-api)
 
 ## Introduction
 
@@ -8,7 +8,7 @@ Sbtc-signers supports sBTC opertions with a public interface for signers.
 In sBTC signers are people who are helping to secure the sBTC protocol by
 signing sBTC deposits and withdrawals.
 
-[sbtc.world](https://signers.stx.eco).
+[sbtc.tech](https://signers.stx.eco).
 
 ## Development
 

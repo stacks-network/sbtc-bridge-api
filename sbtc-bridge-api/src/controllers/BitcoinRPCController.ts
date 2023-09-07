@@ -48,13 +48,13 @@ export const OPTIONS = {
 @Route("/bridge-api/:network/v1/btc/tx")
 export class TransactionController {
 
-  @Get("/keys")
+  //@Get("/keys")
   public getKeys(): KeySet {
     return {
       deposits: {
         revealPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReveal)),
         reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim)),
-        oraclePubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrOracle))
+        oraclePubKey: '' 
       }
     }
   }
@@ -150,8 +150,6 @@ export class TransactionController {
         transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
       } else if (wrappedPsbt.txtype === 'reveal') {
         transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
-      } else {
-        transaction.sign(hex.decode(getConfig().btcSchnorrOracle));
       }
       console.log('sign: signed');
       transaction.finalize();
@@ -212,7 +210,7 @@ export class TransactionController {
     return wrappedPsbt;
   }
   
-  @Get("/commitment/:stxAddress/:revealFee")
+  //@Get("/commitment/:stxAddress/:revealFee")
   public async commitment(stxAddress:string, revealFee:number): Promise<PeginScriptI> {
     const keys = this.getKeys();
 		console.log('reclaimAddr.pubkey: ' + keys.deposits.reclaimPubKey)
@@ -227,38 +225,12 @@ export class TransactionController {
 		return toStorable(script)
   }
   
-  @Get("/commit-deposit-data/:stxAddress/:revealFee")
-  public commitDepositData(stxAddress:string, revealFee:number): string {
-    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
-		return hex.encode(data);
-  }
-  
-  @Get("/commit-deposit/:data")
-  public commitDeposit(data:string): depositPayloadType {
-    const payload = parseDepositPayload(hex.decode(data), 0);
-		return payload;
-  }
-  
-  @Get("/commit-withdrawal-data/:signature/:amount")
-  public commitWithdrawalData(signature:string, amount:number): string {
-    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
-		return hex.encode(data);
-  }
-  
-  @Get("/commit-withdrawal/:data/:sbtcWallet/:compression")
-  public commitWithdrawal(data:string, sbtcWallet:string, compression:number): withdrawalPayloadType {
-    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
-		return payload;
-  }
-  
-  @Get("/:txid")
+  //@Get("/:txid")
   public async fetchRawTransaction(txid:string): Promise<any> {
     return await fetchRawTx(txid, true);
   } 
 
-  @Get("/:txid/hex")
+  //@Get("/:txid/hex")
   public async fetchTransactionHex(txid:string): Promise<any> {
     return await fetchTransactionHex(txid);
   }
@@ -300,14 +272,14 @@ export class WalletController {
     return result;
   }
 
-  @Get("/wallet/create/:wallet")
+  //@Get("/wallet/create/:wallet")
   public async createWallet(wallet:string): Promise<any> {
     //checkAddressForNetwork(getConfig().network, address)
     const result = await createWallet(wallet);
     return result;
   }
 
-  @Get("/address/:address/txs")
+  //@Get("/address/:address/txs")
   public async fetchAddressTransactions(address:string): Promise<any> {
     //checkAddressForNetwork(getConfig().network, address)
     const result = await fetchAddressTransactions(address);
@@ -344,14 +316,14 @@ export class WalletController {
     }
     return result;
   }
-  @Get("/getnewaddress/:addressType")
+  //@Get("/getnewaddress/:addressType")
   public async generateNewAddress(addressType:string): Promise<any> {
     //const wallets = await loadWallet("TBTC-0001");
     await generateNewAddress(addressType);
     const result = await loadWallet(addressType);
     return result;
   }
-  @Get("/loadwallet/:name")
+  //@Get("/loadwallet/:name")
   public async loadWallet(name:string): Promise<any> {
     const wallets = await listWallets();
     for (const wallet in wallets) {
@@ -366,7 +338,7 @@ export class WalletController {
     console.error('wallet: loaded: ' + name)
     return result;
   }
-  @Get("/listwallets")
+  //@Get("/listwallets")
   public async listWallets(): Promise<any> {
     const result = await listWallets();
     return result;
@@ -375,7 +347,7 @@ export class WalletController {
 @Route("/bridge-api/:network/v1/btc/blocks")
 export class BlocksController {
 
-  @Get("/fee-estimate")
+  //@Get("/fee-estimate")
   public async getFeeEstimate(): Promise<FeeEstimateResponse> {
     try {
       return fetchCurrentFeeRatesCypher();
@@ -384,11 +356,11 @@ export class BlocksController {
     }
   }
   
-  @Get("/info")
+  //@Get("/info")
     public async getInfo(): Promise<any> {
       return getBlockChainInfo();
   }
-  @Get("/count")
+  //@Get("/count")
     public async getCount(): Promise<any> {
       return getBlockCount();
   }

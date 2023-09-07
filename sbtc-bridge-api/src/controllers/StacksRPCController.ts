@@ -4,18 +4,47 @@ import { scanCommitments, savePeginCommit, scanPeginCommitTransactions, scanPegi
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
-import type { PeginRequestI, SbtcContractDataI, AddressObject } from 'sbtc-bridge-lib';
+import { type PeginRequestI, type SbtcContractDataI, type AddressObject, buildDepositPayload, depositPayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, withdrawalPayloadType } from 'sbtc-bridge-lib';
 import { getConfig } from '../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { TransactionController } from "../controllers/BitcoinRPCController.js";
+import * as btc from '@scure/btc-signer';
+import { hex } from '@scure/base';
 
 export interface BalanceI {
   balance: number;
 }
 
-@Route("/bridge-api/:network/v1/sbtc/pegins")
+@Route("/bridge-api/:network/v1/sbtc")
 export class DepositsController {
   
+  @Get("/build/deposit/:stxAddress/:revealFee")
+  public commitDepositData(stxAddress:string, revealFee:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
+		return hex.encode(data);
+  }
+  
+  @Get("/parse/deposit/:data")
+  public commitDeposit(data:string): depositPayloadType {
+    const payload = parseDepositPayload(hex.decode(data), 0);
+		return payload;
+  }
+  
+  @Get("/build/withdrawal/:signature/:amount")
+  public commitWithdrawalData(signature:string, amount:number): string {
+    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+    const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
+		return hex.encode(data);
+  }
+  
+  @Get("/parse/withdrawal/:data/:sbtcWallet")
+  public commitWithdrawal(data:string, sbtcWallet:string): withdrawalPayloadType {
+    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
+		return payload;
+  }
+  
+
   public async findPeginRequests(): Promise<any> {
     const result = await findPeginRequestsByFilter({ status: {$gt: -1}});
     return result;
@@ -51,13 +80,13 @@ export class DepositsController {
     }
   }
 
-  @Get("/scan")
+  //@Get("/scan")
   public async scanPeginRequests(): Promise<any> {
     await scanPeginRRTransactions();
     return await scanPeginCommitTransactions();
   }
 
-  @Get("/commits/scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee")
+  //@Get("/commits/scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee")
   public async scanCommitments(btcAddress:string,stxAddress:string, sbtcWalletAddress:string, revealFee:number): Promise<any> {
     const controller = new TransactionController();
     const commitment = await controller.commitment(stxAddress, Number(revealFee));
@@ -71,22 +100,22 @@ export class DepositsController {
 export class SbtcWalletController {
 
   /**
-  @Get("/events/save")
+  //@Get("/events/save")
   public async saveAllSbtcEvents(): Promise<any> {
     return await saveAllSbtcEvents();
   }
 
-  @Get("/events/index/stacks/:txid")
+  //@Get("/events/index/stacks/:txid")
   public async indexSbtcEvent(txid:string): Promise<any> {
     return await indexSbtcEvent(txid);
   }
 
-  @Get("/events/save/:page")
+  //@Get("/events/save/:page")
   public async saveSbtcEvents(page:number): Promise<any> {
     return await saveSbtcEvents(page);
   }
 
-  @Get("/events/:page")
+  //@Get("/events/:page")
   public async findSbtcEvents(page:number): Promise<any> {
     return await findSbtcEvents(page);
   }
@@ -97,6 +126,7 @@ export class SbtcWalletController {
     return await fetchUserSbtcBalance(address);
   }
 
+  @Get("/address/balances/:stxAddress/:cardinal/:ordinal")
   public async fetchUserBalances(stxAddress:string, cardinal:string, ordinal:string): Promise<AddressObject> {
     return await fetchUserBalances(stxAddress, cardinal, ordinal);
   }

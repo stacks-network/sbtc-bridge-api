@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Trust-Machines/sbtc-bridge-api.git"
+    "url": "git+https://github.com/stacks-network/sbtc-bridge-api.git"
   },
   "keywords": [
     "bitcoin",
@@ -24,9 +24,9 @@
   "author": "mike cohen",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Trust-Machines/sbtc-bridge-api/issues"
+    "url": "https://github.com/stacks-network/sbtc-bridge-api/issues"
   },
-  "homepage": "https://github.com/Trust-Machines/sbtc-bridge-api#readme",
+  "homepage": "https://github.com/stacks-network/sbtc-bridge-api#readme",
   "dependencies": {
     "@noble/secp256k1": "^2.0.0",
     "@scure/base": "^1.1.1",
