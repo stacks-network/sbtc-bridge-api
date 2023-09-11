@@ -6,7 +6,7 @@ import { fetchUserBalances } from '$lib/bridge_api'
 import type { SbtcConfig } from '$types/sbtc_config';
 import { StacksTestnet, StacksMainnet, StacksMocknet } from '@stacks/network';
 import { openSignatureRequestPopup, type StacksProvider } from '@stacks/connect';import { AppConfig, UserSession, showConnect, getStacksProvider } from '@stacks/connect';
-import type { AddressObject, SbtcContractDataI } from 'sbtc-bridge-lib' 
+import type { AddressObject, SbtcContractDataType } from 'sbtc-bridge-lib' 
 import { verifyMessageSignature } from '@stacks/encryption';
 import { defaultSbtcConfig } from '$lib/sbtc';
 import { fetchExchangeRates } from "$lib/bridge_api"
@@ -330,7 +330,7 @@ export async function initApplication(conf:SbtcConfig, fromLogin:boolean|undefin
 	sbtcConfig.update(() => conf);
 }
 
-export function checkWalletAddress (sbtcContractData:SbtcContractDataI) {
+export function checkWalletAddress (sbtcContractData:SbtcContractDataType) {
 	if (!sbtcContractData) return
 	const net = (CONFIG.VITE_NETWORK === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const fullPK = sbtcContractData.sbtcWalletPublicKey;        //sbtcContractData.coordinator?.key?.value?.split('x')[1];

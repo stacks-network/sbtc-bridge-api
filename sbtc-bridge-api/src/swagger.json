@@ -6,7 +6,7 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"depositPayloadType": {
+			"DepositPayloadType": {
 				"properties": {
 					"amountSats": {
 						"type": "number",
@@ -52,7 +52,7 @@
 				],
 				"type": "object"
 			},
-			"withdrawalPayloadType": {
+			"WithdrawalPayloadType": {
 				"properties": {
 					"dustAmount": {
 						"type": "number",
@@ -308,7 +308,7 @@
 				],
 				"type": "object"
 			},
-			"SbtcContractDataI": {
+			"SbtcContractDataType": {
 				"properties": {
 					"addressValidation": {
 						"$ref": "#/components/schemas/AddressValidationI"
@@ -446,7 +446,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/depositPayloadType"
+									"$ref": "#/components/schemas/DepositPayloadType"
 								}
 							}
 						}
@@ -511,7 +511,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/withdrawalPayloadType"
+									"$ref": "#/components/schemas/WithdrawalPayloadType"
 								}
 							}
 						}
@@ -620,7 +620,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/SbtcContractDataI"
+									"$ref": "#/components/schemas/SbtcContractDataType"
 								}
 							}
 						}

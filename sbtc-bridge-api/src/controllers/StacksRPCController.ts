@@ -4,7 +4,7 @@ import { scanCommitments, savePeginCommit, scanPeginCommitTransactions, scanPegi
 import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
-import { type PeginRequestI, type SbtcContractDataI, type AddressObject, buildDepositPayload, depositPayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, withdrawalPayloadType } from 'sbtc-bridge-lib';
+import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, DepositPayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, WithdrawalPayloadType } from 'sbtc-bridge-lib';
 import { getConfig } from '../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { TransactionController } from "../controllers/BitcoinRPCController.js";
@@ -26,7 +26,7 @@ export class DepositsController {
   }
   
   @Get("/parse/deposit/:data")
-  public commitDeposit(data:string): depositPayloadType {
+  public commitDeposit(data:string): DepositPayloadType {
     const payload = parseDepositPayload(hex.decode(data), 0);
 		return payload;
   }
@@ -39,7 +39,7 @@ export class DepositsController {
   }
   
   @Get("/parse/withdrawal/:data/:sbtcWallet")
-  public commitWithdrawal(data:string, sbtcWallet:string): withdrawalPayloadType {
+  public commitWithdrawal(data:string, sbtcWallet:string): WithdrawalPayloadType {
     const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
 		return payload;
   }
@@ -60,12 +60,12 @@ export class DepositsController {
     return result;
   }
 
-  public async savePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+  public async savePeginCommit(peginRequest:BridgeTransactionType): Promise<any> {
     const result = await savePeginCommit(peginRequest);
     return result;
   }
 
-  public async updatePeginCommit(peginRequest:PeginRequestI): Promise<any> {
+  public async updatePeginCommit(peginRequest:BridgeTransactionType): Promise<any> {
     const p = await findPeginRequestById(peginRequest._id);
     if (p && p.status === 1) {
       const up = {
@@ -132,12 +132,12 @@ export class SbtcWalletController {
   }
 
   @Get("/data")
-  public async fetchSbtcContractData(): Promise<SbtcContractDataI> {
-    let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
+  public async fetchSbtcContractData(): Promise<SbtcContractDataType> {
+    let sbtcContractData:SbtcContractDataType = {} as SbtcContractDataType;
     try {
       sbtcContractData = await fetchNoArgsReadOnly();
     } catch (err:any) {
-      sbtcContractData = {} as SbtcContractDataI;
+      sbtcContractData = {} as SbtcContractDataType;
       console.log(err.message)
     }
     try {

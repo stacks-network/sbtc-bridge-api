@@ -4,7 +4,7 @@ import { getBlock } from './rpc_blockchain.js';
 import { fetchTransaction, fetchTransactionHex } from './mempool_api.js';
 import { getConfig } from '../config.js';
 import { readDepositValue, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
-import type { payloadType } from 'sbtc-bridge-lib';
+import type { PayloadType } from 'sbtc-bridge-lib';
 
 export async function sendRawTxRpc(hex:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}]}`;
@@ -44,7 +44,7 @@ export async function fetchPegTxData(txid:string, verbose:boolean) {
   //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
   const sbtcWalletAddress = parseSbtcWalletAddress(getConfig().network, res.vout);
   const pegInAmountSats = readDepositValue(res.vout);
-  const payload = {} as payloadType;
+  const payload = {} as PayloadType;
   payload.payload = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress.bitcoinAddress, pegInAmountSats);
   payload.sbtcWallet = sbtcWalletAddress.bitcoinAddress;
   payload.burnBlockHeight = res.block.height;

@@ -7,7 +7,7 @@ import { fetchPegTxData } from './BitcoinRpc.js';
 import fetch from 'node-fetch';
 import { findAlphaEventsByFilter, countAlphaEvents, saveNewAlphaEvent } from '../../../lib/database/db_models.js';
 import util from 'util'
-import type { SbtcAlphaEvent, payloadType } from 'sbtc-bridge-lib';
+import type { SbtcAlphaEvent, PayloadType } from 'sbtc-bridge-lib';
 
 const limit = 10;
 
@@ -63,7 +63,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
-      const payloadData:payloadType = await fetchPegTxData(edata.value, true);
+      const payloadData:PayloadType = await fetchPegTxData(edata.value, true);
       console.log('indexEvents: ', util.inspect(payloadData, false, null, true /* enable colors */));
 
       let newEvent:SbtcAlphaEvent = {

@@ -1,7 +1,7 @@
 import express from "express";
 import { TransactionController, BlocksController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
-import type { PeginRequestI } from 'sbtc-bridge-lib';
+import type { BridgeTransactionType } from 'sbtc-bridge-lib';
 
 const router = express.Router();
 
@@ -186,7 +186,7 @@ router.get("/pegins", async (req, res, next) => {
 router.post("/pegins", async (req, res, next) => {
   try {
     console.log('/sbtc/pegins', req.body);
-    const peginRequest:PeginRequestI = req.body;
+    const peginRequest:BridgeTransactionType = req.body;
     if (peginRequest.status === 1 || peginRequest.status === 5) {
       const controller = new DepositsController();
       const response = await controller.savePeginCommit(peginRequest);
@@ -201,10 +201,10 @@ router.post("/pegins", async (req, res, next) => {
 });
 
 /**
-router.put("/pegins", async (req, res, next) => {
+router.put("/pegins/:id", async (req, res, next) => {
   try {
     console.log('/sbtc/pegins', req.body);
-    const peginRequest:PeginRequestI = req.body;
+    const peginRequest:BridgeTransactionType = req.body;
     const controller = new DepositsController();
     const response = await controller.updatePeginCommit(peginRequest);
     return res.send(response);

@@ -4,7 +4,7 @@ import { hex } from '@scure/base';
 import { c32address, c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
 import { bitcoinToSats } from './formatting.js'
-import type { withdrawalPayloadType, depositPayloadType, payloadType } from './types/sbtc_types.js'
+import type { WithdrawalPayloadType, DepositPayloadType, PayloadType } from './types/sbtc_types.js'
 import { verifyMessageSignature, hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
@@ -30,7 +30,7 @@ keySetForFeeCalculation.push({
   schnorrPub: secp.getPublicKey(priv, false)
 })
 
-export function parseDepositPayload(d1:Uint8Array, amountSats: number):depositPayloadType {
+export function parseDepositPayload(d1:Uint8Array, amountSats: number):DepositPayloadType {
 	const magicOp = getMagicAndOpCode(d1);
 	if (magicOp.magic) {
 		return parseDepositPayloadNoMagic(d1.subarray(2), amountSats);
@@ -38,7 +38,7 @@ export function parseDepositPayload(d1:Uint8Array, amountSats: number):depositPa
 	return parseDepositPayloadNoMagic(d1, amountSats);
 }
 
-function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):depositPayloadType {
+function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):DepositPayloadType {
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	const addr0 = parseInt(hex.encode(d1.subarray(1,2)), 8);
 	const addr1 = hex.encode(d1.subarray(2,22));
@@ -56,7 +56,7 @@ function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):depos
 	};
 }
 
-function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):depositPayloadType {
+function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):DepositPayloadType {
     //console.log('payload rev: ', hex.encode(d1))
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3C') throw new Error('Wrong opcode for deposit: should be 3C was ' + opcode)
@@ -140,7 +140,7 @@ export function bigUint64ToAmount(buf:Uint8Array):number {
 	return Number(amt);
 }
 
-export function parseWithdrawalPayload(network:string, d1:Uint8Array, bitcoinAddress:string):withdrawalPayloadType {
+export function parseWithdrawalPayload(network:string, d1:Uint8Array, bitcoinAddress:string):WithdrawalPayloadType {
 	const magicOp = getMagicAndOpCode(d1);
 	if (magicOp.magic) {
 		return parseWithdrawalPayloadNoMagic(network, d1.subarray(2), bitcoinAddress);
@@ -148,7 +148,7 @@ export function parseWithdrawalPayload(network:string, d1:Uint8Array, bitcoinAdd
 	return parseWithdrawalPayloadNoMagic(network, d1, bitcoinAddress);
 }
 
-function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAddress:string):withdrawalPayloadType {
+function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAddress:string):WithdrawalPayloadType {
 	//console.log('parseWithdrawalPayloadNoMagic: d1: ', hex.encode(d1))
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3E') throw new Error('Wrong opcode for withdraw: should be 3E was ' + opcode)
@@ -323,7 +323,7 @@ export function parseOutputs(network:string, output0:any, bitcoinAddress:string,
 	const witnessData = getMagicAndOpCode(d1);
 	witnessData.txType = output0.scriptPubKey.type;
 
-	let innerPayload:withdrawalPayloadType|depositPayloadType;
+	let innerPayload:WithdrawalPayloadType|DepositPayloadType;
 	if (witnessData.opcode === '3C') {
 		innerPayload = parseDepositPayload(d1, amountSats);
 		return innerPayload;
@@ -346,7 +346,7 @@ function parseOutputsBitcoinCore(network:string, output0:any, bitcoinAddress:str
 	const witnessData = getMagicAndOpCode(d1);
 	witnessData.txType = txType;
 
-	let innerPayload:withdrawalPayloadType|depositPayloadType;
+	let innerPayload:WithdrawalPayloadType|DepositPayloadType;
 	if (witnessData.opcode === '3C') {
 		innerPayload = parseDepositPayload(d1, amountSats);
 		return innerPayload;

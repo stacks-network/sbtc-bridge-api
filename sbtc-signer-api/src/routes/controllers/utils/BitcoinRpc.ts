@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import { getConfig } from '../../../lib/config.js';
 //import { parseSbtcWalletAddress, parseOutputsBitcoinCore } from './payload_helper.js'
-import { payloadType, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
+import { PayloadType, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
 import { fetchTransaction, fetchTransactionHex } from './MempoolApi.js';
 import { hex } from '@scure/base';
 import { c32address, c32addressDecode } from 'c32check';
@@ -39,7 +39,7 @@ export async function fetchPegTxData(txid:string, verbose:boolean) {
   const struc = parseSbtcWalletAddress(getConfig().network, res.vout);
   const sbtcWalletAddress = struc.bitcoinAddress;
   const pegInAmountSats = struc.amountSats;
-  let parsed:payloadType = {
+  let parsed:PayloadType = {
     sbtcWallet: sbtcWalletAddress,
     burnBlockHeight: (res.status) ? res.status.block_height : 0,
   };

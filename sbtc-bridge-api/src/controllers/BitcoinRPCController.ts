@@ -10,7 +10,7 @@ import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
 import { schnorr } from '@noble/curves/secp256k1';
 import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
-import type { KeySet, WrappedPSBT, PeginRequestI, PeginScriptI, withdrawalPayloadType, depositPayloadType } from 'sbtc-bridge-lib'
+import type { KeySet, WrappedPSBT, BridgeTransactionType, CommitmentScriptDataType, WithdrawalPayloadType, DepositPayloadType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
 import { checkAddressForNetwork, toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
@@ -85,7 +85,7 @@ export class TransactionController {
   
     console.log('sign: ', wrappedPsbt);
     console.log('sign: stxAddresses: ', stxAddresses);
-    const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId);
+    const pegin:BridgeTransactionType = await findPeginRequestById(wrappedPsbt.depositId);
   
     if (pegin.originator !== stacksAddress) {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'Stgacks address of signer is different to the deposit originator: ' + pegin.originator + ' p2pkh address recovered: ' + stacksAddress };
@@ -94,7 +94,7 @@ export class TransactionController {
   
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
   
-    const transaction:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+    const transaction:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
     const script = toStorable(pegin.commitTxScript)
     
     console.log('sign: btcTxid: ', pegin.btcTxid);
@@ -158,7 +158,7 @@ export class TransactionController {
       wrappedPsbt.broadcastResult = { failed: true, reason: err.message }
       return wrappedPsbt;      
     }
-    //const tx = btc.Transaction.fromRaw(hex.decode(wrappedPsbt.tx), { allowUnknowInput: true, allowUnknowOutput: true });
+    //const tx = btc.Transaction.fromRaw(hex.decode(wrappedPsbt.tx), { allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
     wrappedPsbt.signedPsbt = base64.encode(transaction.toPSBT())
     //console.log('b64: ', wrappedPsbt.signedPsbt)
     const ttttt = btc.Transaction.fromPSBT(transaction.toPSBT());
@@ -177,7 +177,7 @@ export class TransactionController {
       const result = await this.sendRawTransaction(signedTx);
       console.log(result)
       wrappedPsbt.broadcastResult = result;
-      const pegin:PeginRequestI = await findPeginRequestById(wrappedPsbt.depositId);
+      const pegin:BridgeTransactionType = await findPeginRequestById(wrappedPsbt.depositId);
       let upd = undefined;
       if (wrappedPsbt.txtype === 'reclaim') {
         if (wrappedPsbt.broadcastResult.tx) {
@@ -211,7 +211,7 @@ export class TransactionController {
   }
   
   //@Get("/commitment/:stxAddress/:revealFee")
-  public async commitment(stxAddress:string, revealFee:number): Promise<PeginScriptI> {
+  public async commitment(stxAddress:string, revealFee:number): Promise<CommitmentScriptDataType> {
     const keys = this.getKeys();
 		console.log('reclaimAddr.pubkey: ' + keys.deposits.reclaimPubKey)
 		console.log('revealAddr.pubkey: ' + keys.deposits.revealPubKey)

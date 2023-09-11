@@ -2,7 +2,7 @@ import {Get,Post,Route,Body,Query,Header,Path,SuccessResponse,Controller as Rout
 import { fetchAllowanceContractCallers, fetchDelegationInfo, fetchPoxInfo, getNumRewardSetPoxAddresses, getTotalPoxRejection, isPoxActive, rewardCycleToBurnHeight, getRewardSetSize, getTotalUstxStacked, getStackingMinimum } from './utils/StacksSignersApi.js'
 import { getConfig } from '../../lib/config.js';
 import type { PoxCycleInfo } from 'sbtc-bridge-lib'
-import type { AddressObject, SbtcContractDataI } from 'sbtc-bridge-lib';
+import type { AddressObject, SbtcContractDataType } from 'sbtc-bridge-lib';
 import { deserializeCV, cvToJSON } from 'micro-stacks/clarity';
 import { getBlockCount, validateAddress } from './utils/BitcoinRpc.js'
 import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcAlphaWalletAddress } from './utils/StacksAlphaApi.js';
@@ -11,12 +11,12 @@ import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalan
 
 export class SbtcAlphaController extends Router {
   
-  public async fetchSbtcAlphaContractData(): Promise<SbtcContractDataI> {
-    let sbtcContractData:SbtcContractDataI = {} as SbtcContractDataI;
+  public async fetchSbtcAlphaContractData(): Promise<SbtcContractDataType> {
+    let sbtcContractData:SbtcContractDataType = {} as SbtcContractDataType;
     try {
       sbtcContractData = await fetchNoArgsReadOnly();
     } catch (err:any) {
-      sbtcContractData = {} as SbtcContractDataI;
+      sbtcContractData = {} as SbtcContractDataType;
       console.log(err.message)
     }
     try {

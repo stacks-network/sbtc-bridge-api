@@ -6,7 +6,7 @@ import {
   getStacksSimpleHashOfDataToSign, getStacksAddressFromSignature
 } from '../src/index';
 import { sbtcWallets } from '../src/index';
-import { hex } from '@scure/base';
+import { base58, base58check, hex } from '@scure/base';
 import { commit1 } from './payload.data';
 import { fail, deepStrictEqual } from 'assert';
 import assert from 'assert';
@@ -19,6 +19,18 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   })
 
   beforeEach(async () => {
+  })
+
+  it.concurrent('Convert wif to private key', async () => {
+    const wif = 'cRGhcDVSoLrPLhweao82kNwZHc4BB3QhXxH6JyJrpJkFmUhr7QRn';
+    const decWif = base58.decode(wif)
+    let pk;
+    pk = decWif.subarray(0, decWif.length - 4) // last 4 bytes are checksum
+    pk = pk.subarray(1)
+    console.log(pk.length)
+    console.log(hex.encode(pk))
+    expect(pk.length).equals(33)
+    expect(hex.encode(pk)).equals('6e16df46e3ca6e21dfcb69cb50836766d378f9eef4fba0ec85022f5f880f463901')
   })
 
   it.concurrent('Check parsing deposit payload fails for out of date payload', async () => {
