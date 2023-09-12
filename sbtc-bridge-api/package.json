@@ -59,6 +59,7 @@
     "@scure/bip32": "^1.1.0",
     "@scure/btc-signer": "^1.1.0",
     "@stacks/encryption": "^6.2.0",
+    "@stacks/transactions": "^6.7.0",
     "@vitest/coverage-c8": "^0.29.1",
     "body-parser": "^1.20.1",
     "c32check": "^2.0.0",
