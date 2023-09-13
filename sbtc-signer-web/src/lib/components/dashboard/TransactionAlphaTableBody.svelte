@@ -6,7 +6,7 @@ import { sbtcConfig } from '$stores/stores';
 import { fetchAlphaEvents } from '$lib/events_api'
 import { satsToBitcoin, tsToDate, truncate, fmtNumber } from 'sbtc-bridge-lib'
 import ArrowUpRight from '$lib/components/shared/ArrowUpRight.svelte';
-import type { SbtcAlphaEvent, payloadType } from 'sbtc-bridge-lib';
+import type { SbtcAlphaEvent, PayloadType } from 'sbtc-bridge-lib';
 
 import { goto } from '$app/navigation';
 

@@ -1,10 +1,3 @@
-export type SigData = {
-  pegin: boolean; 
-  webWallet: boolean; 
-  signature?: string;
-  outputsForDisplay: any;
-  inputsForDisplay: any;
-}
 export type SbtcMiniContractsI = {
   [key: string]: string
 }
@@ -35,7 +28,7 @@ export type SbtcMiniContractDataI = {
   burnHeight?: number;
 };
 
-export type SbtcContractDataI = {
+export type SbtcContractDataType = {
   coordinator?: { addr: { value: string }, key:string };
   contractOwner: string;
   sbtcWalletAddress: string;
@@ -60,13 +53,13 @@ export type AddressValidationI = {
   witness_version: number;
   witness_program: string;
 }
-export type SbtcBalance = {
+export type SbtcBalanceType = {
 	cardinal?: string;
 	ordinal?: string;
   address:string;
   balance:number;
 };
-export type PeginRequestI = {
+export type BridgeTransactionType = {
   _id?:string;
   originator: string;
   status: number;
@@ -85,7 +78,7 @@ export type PeginRequestI = {
   reclaimPub?: string;
   stacksAddress: string;
   sbtcWalletAddress: string;
-  commitTxScript?: PeginScriptI;
+  commitTxScript?: CommitmentScriptDataType;
   vout0?: VoutI;
   vout?: VoutI;
 }
@@ -93,7 +86,7 @@ export type RevealOrReclaim = {
   btcTxid?: string;
   signedPsbtHex?: string;
 }
-export type PeginScriptI = {
+export type CommitmentScriptDataType = {
   address?: string;
   script: string|Uint8Array|undefined;
   paymentType: string;
@@ -114,7 +107,7 @@ export type VoutI = {
   value: number;
 }
 export type PegInData = {
-	requestData?: PeginRequestI;
+	requestData?: BridgeTransactionType;
 	confirmations?: number;
 	burnHeight?: number;
 	stacksAddress?: string;
@@ -206,22 +199,22 @@ export type SbtcAlphaEvent = {
   eventIndex: string;
   txid: string;
   bitcoinTxid: string;
-  payloadData:payloadType;
+  payloadData:PayloadType;
 }
 
-export type payloadType = {
+export type PayloadType = {
   sbtcWallet:string;
   burnBlockHeight?:number;
-  payload?:withdrawalPayloadType|depositPayloadType;
+  payload?:WithdrawalPayloadType|DepositPayloadType;
 }
-export type withdrawalPayloadType = {
+export type WithdrawalPayloadType = {
   opcode: string;
   stacksAddress: string;
   signature: string;
   amountSats: number;
   dustAmount?: number;
 };
-export type depositPayloadType = {
+export type DepositPayloadType = {
   opcode: string;
   prinType: number;
   stacksAddress: string;

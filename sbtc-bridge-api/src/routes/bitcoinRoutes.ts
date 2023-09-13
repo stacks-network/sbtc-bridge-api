@@ -51,6 +51,7 @@ router.get("/wallet/validate/:address", async (req, res, next) => {
 
 router.post("/wallet/walletprocesspsbt", async (req, res, next) => {
   try {
+    console.log(req.headers)
     const tx = req.body;
     const controller = new WalletController();
     const response = await controller.processPsbt(tx.hex);
@@ -231,7 +232,7 @@ router.post("/tx/sendrawtx", async (req, res, next) => {
     const result = await controller.sendRawTransaction(tx.hex);
     console.log('/btc/tx/sendrawtx', result);
     return res.send(result);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }

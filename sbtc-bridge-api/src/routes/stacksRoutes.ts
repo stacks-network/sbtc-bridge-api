@@ -1,7 +1,8 @@
 import express from "express";
 import { TransactionController, BlocksController, WalletController } from "../controllers/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
-import type { PeginRequestI } from 'sbtc-bridge-lib';
+import type { BridgeTransactionType } from 'sbtc-bridge-lib';
+import { isUpdateAllowed } from "../lib/stacks_helper.js";
 
 const router = express.Router();
 
@@ -10,7 +11,7 @@ router.get("/build/deposit/:stxAddress/:revealFee", async (req, res, next) => {
     const controller = new DepositsController();
     const response = await controller.commitDepositData(req.params.stxAddress, Number(req.params.revealFee));
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -161,7 +162,7 @@ router.get("/wallet-address", async (req, res, next) => {
   }
 });
 
-router.get("/pegins/search/:stxAddress", async (req, res, next) => {
+router.get("/bridgetx/search/:stxAddress", async (req, res, next) => {
   try {
     const controller = new DepositsController();
     const response = await controller.findPeginRequestsByStacksAddress(req.params.stxAddress);
@@ -172,7 +173,7 @@ router.get("/pegins/search/:stxAddress", async (req, res, next) => {
   }
 });
 
-router.get("/pegins", async (req, res, next) => {
+router.get("/bridgetx", async (req, res, next) => {
   try {
     const controller = new DepositsController();
     const response = await controller.findPeginRequests();
@@ -183,10 +184,15 @@ router.get("/pegins", async (req, res, next) => {
   }
 });
 
-router.post("/pegins", async (req, res, next) => {
+router.post("/bridgetx", async (req, res, next) => {
   try {
-    console.log('/sbtc/pegins', req.body);
-    const peginRequest:PeginRequestI = req.body;
+    console.log('/sbtc/bridgetx', req.body);
+    //if (req.body) return res.send('well done');
+    const peginRequest:BridgeTransactionType = req.body;
+    if (!isUpdateAllowed(req, peginRequest.originator)) {
+      res.sendStatus(401)
+      return;
+    }
     if (peginRequest.status === 1 || peginRequest.status === 5) {
       const controller = new DepositsController();
       const response = await controller.savePeginCommit(peginRequest);
@@ -200,11 +206,14 @@ router.post("/pegins", async (req, res, next) => {
   }
 });
 
-/**
-router.put("/pegins", async (req, res, next) => {
+router.put("/bridgetx/:id", async (req, res, next) => {
   try {
-    console.log('/sbtc/pegins', req.body);
-    const peginRequest:PeginRequestI = req.body;
+    console.log('/sbtc/bridgetx', req.body);
+    const peginRequest:BridgeTransactionType = req.body;
+    if (!isUpdateAllowed(req, peginRequest.originator)) {
+      res.sendStatus(401)
+      return;
+    }
     const controller = new DepositsController();
     const response = await controller.updatePeginCommit(peginRequest);
     return res.send(response);
@@ -213,7 +222,6 @@ router.put("/pegins", async (req, res, next) => {
     next('An error occurred fetching sbtc data.') 
   }
 });
- */
 
 router.get("/pegin-scan", async (req, res, next) => {
   try {
@@ -237,7 +245,7 @@ router.get("/commit-scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee",
   }
 });
 
-router.get("/pegins/:_id", async (req, res, next) => {
+router.get("/bridgetx/:_id", async (req, res, next) => {
   try {
     const controller = new DepositsController();
     const response = await controller.findPeginRequestById(req.params._id);

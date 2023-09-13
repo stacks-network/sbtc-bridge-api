@@ -2,7 +2,7 @@ import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
 import * as P from 'micro-packed';
 import { hex } from '@scure/base';
-import type { PeginRequestI, UTXO } from './types/sbtc_types.js' 
+import type { BridgeTransactionType, UTXO } from './types/sbtc_types.js' 
 import { toStorable, buildDepositPayload, buildDepositPayloadOpReturn } from './payload_utils.js' 
 import { addInputs, inputAmt } from './wallet_utils.js';
 
@@ -28,7 +28,7 @@ export function buildOpReturnDepositTransaction(network:string, amount:number, b
 	if (!stacksAddress) throw new Error('Stacks address required!');
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
 	const txFees = calculateDepositFees(network, false, amount, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
-	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// no reveal fee for op_return
 	addInputs(network, amount, 0, tx, false, addressInfo.utxos, userPaymentPubKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
@@ -51,7 +51,7 @@ export function buildOpReturnDepositTransaction(network:string, amount:number, b
 export function buildOpDropDepositTransaction (network:string, amount:number, btcFeeRates:any, addressInfo:any, commitTxAddress:string, cardinal:string, userPaymentPubKey:string) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const txFees = calculateDepositFees(network, true, amount, btcFeeRates.feeInfo, addressInfo, commitTxAddress, undefined)
-	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
 	tx.addOutputAddress(commitTxAddress, BigInt(amount), net );
 	const changeAmount = inputAmt(tx) - (amount + txFees[1]); 
@@ -59,13 +59,13 @@ export function buildOpDropDepositTransaction (network:string, amount:number, bt
 	return tx;
 }
 
-export function getOpReturnDepositRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
+export function getOpReturnDepositRequest(network:string, amount:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):BridgeTransactionType {
 	if (!stacksAddress) throw new Error('Stacks address missing')
 	const data = buildDepositPayloadOpReturn(network, stacksAddress);
 	//console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
 	//console.log('revealAddr.pubkey: ' + commitKeys.revealPubKey)
 	
-	const req:PeginRequestI = {
+	const req:BridgeTransactionType = {
 		originator: stacksAddress,
 		fromBtcAddress: cardinal,
 		revealPub: commitKeys.revealPubKey,
@@ -82,7 +82,7 @@ export function getOpReturnDepositRequest(network:string, amount:number, commitK
 	return req;
 }
 
-export function getOpDropDepositRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):PeginRequestI {
+export function getOpDropDepositRequest(network:string, revealFee:number, commitKeys:any, stacksAddress:string, sbtcWalletAddress:string, cardinal:string):BridgeTransactionType {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	if (!stacksAddress) throw new Error('Address needed')
 	//console.log('reclaimAddr.pubkey: ' + commitKeys.reclaimPubKey)
@@ -94,7 +94,7 @@ export function getOpDropDepositRequest(network:string, revealFee:number, commit
 		{ script: btc.Script.encode(['IF', 144, 'CHECKSEQUENCEVERIFY', 'DROP', hex.decode(commitKeys.reclaimPubKey), 'CHECKSIG', 'ENDIF']) },
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
-	const req:PeginRequestI = {
+	const req:BridgeTransactionType = {
 		originator: stacksAddress,
 		fromBtcAddress: cardinal,
 		revealPub: commitKeys.revealPubKey,
@@ -130,7 +130,7 @@ export function calculateDepositFees (network:string, opDrop:boolean, amount:num
 	try {
 		const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 		let vsize = 0;
-		const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+		const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 		addInputs(network, amount, revealPayment, tx, true, addressInfo.utxos, hex.encode(secp.getPublicKey(privKey, true)));
 		if (!opDrop) {
 			if (data) tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });

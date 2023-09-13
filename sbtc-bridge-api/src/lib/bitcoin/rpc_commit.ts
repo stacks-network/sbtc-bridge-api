@@ -1,12 +1,12 @@
 import { fetchAddressTransactions, fetchUTXOs } from './mempool_api.js';
 import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
-import type { PeginRequestI, PeginScriptI } from 'sbtc-bridge-lib'
+import type { BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
 import { buildDepositPayload } from 'sbtc-bridge-lib' 
 import { getConfig } from '../config.js';
 import { hex } from '@scure/base';
 
-export async function savePeginCommit(peginRequest:PeginRequestI) {
+export async function savePeginCommit(peginRequest:BridgeTransactionType) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;
   if (!peginRequest.updated) peginRequest.updated = new Date().getTime();
   const result = await saveNewPeginRequest(peginRequest);
@@ -18,7 +18,7 @@ export async function findPeginRequests():Promise<Array<any>> {
   return findPeginRequestsByFilter({});
 }
 
-async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Promise<number> {
+async function matchCommitmentIn(txs:Array<any>, peginRequest:BridgeTransactionType):Promise<number> {
   let matchCount = 0;
   for (const tx of txs) {
     //console.log('scanPeginCommitTransactions: tx: ', tx);
@@ -43,7 +43,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:PeginRequestI):Pro
   return matchCount;
 }
 
-async function matchOpReturns(txs:Array<any>, peginRequest:PeginRequestI):Promise<number> {
+async function matchOpReturns(txs:Array<any>, peginRequest:BridgeTransactionType):Promise<number> {
   let matchCount = 0;
   for (const tx of txs) {
     //console.log('scanPeginCommitTransactions: tx: ', tx);
@@ -73,7 +73,7 @@ async function matchOpReturns(txs:Array<any>, peginRequest:PeginRequestI):Promis
  * @param peginRequest 
  * @returns 
  */
-async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI):Promise<number> {
+async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:BridgeTransactionType):Promise<number> {
   let matchedTx;
   for (const tx of txs) {
     if (tx.txid !== peginRequest.btcTxid) { // filter out the commitment tx
@@ -83,7 +83,7 @@ async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:PeginRequestI
   return matchedTx;
 }
 
-async function inspecTx(tx:any, peginRequest:PeginRequestI) {
+async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
   let matchedTx = 0;
   //console.log('scanPeginCommitTransactions: tx: ', tx);
   for (const vout of tx.vout) {
@@ -177,7 +177,7 @@ export async function scanPeginRRTransactions() {
 	return { matched: matchCount };
 }
 
-export async function scanCommitments(btcAddress:string, stxAddress:string, sbtcWalletAddress:string, revealFee:number, commitment:PeginScriptI) {
+export async function scanCommitments(btcAddress:string, stxAddress:string, sbtcWalletAddress:string, revealFee:number, commitment:CommitmentScriptDataType) {
   console.log('scanCommitments: Scanning commits: ')
   let txs:Array<any> = await fetchAddressTransactions(btcAddress);
   if (!txs || txs.length === 0) return
@@ -202,7 +202,7 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
               //}
               const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
               const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
-              const peginRequest:PeginRequestI = {
+              const peginRequest:BridgeTransactionType = {
                 btcTxid: tx.txid,
                 commitTxScript: commitment,
                 originator: stxAddress,

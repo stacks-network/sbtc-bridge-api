@@ -7,7 +7,7 @@
 	import { page } from "$app/stores";
 	import { onMount, onDestroy } from 'svelte';
 	import { sbtcConfig } from '$stores/stores'
-	import type { SbtcContractDataI, KeySet } from 'sbtc-bridge-lib';
+	import type { SbtcContractDataType, KeySet } from 'sbtc-bridge-lib';
 	import type { SbtcConfig } from '$types/sbtc_config'
 	import { defaultSbtcConfig } from '$lib/sbtc';
 	import { COMMS_ERROR } from '$lib/utils.js'

@@ -7,7 +7,7 @@ import { bytesToHex } from "micro-stacks/common";
 import { getConfig } from '../../../lib/config.js';
 import { fetchAddress } from './MempoolApi.js';
 import fetch from 'node-fetch';
-import type { SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
+import type { SbtcContractDataType, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
 import { callContractReadOnly } from './StacksMiniApi.js'
 
@@ -26,8 +26,8 @@ const noArgMethods = [
   'get-name',
 ]
 
-export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
-  const result = {} as SbtcContractDataI
+export async function fetchNoArgsReadOnly():Promise<SbtcContractDataType> {
+  const result = {} as SbtcContractDataType
   const contractId = getConfig().sbtcContractId;
   const data = {
     contractAddress: contractId!.split('.')[0],
@@ -50,7 +50,7 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   return result;
 }
 
-function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
+function resolveArg(result:SbtcContractDataType, response:any, arg:string) {
   let current = response
   if (response.value && response.value.value) {
     current = response.value.value

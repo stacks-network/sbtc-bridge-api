@@ -1,11 +1,11 @@
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer';
-import { PeginRequestI } from './index.js';
+import { BridgeTransactionType } from './index.js';
 
-export function buildRevealOrReclaimTransaction (network:string, txFee:number, reclaim:boolean, peginRequest:PeginRequestI, commitTransaction:any):btc.Transaction {
+export function buildRevealOrReclaimTransaction (network:string, txFee:number, reclaim:boolean, peginRequest:BridgeTransactionType, commitTransaction:any):btc.Transaction {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const tx:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true });
+	const tx:Transaction = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	const script = peginRequest.commitTxScript //toStorable(peginRequest.commitTxScript)
 	if (!peginRequest || !script) throw new Error('Incorrect data passed')
 	if (!peginRequest.btcTxid) peginRequest.btcTxid = '72d1cebc1bb22757f549063926006f680fd5cb9e3388a214244735d8dd124533'

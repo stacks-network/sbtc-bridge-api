@@ -11,6 +11,7 @@ import { configRoutes } from './routes/configRoutes.js'
 import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
 import { stacksRoutes } from './routes/stacksRoutes.js'
 import { createRequire } from 'node:module';
+import { authorised } from './lib/stacks_helper.js';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
 const swaggerDocument = r('./swagger.json');
@@ -35,6 +36,19 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+app.use((req, res, next) => {
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE') {
+    if (authorised(req.headers.authorization)) {
+      console.log('app.use: ok' + req.method)
+      next()
+    } else {
+      console.log('app.use: 401 ' + req.method)
+      res.sendStatus(401)
+    }
+  } else {
+    next()
+  }
+})
 
 app.use('/bridge-api/:network/v1/config', configRoutes);
 app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);

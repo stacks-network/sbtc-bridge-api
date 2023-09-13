@@ -2,7 +2,7 @@ import { CONFIG } from '$lib/config';
 import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
 import type { AddressMempoolObject } from 'sbtc-bridge-lib' 
-import type { PeginRequestI } from 'sbtc-bridge-lib' 
+import type { BridgeTransactionType } from 'sbtc-bridge-lib' 
 
 export const COMMS_ERROR = 'Error communicating with the server. Please try later.'
 export const smbp = 900
@@ -94,7 +94,7 @@ export const keySetForFeeCalculation = {
   schnorrPub: secp.getPublicKey(priv, false)
 }
 
-export function compare( a:PeginRequestI, b:PeginRequestI ) {
+export function compare( a:BridgeTransactionType, b:BridgeTransactionType ) {
   if ( a.status < b.status ){
     return -1;
   }

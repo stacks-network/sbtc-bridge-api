@@ -30,7 +30,7 @@ export function approxTxFees(network:string, utxos:any, changeAddress:string, pa
     console.log('approxTxFees change=' + changeAddress)
     console.log('approxTxFees dest=' + payeeAddress)
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const tx = new btc.Transaction({ allowUnknowOutput: true });
+	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// create a set of inputs corresponding to the utxo set
 	if (!utxos || utxos.length === 0) throw new Error('No UTXOs');
 	for (const utxo of utxos) {

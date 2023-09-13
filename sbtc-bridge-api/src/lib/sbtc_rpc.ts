@@ -11,7 +11,7 @@ import fetch from 'node-fetch';
 import type { BalanceI } from '../controllers/StacksRPCController.js';
 import { findAlphaEventsByFilter, countAlphaEvents, saveNewAlphaEvent } from './data/db_models.js';
 import util from 'util'
-import type { payloadType, SbtcContractDataI, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
+import type { PayloadType, SbtcContractDataType, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
 import { checkAddressForNetwork } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
 
@@ -30,8 +30,8 @@ const noArgMethods = [
   'get-name',
 ]
 
-export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
-  const result = {} as SbtcContractDataI
+export async function fetchNoArgsReadOnly():Promise<SbtcContractDataType> {
+  const result = {} as SbtcContractDataType
   const contractId = getConfig().sbtcContractId;
   //checkAddressForNetwork(getConfig().network, contractId)
   const data = {
@@ -56,7 +56,7 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataI> {
   return result;
 }
 
-function resolveArg(result:SbtcContractDataI, response:any, arg:string) {
+function resolveArg(result:SbtcContractDataType, response:any, arg:string) {
   let current = response
   if (response.value && response.value.value) {
     current = response.value.value
@@ -157,7 +157,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
       const edata = cvToJSON(deserializeCV(event.contract_log.value.hex));
-      const payloadData:payloadType = await fetchPegTxData(edata.value, true);
+      const payloadData:PayloadType = await fetchPegTxData(edata.value, true);
       console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
 
       let newEvent = {

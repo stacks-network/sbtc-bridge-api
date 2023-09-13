@@ -185,7 +185,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 		const script = btc.RawTx.decode(hex.decode(hexy))
 		if (amt < bar && utxo.status.confirmed) {
 			amt += utxo.value;
-			const txFromUtxo = btc.Transaction.fromRaw(hex.decode(hexy), {allowUnknowInput:true, allowUnknowOutput: true})
+			const txFromUtxo = btc.Transaction.fromRaw(hex.decode(hexy), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
 			const outputToSpend = txFromUtxo.getOutput(utxo.vout)
 			if (!outputToSpend || !outputToSpend.script) throw new Error('no script passed ?')
 			const spendScr = btc.OutScript.decode(outputToSpend.script)

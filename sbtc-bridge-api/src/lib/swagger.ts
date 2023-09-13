@@ -57,7 +57,7 @@ export const swagger = {
 				"type": "object",
 				"additionalProperties": false
 			},
-			"SbtcContractDataI": {
+			"SbtcContractDataType": {
 				"properties": {
 					"coordinator": {
 						"properties": {
@@ -412,7 +412,7 @@ export const swagger = {
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/SbtcContractDataI"
+									"$ref": "#/components/schemas/SbtcContractDataType"
 								}
 							}
 						}

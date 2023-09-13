@@ -1,6 +1,6 @@
 {
   "name": "sbtc-bridge-lib",
-  "version": "1.0.68",
+  "version": "1.0.71",
   "description": "Library for sBTC Bridge web client and API apps ",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -30,9 +30,10 @@
   "dependencies": {
     "@noble/secp256k1": "^2.0.0",
     "@scure/base": "^1.1.1",
-    "@scure/btc-signer": "^1.0.1",
+    "@scure/btc-signer": "^1.1.0",
     "@stacks/encryption": "^6.5.4",
     "@stacks/stacks-blockchain-api-types": "^7.1.10",
+    "base58check": "^2.0.0",
     "c32check": "^2.0.0",
     "micro-packed": "^0.3.2",
     "micro-stacks": "^1.2.1"

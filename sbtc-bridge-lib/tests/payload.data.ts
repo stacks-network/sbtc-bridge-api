@@ -1,6 +1,6 @@
-import type { PeginRequestI } from '../src/index';
+import type { BridgeTransactionType } from '../src/index';
 
-export const commit1:PeginRequestI = {
+export const commit1:BridgeTransactionType = {
   _id: ("6463863acdc2ba2dc1c6786d"),
   fromBtcAddress: 'tb1psz58gxdxfdyqzur04r2vmgyau7mz5xmg52ns7hg8df7dpu0mlc3sz0wtkj',
   status: 2,
