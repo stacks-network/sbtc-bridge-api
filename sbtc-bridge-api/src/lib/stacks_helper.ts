@@ -4,8 +4,8 @@ import { c32address, c32addressDecode } from 'c32check';
 import { hex } from '@scure/base';
 import util from 'util'
 import { publicKeyFromSignatureRsv, type MessageSignature, StacksMessageType, publicKeyFromSignatureVrs } from '@stacks/transactions';
-import { getStacksAddressFromPubkey } from 'sbtc-bridge-lib/dist/payload_utils';
-import { getConfig } from './config';
+import { getStacksAddressFromPubkey } from 'sbtc-bridge-lib/dist/payload_utils.js';
+import { getConfig } from './config.js';
 const authMessage = 'Please sign this message to complete authentication'
 
 export function isUpdateAllowed(req, stacksAddressFromRequest:string) {
