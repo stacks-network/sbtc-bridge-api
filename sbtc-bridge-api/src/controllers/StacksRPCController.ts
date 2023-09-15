@@ -141,11 +141,6 @@ export class SbtcWalletController {
       console.log(err.message)
     }
     try {
-      sbtcContractData.addressValidation = await validateAddress(sbtcContractData.sbtcWalletAddress);
-    } catch (err:any) {
-      console.log(err.message)
-    }
-    try {
       const contractId = getConfig().sbtcContractId;
       const contractOwner = await fetchDataVar(contractId.split('.')[0], contractId.split('.')[1], 'contract-owner');
       const result = cvToJSON(deserializeCV(contractOwner.data));

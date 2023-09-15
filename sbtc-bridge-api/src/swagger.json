@@ -272,47 +272,8 @@
 				],
 				"type": "object"
 			},
-			"AddressValidationI": {
-				"properties": {
-					"witness_program": {
-						"type": "string"
-					},
-					"witness_version": {
-						"type": "number",
-						"format": "double"
-					},
-					"iswitness": {
-						"type": "boolean"
-					},
-					"isscript": {
-						"type": "boolean"
-					},
-					"scriptPubKey": {
-						"type": "string"
-					},
-					"address": {
-						"type": "string"
-					},
-					"isvalid": {
-						"type": "boolean"
-					}
-				},
-				"required": [
-					"witness_program",
-					"witness_version",
-					"iswitness",
-					"isscript",
-					"scriptPubKey",
-					"address",
-					"isvalid"
-				],
-				"type": "object"
-			},
 			"SbtcContractDataType": {
 				"properties": {
-					"addressValidation": {
-						"$ref": "#/components/schemas/AddressValidationI"
-					},
 					"burnHeight": {
 						"type": "number",
 						"format": "double"
@@ -355,6 +316,9 @@
 					"contractOwner": {
 						"type": "string"
 					},
+					"contractId": {
+						"type": "string"
+					},
 					"coordinator": {
 						"properties": {
 							"key": {
@@ -382,7 +346,8 @@
 				"required": [
 					"sbtcWalletPublicKey",
 					"sbtcWalletAddress",
-					"contractOwner"
+					"contractOwner",
+					"contractId"
 				],
 				"type": "object"
 			}

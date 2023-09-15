@@ -53,6 +53,7 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataType> {
       //throw new Error('Error fetching sbtc alpha data from sbtc contrcat: ' + err.message)
     }
   }
+  result.contractId = contractId;
   return result;
 }
 

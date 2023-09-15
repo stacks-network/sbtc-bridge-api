@@ -1,1 +1,0 @@
-{"@context":["https://www.w3.org/ns/did/v1","https://w3id.org/security/suites/secp256k1recovery-2020/v2"],"id":"did:web:stx.eco","verificationMethod":[{"id":"did:web:stx.eco#address-0","type":"EcdsaSecp256k1RecoveryMethod2020","controller":"did:web:stx.eco","blockchainAccountId":"ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN"}],"authentication":["did:web:stx.eco#address-0"]}

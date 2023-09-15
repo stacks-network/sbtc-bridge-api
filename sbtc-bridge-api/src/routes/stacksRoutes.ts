@@ -126,7 +126,14 @@ router.get("/events/:page", async (req, res, next) => {
 });
  */
 
-router.get("/data", async (req, res, next) => {
+/**
+ * fetchs a bunch of objects needed in the UI;
+ * 1. sbtc contract data
+ * 2. current btc exchange rate data 
+ * 3. keys: pair of custodial keys for testing reclaima nd reveal transactions 
+ * @returns 
+ */
+router.get("/init-ui", async (req, res, next) => {
   try {
     const controller1 = new SbtcWalletController();
     const sbtcContractData = await controller1.fetchSbtcContractData();
@@ -134,20 +141,33 @@ router.get("/data", async (req, res, next) => {
     const controller2 = new TransactionController();
     const keys = await controller2.getKeys();
     const controller3 = new WalletController();
-    const sbtcWalletAddressInfo = await controller3.fetchUtxoSet(sbtcContractData.sbtcWalletAddress, true);
     const controller = new BlocksController();
     const btcFeeRates = await controller.getFeeEstimate();
 
     const response = {
       keys,
       sbtcContractData,
-      sbtcWalletAddressInfo,
       btcFeeRates
     }
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+/**
+ * fetchs sbtc contract data
+ * @returns 
+ */
+router.get("/data", async (req, res, next) => {
+  try {
+    const controller = new SbtcWalletController();
+    const sbtcContractData = await controller.fetchSbtcContractData();
+    return res.send(sbtcContractData);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
   }
 });
 

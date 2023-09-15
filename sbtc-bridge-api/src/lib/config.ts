@@ -17,7 +17,7 @@ const SIMNNET_CONFIG = {
   port: PORT,
   network: 'simnet',
   walletPath: '/wallet/SBTC-0001',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.related-pink-tick',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
   stacksApi: 'http://localhost:3999',
   stacksExplorerUrl: 'http://localhost:8000',
   bitcoinExplorerUrl: 'http://localhost:3002',

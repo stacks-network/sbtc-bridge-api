@@ -30,6 +30,7 @@ export type SbtcMiniContractDataI = {
 
 export type SbtcContractDataType = {
   coordinator?: { addr: { value: string }, key:string };
+  contractId: string;
   contractOwner: string;
   sbtcWalletAddress: string;
   sbtcWalletPublicKey: string;
@@ -42,7 +43,6 @@ export type SbtcContractDataType = {
   decimals?: number;
   name?: string;
   burnHeight?: number;
-  addressValidation?: AddressValidationI;
 }
 export type AddressValidationI = {
   isvalid: boolean;

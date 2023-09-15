@@ -352,3 +352,23 @@ export function inputAmt (tx:btc.Transaction) {
 export function toXOnly(pubkey: string): string {
     return hex.encode(hex.decode(pubkey).subarray(1, 33))
 }
+
+export function getPegWalletAddressFromPublicKey (network:string, sbtcWalletPublicKey:string) {
+	let net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	if (network === 'development' || network === 'simnet') {
+		net = { bech32: 'bcrt', pubKeyHash: 0x6f, scriptHash: 0xc4, wif: 0 }
+	}
+	const fullPK = hex.decode(sbtcWalletPublicKey);
+	//sbtcContractData.coordinator?.key?.value?.split('x')[1];
+	let xOnlyKey = fullPK;
+	if (fullPK.length === 33) {
+		xOnlyKey = fullPK.subarray(1)
+	}
+	//const trObj = btc.p2tr(xOnlyKey, undefined, net);
+	//if (trObj.type === 'tr') 
+	//const addr = trObj.address
+
+	//const assumeTweakedPubKey = hex.decode(xOnlyKey);
+	const addr = btc.Address(net).encode({type: 'tr', pubkey: xOnlyKey})
+	return addr;
+}

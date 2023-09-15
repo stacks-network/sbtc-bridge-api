@@ -107,24 +107,24 @@ export {
 }
 
 import {
-    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
     checkAddressForNetwork,
     addInputs,
     inputAmt,
-    toXOnly
+    toXOnly,
+    getPegWalletAddressFromPublicKey
 } from './wallet_utils.js'
 export {
-    sbtcMiniContracts,
     sbtcWallets, 
     getTestAddresses,
     addressFromPubkey,
     checkAddressForNetwork,
     addInputs,
     inputAmt,
-    toXOnly
+    toXOnly,
+    getPegWalletAddressFromPublicKey
 }
 
 import type {
@@ -134,9 +134,6 @@ import type {
     PegInData,
     CommitKeysI,
     Message,
-    SbtcMiniContractsI,
-    SbtcMiniWalletI,
-    SbtcMiniContractDataI,
     SbtcContractDataType,
     AddressValidationI,
     SbtcBalanceType,
@@ -161,9 +158,6 @@ export type {
     PegInData,
     CommitKeysI,
     Message,
-    SbtcMiniContractsI,
-    SbtcMiniWalletI,
-    SbtcMiniContractDataI,
     SbtcContractDataType,
     AddressValidationI,
     SbtcBalanceType,
