@@ -5,7 +5,7 @@ import { hex } from '@scure/base';
 import type { KeySet, BridgeTransactionType, UTXO } from './types/sbtc_types.js' 
 import { toStorable } from './payload_utils.js' 
 import { getDataToSign, buildWithdrawalPayload, amountToBigUint64, bigUint64ToAmount } from './payload_utils.js' 
-import { addInputs, inputAmt } from './wallet_utils.js';
+import { addInputs, inputAmt, toXOnly } from './wallet_utils.js';
 
 const concat = P.concatBytes;
 
@@ -120,9 +120,14 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
 	console.log('revealAddr.pubkey: ' + commitKeys.deposits.revealPubKey)
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	
+	let pk1U = hex.decode(commitKeys.deposits.revealPubKey)
+	let pk2U = hex.decode(commitKeys.deposits.reclaimPubKey)
+	if (pk1U.length === 33) pk1U = pk1U.subarray(1)
+	if (pk2U.length === 33) pk2U = pk2U.subarray(1)
+
 	const scripts =  [
-	  { script: btc.Script.encode([data, 'DROP', hex.decode(commitKeys.deposits.revealPubKey), 'CHECKSIG']) },
-	  { script: btc.Script.encode([hex.decode(commitKeys.deposits.revealPubKey), 'CHECKSIG']) }
+	  { script: btc.Script.encode([data, 'DROP', pk1U, 'CHECKSIG']) },
+	  { script: btc.Script.encode([pk2U, 'CHECKSIG']) }
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
 	const req:BridgeTransactionType = {

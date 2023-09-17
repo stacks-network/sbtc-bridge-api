@@ -20,10 +20,7 @@ const limit = 10;
 const noArgMethods = [
   'get-coordinator-data',
   'get-bitcoin-wallet-public-key',
-  'get-num-keys',
-  'get-num-signers',
-  'get-threshold',
-  'get-trading-halted',
+  'get-supply',
   'get-token-uri',
   'get-total-supply',
   'get-decimals',
