@@ -2,7 +2,7 @@ import { fetchAddressTransactions, fetchUTXOs } from './mempool_api.js';
 import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
 import type { BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { buildDepositPayload } from 'sbtc-bridge-lib' 
+import { buildDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { getConfig } from '../config.js';
 import { hex } from '@scure/base';
 
@@ -24,7 +24,7 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:BridgeTransactionT
     //console.log('scanPeginCommitTransactions: tx: ', tx);
     for (const vout of tx.vout) {
       const senderAddress = tx.vin[0]?.prevout?.scriptpubkey_address || undefined;
-      //console.log('matchCommitmentIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
+      //console.log('matchCommitmentIn: matching: ' + peginRequest.uiPayload.amountSats + ' to ' + vout.value)
       if (peginRequest.commitTxScript?.address === vout.scriptpubkey_address) {
         const up = {
           tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
@@ -48,8 +48,8 @@ async function matchOpReturns(txs:Array<any>, peginRequest:BridgeTransactionType
   for (const tx of txs) {
     //console.log('scanPeginCommitTransactions: tx: ', tx);
     for (const vout of tx.vout) {
-      if (vout.scriptpubkey_address === peginRequest.sbtcWalletAddress) {
-        if (vout.value === peginRequest.amount) {
+      if (vout.scriptpubkey_address === getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey)) {
+        if (vout.value === peginRequest.uiPayload.amountSats) {
           const up = {
             btcTxid: tx.txid,
             status: 5,
@@ -87,8 +87,8 @@ async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
   let matchedTx = 0;
   //console.log('scanPeginCommitTransactions: tx: ', tx);
   for (const vout of tx.vout) {
-    //console.log('matchRevealOrReclaimIn: matching: ' + peginRequest.amount + ' to ' + vout.value)
-    if (peginRequest.fromBtcAddress === vout.scriptpubkey_address) {
+    //console.log('matchRevealOrReclaimIn: matching: ' + peginRequest.uiPayload.amountSats + ' to ' + vout.value)
+    if (peginRequest.uiPayload.bitcoinAddress === vout.scriptpubkey_address) {
       // reveal path spent
       const up = {
         tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
@@ -100,7 +100,7 @@ async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
       }
       await updatePeginRequest(peginRequest, up);
       //console.log('matchRevealOrReclaimIn: changes: ', up);
-    } else if (peginRequest.sbtcWalletAddress === vout.scriptpubkey_address) {
+    } else if (getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey) === vout.scriptpubkey_address) {
       // reclaim path spent
       const up = {
         tries:  (peginRequest.tries) ? peginRequest.tries + 1 : 1,
@@ -126,7 +126,7 @@ export async function scanPeginCommitTransactions() {
     if (!requests || requests.length === 0) return;
     for (const peginRequest of requests) {
       if (peginRequest.mode === 'op_return') {
-        const txs:Array<any> = await fetchAddressTransactions(peginRequest.sbtcWalletAddress);
+        const txs:Array<any> = await fetchAddressTransactions(getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey));
         matchOpReturns(txs, peginRequest);
       } else {
         if (peginRequest.commitTxScript) {

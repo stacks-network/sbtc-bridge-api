@@ -1,7 +1,7 @@
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer';
-import { BridgeTransactionType } from './index.js';
+import { BridgeTransactionType, getPegWalletAddressFromPublicKey } from './index.js';
 
 export function buildRevealOrReclaimTransaction (network:string, txFee:number, reclaim:boolean, peginRequest:BridgeTransactionType, commitTransaction:any):btc.Transaction {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
@@ -9,6 +9,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 	const script = peginRequest.commitTxScript //toStorable(peginRequest.commitTxScript)
 	if (!peginRequest || !script) throw new Error('Incorrect data passed')
 	if (!peginRequest.btcTxid) peginRequest.btcTxid = '72d1cebc1bb22757f549063926006f680fd5cb9e3388a214244735d8dd124533'
+	let outAddr = getPegWalletAddressFromPublicKey(network, peginRequest.uiPayload.sbtcWalletPublicKey);
 	if (script.paymentType === 'wsh') {
 		if (!script.witnessScript) throw new Error('Incorrect data passed')
 		//const script = btc.RawTx.decode(hex.decode(tx.hex));
@@ -18,7 +19,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 			witnessScript: (script.witnessScript as Uint8Array),
 			witnessUtxo: {
 				script: (script.script as Uint8Array), //(pegInData.requestData.commitTxScript.witnessScript),
-				amount: BigInt(peginRequest.amount)
+				amount: BigInt(peginRequest.uiPayload.amountSats)
 			}
 		}
 		//console.log('nextI: ', nextI)
@@ -28,9 +29,9 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 		if (!peginRequest.commitTxScript.address) throw new Error('Incorrect data passed')
 		if (!script.tapMerkleRoot) throw new Error('Incorrect data passed')
 		if (!script.tapInternalKey) throw new Error('Incorrect data passed')
-		const sbtcWalletAddrScript = btc.Address(net).decode(peginRequest.sbtcWalletAddress)
+		const sbtcWalletAddrScript = btc.Address(net).decode(outAddr)
 		if (sbtcWalletAddrScript.type !== 'tr') throw new Error('Taproot required')
-		//const fromBtcAddressScript = btc.Address(net).decode(peginRequest.fromBtcAddress);
+		//const fromBtcAddressScript = btc.Address(net).decode(peginRequest.uiPayload.bitcoinAddress);
 		//if (fromBtcAddressScript.type !== 'tr') throw new Error('Taproot required')
 
 		const commitAddressScript = btc.Address(net).decode(peginRequest.commitTxScript.address);
@@ -122,14 +123,13 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 		tx.addInput(nextI);
 	}
 
-	let outAddr = peginRequest.sbtcWalletAddress;
-	if (reclaim) outAddr = peginRequest.senderAddress || peginRequest.fromBtcAddress;
+	if (reclaim) outAddr = peginRequest.uiPayload.bitcoinAddress;
 
-	const amount = peginRequest.amount - txFee;
+	const amount = peginRequest.uiPayload.amountSats - txFee;
 	/**
 	if (addressInfo.utxos.length === -1) { // never
 		const feeUtxo = addInputForFee(tx);
-		amount = peginRequest.amount + feeUtxo?.value - fee;
+		amount = peginRequest.uiPayload.amountSats + feeUtxo?.value - fee;
 	}
 	 */
 	tx.addOutputAddress(outAddr, BigInt(amount), net);

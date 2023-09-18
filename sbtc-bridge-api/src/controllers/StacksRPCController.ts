@@ -69,7 +69,7 @@ export class DepositsController {
     const p = await findPeginRequestById(peginRequest._id);
     if (p && p.status === 1) {
       const up = {
-        amount: peginRequest.amount
+        amount: peginRequest.uiPayload.amountSats
       }
       const newP = await updatePeginRequest(peginRequest, up);
       console.log('updatePeginCommit: ', newP);

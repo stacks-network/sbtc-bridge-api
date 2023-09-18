@@ -1,6 +1,6 @@
 import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
-import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets } from "../lib/bitcoin/rpc_wallet.js";
+import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../lib/bitcoin/rpc_wallet.js";
 import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
@@ -290,16 +290,20 @@ export class WalletController {
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     let result:any = {};
     //checkAddressForNetwork(getConfig().network, address);
-    try {
       if (address) {
-        result = await getAddressInfo(address);
-        const addressValidation = await validateAddress(address);
-        result.addressValidation = addressValidation
+        try {
+          if (getConfig().network === 'simnet') {
+            console.log('importing address')
+            await importAddress(address)
+          }
+          result = await getAddressInfo(address);
+          const addressValidation = await validateAddress(address);
+          result.addressValidation = addressValidation
+        } catch (err:any) {
+          console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
+          // carry on
+        }
       }
-    } catch (err:any) {
-      console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
-      // carry on
-    }
     try {
       //console.log('fetchUtxoSet1:', result)
       const utxos = await fetchUTXOs(address);

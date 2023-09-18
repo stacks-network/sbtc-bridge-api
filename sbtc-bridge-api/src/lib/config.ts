@@ -19,7 +19,7 @@ const SIMNNET_CONFIG = {
   walletPath: '/wallet/SBTC-0001',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
   stacksApi: 'http://localhost:3999',
-  stacksExplorerUrl: 'http://localhost:8000',
+  stacksExplorerUrl: 'http://localhost:3000',
   bitcoinExplorerUrl: 'http://localhost:3002',
   mempoolUrl: 'http://localhost:18443',
   blockCypherUrl: 'http://localhost:18443',

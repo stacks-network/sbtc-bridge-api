@@ -1,6 +1,6 @@
 {
   "name": "sbtc-bridge-lib",
-  "version": "1.0.74",
+  "version": "1.0.78",
   "description": "Library for sBTC Bridge web client and API apps ",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

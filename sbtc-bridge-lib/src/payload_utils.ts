@@ -469,9 +469,15 @@ enum StacksNetworkVersion {
 	testnetP2SH = 21, // 'N'    TestnetMultiSig
 }
 
+/**
+ * Ensure we don't overwrite the original object with Uint8Arrays these can't be serialised to local storage.
+ * @param script  
+ * @returns 
+ */
 export function fromStorable(script:any) {
-	if (typeof script.tweakedPubkey !== 'string') return script
-	return codifyScript(script, true)
+	const clone = JSON.parse(JSON.stringify(script));
+	if (typeof script.tweakedPubkey !== 'string') return clone
+	return codifyScript(clone, true)
 }
   
 export function toStorable(script:any) {

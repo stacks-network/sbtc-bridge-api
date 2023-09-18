@@ -2,10 +2,10 @@ import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
 import * as P from 'micro-packed';
 import { hex } from '@scure/base';
-import type { KeySet, BridgeTransactionType, UTXO } from './types/sbtc_types.js' 
+import type { KeySet, BridgeTransactionType, UTXO, WithdrawPayloadUIType } from './types/sbtc_types.js' 
 import { toStorable } from './payload_utils.js' 
 import { getDataToSign, buildWithdrawalPayload, amountToBigUint64, bigUint64ToAmount } from './payload_utils.js' 
-import { addInputs, inputAmt, toXOnly } from './wallet_utils.js';
+import { addInputs, getPegWalletAddressFromPublicKey, inputAmt, toXOnly } from './wallet_utils.js';
 
 const concat = P.concatBytes;
 
@@ -13,35 +13,35 @@ const privKey = hex.decode('0101010101010101010101010101010101010101010101010101
 export const revealPayment = 10001
 export const dust = 500
 
-export function buildOpReturnWithdrawTransaction(network:string, amount:number, signature:string, addressInfo:any, commitKeys:any, btcFeeRates:any, stacksAddress:string, sbtcWalletAddress:string, changeAddress:string, userPaymentPubKey:string) {
-	if (!signature) throw new Error('Signature of output 2 scriptPubKey is required');
+export function buildOpReturnWithdrawTransaction(network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any) {
+	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const data = buildData(network, amount, signature, false)
-	const txFees = calculateWithdrawFees(network, false, addressInfo, amount, btcFeeRates, sbtcWalletAddress, changeAddress, userPaymentPubKey, data)
+	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
+	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, false)
+	const txFees = calculateWithdrawFees(network, false, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress, uiPayload.bitcoinAddress, uiPayload.userPaymentPubKey, data)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
-	if (!signature) throw new Error('Signature of the amount and output 2 scriptPubKey is missing.')
+	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.userPaymentPubKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
 	const change = inputAmt(tx) - (dust + txFees[1]);
-	if (change > 0) tx.addOutputAddress(changeAddress, BigInt(change), net);
+	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
 	tx.addOutputAddress(sbtcWalletAddress, BigInt(dust), net);
 	return tx;
 }
 
-export function buildOpDropWithdrawTransaction (network:string, amount:number, signature:string, addressInfo:any, commitKeys:any, btcFeeRates:any, stacksAddress:string, sbtcWalletAddress:string, changeAddress:string, userPaymentPubKey:string) {
-	if (!signature) throw new Error('Signature of output 2 scriptPubKey is required');
+export function buildOpDropWithdrawTransaction (network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any, originator:string) {
+	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const txFees = calculateWithdrawFees(network, true, addressInfo, amount, btcFeeRates, sbtcWalletAddress, changeAddress, userPaymentPubKey, undefined)
+	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
+	const txFees = calculateWithdrawFees(network, true, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress, uiPayload.bitcoinAddress, uiPayload.userPaymentPubKey, undefined)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	addInputs(network, amount, revealPayment, tx, false, addressInfo.utxos, userPaymentPubKey);
-	if (!signature) throw new Error('Signature of the amount and output 2 scriptPubKey is missing.')
-	const data = buildData(network, amount, signature, true)
-	const csvScript = getWithdrawScript(network, data, sbtcWalletAddress, changeAddress);
+	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.userPaymentPubKey);
+	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, true)
+	const csvScript = getWithdrawScript(network, data, sbtcWalletAddress, uiPayload.bitcoinAddress);
 	if (!csvScript ) throw new Error('script required!');
-	getOpDropWithdrawRequest(network, amount, sbtcWalletAddress, stacksAddress, signature, commitKeys, changeAddress)
+	getOpDropWithdrawRequest(network, uiPayload, originator);
 	tx.addOutput({ script: csvScript.script, amount: BigInt(dust) });
 	const change = inputAmt(tx) - (dust + txFees[1]);
-	if (change > 0) tx.addOutputAddress(changeAddress, BigInt(change), net);
+	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
 	return tx;
 }
 
@@ -114,14 +114,12 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
 	}
 }
 
-  export function getOpDropWithdrawRequest(network:string, amount:number, sbtcWalletAddress:string, stacksAddress:string, signature:string, commitKeys:KeySet, fromBtcAddress:string):BridgeTransactionType {
-	const data = buildData(network, amount, signature, true);
-	console.log('reclaimAddr.pubkey: ' + commitKeys.deposits.revealPubKey)
-	console.log('revealAddr.pubkey: ' + commitKeys.deposits.revealPubKey)
+  export function getOpDropWithdrawRequest(network:string, uiPayload:WithdrawPayloadUIType, originator:string):BridgeTransactionType {
+	const data = buildData(network, uiPayload.amountSats, uiPayload.signature!, true);
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	
-	let pk1U = hex.decode(commitKeys.deposits.revealPubKey)
-	let pk2U = hex.decode(commitKeys.deposits.reclaimPubKey)
+	let pk1U = hex.decode(uiPayload.sbtcWalletPublicKey)
+	let pk2U = hex.decode(uiPayload.reclaimPublicKey)
 	if (pk1U.length === 33) pk1U = pk1U.subarray(1)
 	if (pk2U.length === 33) pk2U = pk2U.subarray(1)
 
@@ -130,42 +128,32 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
 	  { script: btc.Script.encode([pk2U, 'CHECKSIG']) }
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
+	// convert unit8 arrays to hex strings for transportation.
+	const commitTxScript = toStorable(script)
 	const req:BridgeTransactionType = {
-	  originator: stacksAddress,
-	  fromBtcAddress: fromBtcAddress,
-	  revealPub: commitKeys.deposits.revealPubKey,
-	  reclaimPub: commitKeys.deposits.revealPubKey,
-	  status: 1,
-	  tries: 0,
-	  mode: 'op_drop',
-	  amount: amount,
-	  requestType: 'withdrawal',
-	  wallet: 'p2tr(TAPROOT_UNSPENDABLE_KEY, [{ script: Script.encode([data, \'DROP\', revealPubK, \'CHECKSIG\']) }, { script: Script.encode([reclaimPubKey, \'CHECKSIG\']) }], net, true)',
-	  stacksAddress: stacksAddress,
-	  sbtcWalletAddress: sbtcWalletAddress,
+		network,
+		originator,
+		commitTxScript,
+		uiPayload,
+		status: 1,
+		mode: 'op_drop',
+		requestType: 'withdrawal',
+		created: new Date().getTime(),
+		updated: new Date().getTime()
 	}
-	req.commitTxScript = toStorable(script)
 	return req;
   }
   
-  export function getOpReturnWithdrawRequest(network:string, amount:number, sbtcWalletAddress:string, stacksAddress:string, signature:string, commitKeys:KeySet, fromBtcAddress:string):BridgeTransactionType {
-	const data = buildData(network, amount, signature, false);
-	console.log('reclaimAddr.pubkey: ' + commitKeys.deposits.reclaimPubKey)
-	console.log('revealAddr.pubkey: ' + commitKeys.deposits.revealPubKey)
-	
+  export function getOpReturnWithdrawRequest(network:string, uiPayload:WithdrawPayloadUIType, originator:string):BridgeTransactionType {
 	const req:BridgeTransactionType = {
-	  originator: stacksAddress,
-	  fromBtcAddress: fromBtcAddress,
-	  revealPub: commitKeys.deposits.revealPubKey,
-	  reclaimPub: commitKeys.deposits.reclaimPubKey,
-	  status: 1,
-	  tries: 0,
-	  mode: 'op_return',
-	  amount: amount,
-	  requestType: 'withdrawal',
-	  wallet: hex.encode(data),
-	  stacksAddress: stacksAddress,
-	  sbtcWalletAddress: sbtcWalletAddress,
+		network,
+		originator,
+		uiPayload,
+		status: 1,
+		mode: 'op_return',
+		requestType: 'withdrawal',
+		created: new Date().getTime(),
+		updated: new Date().getTime()
 	}
 	return req;
   }

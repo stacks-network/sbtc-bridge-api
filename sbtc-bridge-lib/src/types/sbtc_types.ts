@@ -61,23 +61,15 @@ export type SbtcBalanceType = {
 };
 export type BridgeTransactionType = {
   _id?:string;
+  network:string
   originator: string;
+  uiPayload:DepositPayloadUIType|WithdrawPayloadUIType;
   status: number;
-  tries?: number;
-	updated?: number;
-  amount: number;
+	created: number;
+	updated: number;
   mode: string,
   requestType:string;
-  wallet?: string,
   btcTxid?: string;
-  senderAddress?: string;
-  fromBtcAddress: string;
-  reveal?: RevealOrReclaim;
-  reclaim?: RevealOrReclaim;
-  revealPub?: string;
-  reclaimPub?: string;
-  stacksAddress: string;
-  sbtcWalletAddress: string;
   commitTxScript?: CommitmentScriptDataType;
   vout0?: VoutI;
   vout?: VoutI;
@@ -254,4 +246,28 @@ export type ExchangeRate = {
     sell: number;
     symbol: string;
     name: string;
+}
+
+export type AuthorisationDataType = {
+  signature: string;
+  publicKey: string;
+  stxAddress:string;
+  amountSats:number;
+}
+export type DepositPayloadUIType = {
+  sbtcWalletPublicKey:string
+  reclaimPublicKey: string;
+  bitcoinAddress:string;
+  userPaymentPubKey: string;
+  principal:string;
+  amountSats:number;
+}
+export type WithdrawPayloadUIType = {
+  sbtcWalletPublicKey:string
+  reclaimPublicKey: string;
+  bitcoinAddress:string;
+  signature?: string|undefined;
+  userPaymentPubKey: string;
+  principal:string;
+  amountSats:number;
 }

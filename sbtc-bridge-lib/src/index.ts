@@ -148,7 +148,10 @@ import type {
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject,
-    ExchangeRate
+    ExchangeRate,
+    AuthorisationDataType,
+    DepositPayloadUIType,
+    WithdrawPayloadUIType
 } from './types/sbtc_types.js'
 
 export type {
@@ -172,7 +175,10 @@ export type {
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject,
-    ExchangeRate
+    ExchangeRate,
+    AuthorisationDataType,
+    DepositPayloadUIType,
+    WithdrawPayloadUIType
 }
 import type {
     PoxInfo,
