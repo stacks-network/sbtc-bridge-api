@@ -27,7 +27,7 @@ export function buildOpReturnDepositTransaction(network:string, uiPayload:Deposi
 	const txFees = calculateDepositFees(network, false, uiPayload.amountSats, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// no reveal fee for op_return
-	addInputs(network, uiPayload.amountSats, 0, tx, false, addressInfo.utxos, uiPayload.userPaymentPubKey);
+	addInputs(network, uiPayload.amountSats, 0, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
 	tx.addOutputAddress(sbtcWalletAddress, BigInt(uiPayload.amountSats), net);
 	const changeAmount = inputAmt(tx) - (uiPayload.amountSats + txFees[1]); 
@@ -47,7 +47,7 @@ export function buildOpDropDepositTransaction (network:string, uiPayload:Deposit
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const txFees = calculateDepositFees(network, true, uiPayload.amountSats, btcFeeRates.feeInfo, addressInfo, commitTxAddress, undefined)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.userPaymentPubKey);
+	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	tx.addOutputAddress(commitTxAddress, BigInt(uiPayload.amountSats), net );
 	const changeAmount = inputAmt(tx) - (uiPayload.amountSats + txFees[1]); 
 	if (changeAmount > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(changeAmount), net);

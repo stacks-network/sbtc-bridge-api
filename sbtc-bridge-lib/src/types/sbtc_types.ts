@@ -67,7 +67,8 @@ export type BridgeTransactionType = {
   status: number;
 	created: number;
 	updated: number;
-  mode: string,
+  tries?: number;
+  mode: string;
   requestType:string;
   btcTxid?: string;
   commitTxScript?: CommitmentScriptDataType;
@@ -254,20 +255,16 @@ export type AuthorisationDataType = {
   stxAddress:string;
   amountSats:number;
 }
-export type DepositPayloadUIType = {
+export interface PayloadUIType {
   sbtcWalletPublicKey:string
   reclaimPublicKey: string;
+  paymentPublicKey: string;
+}
+export interface DepositPayloadUIType extends PayloadUIType {
   bitcoinAddress:string;
-  userPaymentPubKey: string;
   principal:string;
   amountSats:number;
 }
-export type WithdrawPayloadUIType = {
-  sbtcWalletPublicKey:string
-  reclaimPublicKey: string;
-  bitcoinAddress:string;
+export interface WithdrawPayloadUIType extends DepositPayloadUIType {
   signature?: string|undefined;
-  userPaymentPubKey: string;
-  principal:string;
-  amountSats:number;
 }

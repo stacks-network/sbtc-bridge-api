@@ -187,32 +187,33 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
   const foundTx = [];
   do {
     for (const tx of txs) {
-      if (tx.txid === '22304ae9f83e68a9db4eb05d2a43861a12647ba8d0261402f0bf8bb2c5fd2b3d') console.log('fixCommitments: tx: ', tx);
-      //console.log('fixCommitments: tx: ' + tx.txid);
       if (tx.vout && tx.vout[0]) {
         if (tx.vout[0].scriptpubkey_type === 'op_return') {
           console.log('scanCommitments: return: tx: ' + tx.txid + ' is ' + tx.vout[0].scriptpubkey_type + ' value = ' + tx.vout[1].value + ' sats');
         } else {
           if (tx.vout[0].scriptpubkey_type === 'v1_p2tr') {
             if (isUnspent(tx.vout[0].scriptpubkey_address, tx.txid)) {
-              //if (pegins) {
-              //  for (const pegin of pegins) {
-              //    console.log('pegin: ' + pegin._id + ' value ' + pegin.amount + ' vout value = ' + tx.vout[0].value);
-              //  }
-              //}
               const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
               const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
               const peginRequest:BridgeTransactionType = {
                 btcTxid: tx.txid,
+                network: 'testnet',
+                created: new Date().getTime(),
+                updated: new Date().getTime(),
+                uiPayload: {
+                  amountSats: tx.vout[0].value,
+                  principal: hex.encode(data),
+                  bitcoinAddress: btcAddress,
+                  reclaimPublicKey: '',
+                  paymentPublicKey: '',
+                  sbtcWalletPublicKey: sbtcWalletAddress,
+                },
+            
                 commitTxScript: commitment,
                 originator: stxAddress,
-                amount: tx.vout[0].value,
                 status: 2,
                 mode: 'op_drop',
                 requestType: 'deposit',
-                fromBtcAddress: btcAddress,
-                stacksAddress: hex.encode(data),
-                sbtcWalletAddress,
                 vout: tx.vout[0]
               }
               const pegins = await findPeginRequestsByFilter({ status:2, fromBtcAddress: btcAddress, amount: tx.vout[0].value, originator: stxAddress, mode: 'op_drop', })

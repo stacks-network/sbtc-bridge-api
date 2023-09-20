@@ -2,9 +2,18 @@ import type { BridgeTransactionType } from '../src/index';
 
 export const commit1:BridgeTransactionType = {
   _id: ("6463863acdc2ba2dc1c6786d"),
-  fromBtcAddress: 'tb1psz58gxdxfdyqzur04r2vmgyau7mz5xmg52ns7hg8df7dpu0mlc3sz0wtkj',
+  network: 'testnet',
+  created: new Date().getTime(),
+  updated: new Date().getTime(),
+  uiPayload: {
+    amountSats: 1000,
+    principal: 'ST29N24XJPW2WRVF6S2JWBC3TJBGBA5EXPSC03Y0G',
+    bitcoinAddress: 'tb1qxj5tpfsz836fyh5c3gfu2t9spjpzf924etnrsp',
+    reclaimPublicKey: 'tb1qxj5tpfsz836fyh5c3gfu2t9spjpzf924etnrsp',
+    paymentPublicKey: 'tb1qxj5tpfsz836fyh5c3gfu2t9spjpzf924etnrsp',
+    sbtcWalletPublicKey: 'tb1p4m8lyp5m3tjfwq2288429rk7sxnp5xjqslxkvatkujtsr8kkxlgqu9r4cd',
+  },
   status: 2,
-  amount: 1000,
   tries: 1,
   mode: 'op_drop',
   requestType: 'wrap',

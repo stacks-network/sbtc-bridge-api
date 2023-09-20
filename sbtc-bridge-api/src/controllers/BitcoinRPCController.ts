@@ -12,7 +12,7 @@ import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
 import type { KeySet, WrappedPSBT, BridgeTransactionType, CommitmentScriptDataType, WithdrawalPayloadType, DepositPayloadType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { checkAddressForNetwork, toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload } from 'sbtc-bridge-lib' 
+import { checkAddressForNetwork, toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updatePeginRequest } from '../lib/data/db_models.js';
@@ -107,8 +107,10 @@ export class TransactionController {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'Incorrect data passed' }
       return wrappedPsbt;
     }
+
+    const sbtcWalletAddress = getPegWalletAddressFromPublicKey(getConfig().network, pegin.uiPayload.sbtcWalletPublicKey);
   
-    const sbtcWalletAddrScript = btc.Address(net).decode(pegin.sbtcWalletAddress)
+    const sbtcWalletAddrScript = btc.Address(net).decode(sbtcWalletAddress)
     if (sbtcWalletAddrScript.type !== 'tr') throw new Error('Taproot required')
     const commitAddressScript = btc.Address(net).decode(pegin.commitTxScript.address);
     if (commitAddressScript.type !== 'tr') throw new Error('Taproot required')
@@ -126,7 +128,7 @@ export class TransactionController {
     //console.log('nextI: ', nextI);
     transaction.addInput(nextI);
   
-    let outAddr = pegin.sbtcWalletAddress;
+    let outAddr = sbtcWalletAddress;
     if (wrappedPsbt.txtype === 'reclaim') outAddr = commitTx.vin[0]?.prevout?.scriptpubkey_address
   
     const fee = 4000 //transaction.fee;
@@ -143,7 +145,7 @@ export class TransactionController {
     }
     */
     
-    transaction.addOutputAddress(pegin.fromBtcAddress, BigInt(amount), net);
+    transaction.addOutputAddress(pegin.uiPayload.bitcoinAddress, BigInt(amount), net);
   
     try {
       if (wrappedPsbt.txtype === 'reclaim') {
