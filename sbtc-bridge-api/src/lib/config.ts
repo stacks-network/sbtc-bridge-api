@@ -136,20 +136,6 @@ export function setConfigOnStart() {
 }
 
 function setOverrides() {
-  //console.log('process.env: ', process.env)
-  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
-    console.log('================================================ >> ' + process.env.NODE_ENV)
-    // Not Trust Machines Kit - so override the btc connection params with platform values;
-    CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
-    CONFIG.mongoDbName = process.env.mongoDbName || '';
-    CONFIG.mongoUser = process.env.mongoUser || ''
-    CONFIG.mongoPwd = process.env.mongoPwd || '';
-    CONFIG.btcNode = process.env.btcNode || '';
-    CONFIG.btcRpcUser = process.env.btcRpcUser || '';
-    CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
-    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
-    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
-  }
   if (isSimnet() || isDev()) {
     // below are injected from the server environment but overridden  
     // with non secure values for local development. The mongo db 
@@ -176,6 +162,20 @@ function setOverrides() {
     console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
     console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(0,2))
     console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
+  }
+  //console.log('process.env: ', process.env)
+  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
+    console.log('================================================ >> ' + process.env.NODE_ENV)
+    // Not Trust Machines Kit - so override the btc connection params with platform values;
+    CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
+    CONFIG.mongoDbName = process.env.mongoDbName || '';
+    CONFIG.mongoUser = process.env.mongoUser || ''
+    CONFIG.mongoPwd = process.env.mongoPwd || '';
+    CONFIG.btcNode = process.env.btcNode || '';
+    CONFIG.btcRpcUser = process.env.btcRpcUser || '';
+    CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
+    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
+    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
   }
 }
 
