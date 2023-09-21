@@ -1,8 +1,8 @@
 import cron from 'node-cron';
-import { saveAllSbtcEvents } from '../lib/sbtc_rpc.js';
-import { scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
-import { updateExchangeRates } from '../lib/bitcoin/blockcypher_api.js';
-import { checkReveal } from '../lib/bitcoin/rpc_reveal.js';
+import { saveAllSbtcEvents } from '../events/events_helper.js';
+import { scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitcoin/rpc_commit.js';
+import { updateExchangeRates } from '../../lib/bitcoin/api_blockcypher.js';
+import { checkReveal } from '../../lib/bitcoin/rpc_reveal.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
   console.log('Running: sbtcEventJob at: ' + fireDate);
@@ -16,10 +16,10 @@ export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
 export const peginRequestJob = cron.schedule('*/11 * * * *', (fireDate) => {
   console.log('Running: peginRequestJob at: ' + fireDate);
   try {
-    scanPeginCommitTransactions();
+    scanBridgeTransactions();
     scanPeginRRTransactions();
   } catch (err) {
-    console.log('Error running: scanPeginCommitTransactions: ', err);
+    console.log('Error running: scanBridgeTransactions: ', err);
   }
 });
 

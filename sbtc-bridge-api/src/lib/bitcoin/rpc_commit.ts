@@ -1,27 +1,28 @@
-import { fetchAddressTransactions, fetchUTXOs } from './mempool_api.js';
-import { updatePeginRequest, findPeginRequestsByFilter, saveNewPeginRequest } from '../data/db_models.js';
+import { fetchAddressTransactions, fetchTransaction, fetchTransactionHex, fetchUTXOs } from './api_mempool.js';
+import { updateBridgeTransaction, findBridgeTransactionsByFilter, saveNewBridgeTransaction, findContractEventsByFilter } from '../data/db_models.js';
 import type { BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
 import { buildDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { getConfig } from '../config.js';
 import { hex } from '@scure/base';
+import { getAddressFromOutScript } from 'sbtc-bridge-lib/dist/wallet_utils.js';
 
 export async function savePeginCommit(peginRequest:BridgeTransactionType) {
   if (!peginRequest.status || peginRequest.status < 1) peginRequest.status = 1;
   if (!peginRequest.updated) peginRequest.updated = new Date().getTime();
-  const result = await saveNewPeginRequest(peginRequest);
+  const result = await saveNewBridgeTransaction(peginRequest);
   //console.log('peginRequest: saved one: ', result);
   return result;
 }
 
 export async function findPeginRequests():Promise<Array<any>> {
-  return findPeginRequestsByFilter({});
+  return findBridgeTransactionsByFilter({});
 }
 
 async function matchCommitmentIn(txs:Array<any>, peginRequest:BridgeTransactionType):Promise<number> {
   let matchCount = 0;
   for (const tx of txs) {
-    //console.log('scanPeginCommitTransactions: tx: ', tx);
+    //console.log('scanBridgeTransactions: tx: ', tx);
     for (const vout of tx.vout) {
       const senderAddress = tx.vin[0]?.prevout?.scriptpubkey_address || undefined;
       //console.log('matchCommitmentIn: matching: ' + peginRequest.uiPayload.amountSats + ' to ' + vout.value)
@@ -33,33 +34,38 @@ async function matchCommitmentIn(txs:Array<any>, peginRequest:BridgeTransactionT
           status: 2,
           vout: vout
         }
-        await updatePeginRequest(peginRequest, up);
+        await updateBridgeTransaction(peginRequest, up);
         matchCount++;
-    } else {
-        await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
+      } else {
+        await updateBridgeTransaction(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
       }
     }
   }
   return matchCount;
 }
 
-async function matchOpReturns(txs:Array<any>, peginRequest:BridgeTransactionType):Promise<number> {
+async function matchOpReturns(txHex:any, peginRequest:BridgeTransactionType):Promise<number> {
   let matchCount = 0;
-  for (const tx of txs) {
-    //console.log('scanPeginCommitTransactions: tx: ', tx);
-    for (const vout of tx.vout) {
-      if (vout.scriptpubkey_address === getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey)) {
-        if (vout.value === peginRequest.uiPayload.amountSats) {
-          const up = {
-            btcTxid: tx.txid,
-            status: 5,
-            vout0: tx.vout[0],
-            vout: vout
-          }
-          await updatePeginRequest(peginRequest, up);
-          //console.log('scanPeginCommitTransactions: changes: ', up);
-          matchCount++;
+  const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txHex))
+  const events = await findContractEventsByFilter({ btcTxid: tx.hash })
+  let eventId = undefined;
+  if (events && events.length > 0) {
+    eventId = events[0]._id
+  }
+  for (let i = 0; i<tx.outputsLength; i++) {
+    const outp = tx.getOutput(i);
+    //const spendScr = btc.OutScript.decode(outp.script)
+    const addr = getAddressFromOutScript(getConfig().network, outp.script)
+    if (addr === getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey)) {
+      if (Number(outp.amount) === peginRequest.uiPayload.amountSats) {
+        const up = {
+          eventId,
+          vout0: tx.getOutput(0),
+          vout: outp
         }
+        await updateBridgeTransaction(peginRequest, up);
+        //console.log('scanBridgeTransactions: changes: ', up);
+        matchCount++;
       }
     }
   }
@@ -85,7 +91,7 @@ async function matchRevealOrReclaimIn(txs:Array<any>, peginRequest:BridgeTransac
 
 async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
   let matchedTx = 0;
-  //console.log('scanPeginCommitTransactions: tx: ', tx);
+  //console.log('scanBridgeTransactions: tx: ', tx);
   for (const vout of tx.vout) {
     //console.log('matchRevealOrReclaimIn: matching: ' + peginRequest.uiPayload.amountSats + ' to ' + vout.value)
     if (peginRequest.uiPayload.bitcoinAddress === vout.scriptpubkey_address) {
@@ -98,7 +104,7 @@ async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
           vout: vout
         }
       }
-      await updatePeginRequest(peginRequest, up);
+      await updateBridgeTransaction(peginRequest, up);
       //console.log('matchRevealOrReclaimIn: changes: ', up);
     } else if (getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey) === vout.scriptpubkey_address) {
       // reclaim path spent
@@ -110,41 +116,41 @@ async function inspecTx(tx:any, peginRequest:BridgeTransactionType) {
           vout: vout
         }
       }
-      await updatePeginRequest(peginRequest, up);
+      await updateBridgeTransaction(peginRequest, up);
       //console.log('matchRevealOrReclaimIn: changes: ', up);
     } else {
-      await updatePeginRequest(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
+      await updateBridgeTransaction(peginRequest, { tries:  ((peginRequest.tries || 1) + 1) });
     }
   }
   return matchedTx;
 }
-export async function scanPeginCommitTransactions() {
+export async function scanBridgeTransactions() {
   let matchCount = 0;
 	const filter = { status: 1 };
   try {
-    const requests:any = await findPeginRequestsByFilter(filter);
+    const requests:any = await findBridgeTransactionsByFilter(filter);
     if (!requests || requests.length === 0) return;
     for (const peginRequest of requests) {
       if (peginRequest.mode === 'op_return') {
-        const txs:Array<any> = await fetchAddressTransactions(getPegWalletAddressFromPublicKey(getConfig().network, peginRequest.uiPayload.sbtcWalletPublicKey));
-        matchOpReturns(txs, peginRequest);
+        const tx = await fetchTransactionHex(peginRequest.btcTxid)
+        matchOpReturns(tx, peginRequest);
       } else {
         if (peginRequest.commitTxScript) {
           const address = peginRequest.commitTxScript.address;
           try {
             const txs:Array<any> = await fetchAddressTransactions(address);
             if (txs && txs.length > 0) {
-              //console.log('scanPeginCommitTransactions: processing: ' + txs.length + ' from ' + address);
+              //console.log('scanBridgeTransactions: processing: ' + txs.length + ' from ' + address);
               matchCount += await matchCommitmentIn(txs, peginRequest);
             }
           } catch(err:any) {
-            console.log('scanPeginCommitTransactions: processing: ' + err.message);
+            console.log('scanBridgeTransactions: processing: ' + err.message);
           }
         }
       }
     }
   } catch (err: any) {
-    console.log('scanPeginCommitTransactions: requests: ', err)
+    console.log('scanBridgeTransactions: requests: ', err)
   }
 	return { matched: matchCount };
 }
@@ -152,7 +158,7 @@ export async function scanPeginRRTransactions() {
   let matchCount = 0;
 	const filter = { status: 2 };
   try {
-    const requests:any = await findPeginRequestsByFilter(filter);
+    const requests:any = await findBridgeTransactionsByFilter(filter);
     //console.log('scanPeginRRTransactions: processing1: ' + requests);
     if (!requests || requests.length === 0) return;
     for (const peginRequest of requests) {
@@ -216,7 +222,7 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
                 requestType: 'deposit',
                 vout: tx.vout[0]
               }
-              const pegins = await findPeginRequestsByFilter({ status:2, fromBtcAddress: btcAddress, amount: tx.vout[0].value, originator: stxAddress, mode: 'op_drop', })
+              const pegins = await findBridgeTransactionsByFilter({ status:2, fromBtcAddress: btcAddress, amount: tx.vout[0].value, originator: stxAddress, mode: 'op_drop', })
               console.log('pegin  pegins.length: ' + pegins.length);
               if (!pegins || pegins.length === 0) {
                 try {
@@ -224,7 +230,7 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
                     throw new Error('Commitment data does not match the payment - probably an old version of the wire format... skipping entry.')
                   }
                   // avoid overwriting the data for now..
-                  //const saveP = await saveNewPeginRequest(peginRequest);
+                  //const saveP = await saveNewBridgeTransaction(peginRequest);
                   foundTx.push(peginRequest);
                 } catch(err) {
                   console.log(err.message)

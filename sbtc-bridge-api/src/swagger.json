@@ -518,7 +518,6 @@
 						}
 					}
 				},
-				"description": "//@Get(\"/events/save\")\npublic async saveAllSbtcEvents(): Promise<any> {\n  return await saveAllSbtcEvents();\n}\n\n//@Get(\"/events/index/stacks/:txid\")\npublic async indexSbtcEvent(txid:string): Promise<any> {\n  return await indexSbtcEvent(txid);\n}\n\n//@Get(\"/events/save/:page\")\npublic async saveSbtcEvents(page:number): Promise<any> {\n  return await saveSbtcEvents(page);\n}\n\n//@Get(\"/events/:page\")\npublic async findSbtcEvents(page:number): Promise<any> {\n  return await findSbtcEvents(page);\n}",
 				"security": [],
 				"parameters": [
 					{

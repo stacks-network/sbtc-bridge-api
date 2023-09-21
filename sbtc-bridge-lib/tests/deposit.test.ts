@@ -12,6 +12,7 @@ import { fail, deepStrictEqual } from 'assert';
 import assert from 'assert';
 import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
+import { parsePayloadFromUnknownOutput } from '../src/payload_utils';
 
 describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   beforeAll(async () => {
@@ -105,5 +106,15 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
       stacksAddress: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
     })
   })
+
+  it.concurrent('Parse deposit op_return', async () => {
+    const d1 = '3c1a7010183fd1a76976e7b2bb67acdf57cdfe70488200';
+    const address = 'tb1p68eyfa7nprcegz4xdj5q9msjy69xgshzckvy64cmwegfzu77v2wslah8ww';
+    const res = parsePayloadFromUnknownOutput('testnet', d1, address)
+    console.log(res)
+    expect(res).equals(33)
+  })
+
+
 })
 

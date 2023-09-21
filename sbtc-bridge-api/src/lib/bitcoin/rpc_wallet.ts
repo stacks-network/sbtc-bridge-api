@@ -1,6 +1,6 @@
-import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
+import { BASE_URL, OPTIONS, handleError } from '../../routes/bitcoin/BitcoinRPCController.js'
 import fetch from 'node-fetch';
-import type { FeeEstimateResponse } from '../../controllers/BitcoinRPCController.js'
+import type { FeeEstimateResponse } from '../../routes/bitcoin/BitcoinRPCController.js'
 
 export async function createWallet(wallet:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"createwallet","params":["${wallet}", false, true, "devnet", false, true, true, false]}`;

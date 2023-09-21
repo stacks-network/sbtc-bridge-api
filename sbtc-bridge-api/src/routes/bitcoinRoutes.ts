@@ -1,7 +1,7 @@
 import express from "express";
-import { TransactionController, BlocksController, DefaultController, WalletController } from "../controllers/BitcoinRPCController.js";
+import { TransactionController, BlocksController, WalletController } from "./bitcoin/BitcoinRPCController.js";
 import type { WrappedPSBT } from 'sbtc-bridge-lib';
-import { updateExchangeRates } from '../lib/bitcoin/blockcypher_api.js';
+import { updateExchangeRates } from '../lib/bitcoin/api_blockcypher.js';
 
 const router = express.Router();
 

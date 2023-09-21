@@ -1,13 +1,13 @@
 import { Get, Route } from "tsoa";
-import { fetchDataVar, indexSbtcEvent, findSbtcEvents, fetchNoArgsReadOnly, saveSbtcEvents, saveAllSbtcEvents, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from '../lib/sbtc_rpc.js';
-import { scanCommitments, savePeginCommit, scanPeginCommitTransactions, scanPeginRRTransactions } from '../lib/bitcoin/rpc_commit.js';
-import { getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { validateAddress } from "../lib/bitcoin/rpc_wallet.js";
-import { updatePeginRequest, findPeginRequestById, findPeginRequestsByFilter } from '../lib/data/db_models.js';
+import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './stacks_helper.js';
+import { scanCommitments, savePeginCommit, scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitcoin/rpc_commit.js';
+import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
+import { validateAddress } from "../../lib/bitcoin/rpc_wallet.js";
+import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
 import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, DepositPayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, WithdrawalPayloadType } from 'sbtc-bridge-lib';
-import { getConfig } from '../lib/config.js';
+import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
-import { TransactionController } from "../controllers/BitcoinRPCController.js";
+import { TransactionController } from "../bitcoin/BitcoinRPCController.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 
@@ -27,7 +27,7 @@ export class DepositsController {
   
   @Get("/parse/deposit/:data")
   public commitDeposit(data:string): DepositPayloadType {
-    const payload = parseDepositPayload(hex.decode(data), 0);
+    const payload = parseDepositPayload(hex.decode(data));
 		return payload;
   }
   
@@ -46,17 +46,17 @@ export class DepositsController {
   
 
   public async findPeginRequests(): Promise<any> {
-    const result = await findPeginRequestsByFilter({ status: {$gt: -1}});
+    const result = await findBridgeTransactionsByFilter({ status: {$gt: -1}});
     return result;
   }
 
   public async findPeginRequestsByStacksAddress(stacksAddress:string): Promise<any> {
-    const result = await findPeginRequestsByFilter({ stacksAddress });
+    const result = await findBridgeTransactionsByFilter({ stacksAddress });
     return result;
   }
 
-  public async findPeginRequestById(_id:string): Promise<any> {
-    const result = await findPeginRequestById(_id);
+  public async findBridgeTransactionById(_id:string): Promise<any> {
+    const result = await findBridgeTransactionById(_id);
     return result;
   }
 
@@ -66,12 +66,12 @@ export class DepositsController {
   }
 
   public async updatePeginCommit(peginRequest:BridgeTransactionType): Promise<any> {
-    const p = await findPeginRequestById(peginRequest._id);
+    const p = await findBridgeTransactionById(peginRequest._id);
     if (p && p.status === 1) {
       const up = {
         amount: peginRequest.uiPayload.amountSats
       }
-      const newP = await updatePeginRequest(peginRequest, up);
+      const newP = await updateBridgeTransaction(peginRequest, up);
       console.log('updatePeginCommit: ', newP);
       return newP;
     } else {
@@ -83,7 +83,7 @@ export class DepositsController {
   //@Get("/scan")
   public async scanPeginRequests(): Promise<any> {
     await scanPeginRRTransactions();
-    return await scanPeginCommitTransactions();
+    return await scanBridgeTransactions();
   }
 
   //@Get("/commits/scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee")
@@ -98,28 +98,6 @@ export class DepositsController {
 
 @Route("/bridge-api/:network/v1/sbtc")
 export class SbtcWalletController {
-
-  /**
-  //@Get("/events/save")
-  public async saveAllSbtcEvents(): Promise<any> {
-    return await saveAllSbtcEvents();
-  }
-
-  //@Get("/events/index/stacks/:txid")
-  public async indexSbtcEvent(txid:string): Promise<any> {
-    return await indexSbtcEvent(txid);
-  }
-
-  //@Get("/events/save/:page")
-  public async saveSbtcEvents(page:number): Promise<any> {
-    return await saveSbtcEvents(page);
-  }
-
-  //@Get("/events/:page")
-  public async findSbtcEvents(page:number): Promise<any> {
-    return await findSbtcEvents(page);
-  }
-   */
 
   @Get("/address/:address/balance")
   public async fetchUserSbtcBalance(address:string): Promise<BalanceI> {

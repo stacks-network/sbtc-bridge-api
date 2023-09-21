@@ -1,22 +1,22 @@
 import { Post, Get, Route } from "tsoa";
-import { fetchRawTx, sendRawTxRpc } from '../lib/bitcoin/rpc_transaction.js';
-import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../lib/bitcoin/rpc_wallet.js";
-import { getBlockChainInfo, getBlockCount } from "../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../lib/bitcoin/mempool_api.js";
-import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../lib/bitcoin/blockcypher_api.js";
-import { findPeginRequestById } from "../lib/data/db_models.js";
-import { getConfig } from '../lib/config.js';
-import { fetchTransactionHex } from '../lib/bitcoin/mempool_api.js';
+import { fetchRawTx, sendRawTxRpc } from '../../lib/bitcoin/rpc_transaction.js';
+import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../../lib/bitcoin/rpc_wallet.js";
+import { getBlockChainInfo, getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
+import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../../lib/bitcoin/api_mempool.js";
+import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../../lib/bitcoin/api_blockcypher.js";
+import { findBridgeTransactionById } from "../../lib/data/db_models.js";
+import { getConfig } from '../../lib/config.js';
+import { fetchTransactionHex } from '../../lib/bitcoin/api_mempool.js';
 import { schnorr } from '@noble/curves/secp256k1';
 import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
-import type { KeySet, WrappedPSBT, BridgeTransactionType, CommitmentScriptDataType, WithdrawalPayloadType, DepositPayloadType } from 'sbtc-bridge-lib'
+import type { KeySet, WrappedPSBT, BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { checkAddressForNetwork, toStorable, getStacksAddressFromSignature, buildDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parseDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
+import { toStorable, getStacksAddressFromSignature, buildDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
-import { updatePeginRequest } from '../lib/data/db_models.js';
-import { getExchangeRates } from '../lib/data/db_models.js'
+import { updateBridgeTransaction } from '../../lib/data/db_models.js';
+import { getExchangeRates } from '../../lib/data/db_models.js'
 
 
 export interface FeeEstimateResponse {
@@ -85,7 +85,7 @@ export class TransactionController {
   
     console.log('sign: ', wrappedPsbt);
     console.log('sign: stxAddresses: ', stxAddresses);
-    const pegin:BridgeTransactionType = await findPeginRequestById(wrappedPsbt.depositId);
+    const pegin:BridgeTransactionType = await findBridgeTransactionById(wrappedPsbt.depositId);
   
     if (pegin.originator !== stacksAddress) {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'Stgacks address of signer is different to the deposit originator: ' + pegin.originator + ' p2pkh address recovered: ' + stacksAddress };
@@ -179,7 +179,7 @@ export class TransactionController {
       const result = await this.sendRawTransaction(signedTx);
       console.log(result)
       wrappedPsbt.broadcastResult = result;
-      const pegin:BridgeTransactionType = await findPeginRequestById(wrappedPsbt.depositId);
+      const pegin:BridgeTransactionType = await findBridgeTransactionById(wrappedPsbt.depositId);
       let upd = undefined;
       if (wrappedPsbt.txtype === 'reclaim') {
         if (wrappedPsbt.broadcastResult.tx) {
@@ -202,7 +202,7 @@ export class TransactionController {
           }
         }
       }
-      if (upd) await updatePeginRequest(pegin, upd);
+      if (upd) await updateBridgeTransaction(pegin, upd);
 
     } catch (err:any) {
       wrappedPsbt.broadcastResult = { failed: true, reason: 'Error broadcasting - ' + err.message }

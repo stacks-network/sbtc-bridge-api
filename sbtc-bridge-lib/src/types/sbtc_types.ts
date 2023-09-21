@@ -61,6 +61,7 @@ export type SbtcBalanceType = {
 };
 export type BridgeTransactionType = {
   _id?:string;
+  eventId?:string;
   network:string
   originator: string;
   uiPayload:DepositPayloadUIType|WithdrawPayloadUIType;

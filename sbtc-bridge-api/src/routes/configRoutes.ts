@@ -1,6 +1,6 @@
 import express from "express";
-import { DefaultController } from "../controllers/BitcoinRPCController.js";
-import { ConfigController } from "../controllers/ConfigController.js";
+import { DefaultController } from "./bitcoin/BitcoinRPCController.js";
+import { ConfigController } from "./config/ConfigController.js";
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 import { getConfig } from '../config.js';
 import { saveNewExchangeRate, updateExchangeRate, getExchangeRates, findExchangeRateByCurrency } from '../data/db_models.js';
 import fetch from 'node-fetch';
-import { currencies } from './currencies.js';
+import { currencies } from '../utils_currencies.js';
 import { ExchangeRate } from 'sbtc-bridge-lib';
 
 export async function updateExchangeRates() {

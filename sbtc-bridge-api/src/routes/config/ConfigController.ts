@@ -1,5 +1,5 @@
 import { Get, Route } from "tsoa";
-import { getConfig } from '../lib/config.js';
+import { getConfig } from '../../lib/config.js';
 
 export interface IStringToStringDictionary { [key: string]: string|number|undefined; }
 

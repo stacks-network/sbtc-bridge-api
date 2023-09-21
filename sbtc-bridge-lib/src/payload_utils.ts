@@ -30,17 +30,17 @@ keySetForFeeCalculation.push({
   schnorrPub: secp.getPublicKey(priv, false)
 })
 
-export function parseDepositPayload(d1:Uint8Array, amountSats: number):DepositPayloadType {
+export function parseDepositPayload(d1:Uint8Array):DepositPayloadType {
 	const magicOp = getMagicAndOpCode(d1);
 	if (magicOp.magic) {
-		return parseDepositPayloadNoMagic(d1.subarray(2), amountSats);
+		return parseDepositPayloadNoMagic(d1.subarray(2));
 	}
-	return parseDepositPayloadNoMagic(d1, amountSats);
+	return parseDepositPayloadNoMagic(d1);
 }
 
-function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):DepositPayloadType {
+function parseDepositPayloadNoPrincipal(d1:Uint8Array):DepositPayloadType {
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
-	const addr0 = parseInt(hex.encode(d1.subarray(1,2)), 8);
+	const addr0 = parseInt(hex.encode(d1.subarray(1,2)), 16);
 	const addr1 = hex.encode(d1.subarray(2,22));
 	const stacksAddress = c32address(addr0, addr1);
 	return {
@@ -52,20 +52,20 @@ function parseDepositPayloadNoPrincipal(d1:Uint8Array, amountSats: number):Depos
 		lengthOfMemo: 0,
 		memo: undefined,
 		revealFee: 0,
-		amountSats
+		amountSats: 0
 	};
 }
 
-function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):DepositPayloadType {
+function parseDepositPayloadNoMagic(d1:Uint8Array):DepositPayloadType {
     //console.log('payload rev: ', hex.encode(d1))
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3C') throw new Error('Wrong opcode for deposit: should be 3C was ' + opcode)
-	const prinType = parseInt(hex.encode(d1.subarray(1,2)), 8);
-	if (prinType === 22 || prinType === 26) return parseDepositPayloadNoPrincipal(d1, amountSats)
+	const prinType = parseInt(hex.encode(d1.subarray(1,2)), 16);
+	if (prinType === 22 || prinType === 26) return parseDepositPayloadNoPrincipal(d1)
 	const addr0 = parseInt(hex.encode(d1.subarray(2,3)), 16);
 	const addr1 = hex.encode(d1.subarray(3,23));
 	const stacksAddress = c32address(addr0, addr1);
-	const lengthOfCname = parseInt(hex.encode(d1.subarray(23,24)), 8);
+	const lengthOfCname = parseInt(hex.encode(d1.subarray(23,24)), 16);
 	let cname;
 	if (lengthOfCname > 0) {
 	  cname = new TextDecoder().decode(d1.subarray(24, 24 + lengthOfCname));
@@ -73,7 +73,7 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):DepositPa
 
 	let current = 24 + lengthOfCname;
 	let memo;
-	const lengthOfMemo = parseInt(hex.encode(d1.subarray(current, current + 1)), 8);
+	const lengthOfMemo = parseInt(hex.encode(d1.subarray(current, current + 1)), 16);
 	if (lengthOfMemo > 0) {
 		memo = new TextDecoder().decode(d1.subarray(current + 1, lengthOfMemo + current + 1));
 	}
@@ -97,7 +97,7 @@ function parseDepositPayloadNoMagic(d1:Uint8Array, amountSats: number):DepositPa
 		lengthOfMemo,
 		memo,
 		revealFee,
-		amountSats
+		amountSats: 0
 	};
 }
 
@@ -317,6 +317,23 @@ export function readDepositValue(outputs:Array<any>) {
 	return amountSats;
 }
   
+export function parsePayloadFromUnknownOutput(network:string, out0:any, bitcoinAddress:string) {
+	const d1 = out0.script
+	const witnessData = getMagicAndOpCode(d1);
+	witnessData.txType = out0.type;
+
+	let innerPayload:WithdrawalPayloadType|DepositPayloadType;
+	if (witnessData.opcode === '3C') {
+		innerPayload = parseDepositPayload(d1);
+		return innerPayload;
+	} else if (witnessData.opcode.toUpperCase() === '3E') {
+		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
+		return innerPayload;
+	} else {
+	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
+	}
+}
+
 export function parseOutputs(network:string, output0:any, bitcoinAddress:string, amountSats: number) {
 	if (output0.scriptpubkey_type) return parseOutputsBitcoinCore(network, output0, bitcoinAddress, amountSats)
 	const d1 = hex.decode(output0.scriptPubKey.asm.split(' ')[1]);
@@ -325,7 +342,7 @@ export function parseOutputs(network:string, output0:any, bitcoinAddress:string,
 
 	let innerPayload:WithdrawalPayloadType|DepositPayloadType;
 	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1, amountSats);
+		innerPayload = parseDepositPayload(d1);
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
 		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
@@ -348,7 +365,7 @@ function parseOutputsBitcoinCore(network:string, output0:any, bitcoinAddress:str
 
 	let innerPayload:WithdrawalPayloadType|DepositPayloadType;
 	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1, amountSats);
+		innerPayload = parseDepositPayload(d1);
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
 		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
