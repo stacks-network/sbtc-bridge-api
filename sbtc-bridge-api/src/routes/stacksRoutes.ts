@@ -1,8 +1,8 @@
 import express from "express";
-import { TransactionController, BlocksController, WalletController } from "../controllers/BitcoinRPCController.js";
-import { SbtcWalletController, DepositsController } from "../controllers/StacksRPCController.js";
+import { TransactionController, BlocksController, WalletController } from "./bitcoin/BitcoinRPCController.js";
+import { SbtcWalletController, DepositsController } from "./stacks/StacksRPCController.js";
 import type { BridgeTransactionType } from 'sbtc-bridge-lib';
-import { isUpdateAllowed } from "../lib/stacks_helper.js";
+import { isUpdateAllowed } from "../lib/utils_stacks.js";
 
 const router = express.Router();
 
@@ -268,7 +268,7 @@ router.get("/commit-scan/:btcAddress/:stxAddress/:sbtcWalletAddress/:revealFee",
 router.get("/bridgetx/:_id", async (req, res, next) => {
   try {
     const controller = new DepositsController();
-    const response = await controller.findPeginRequestById(req.params._id);
+    const response = await controller.findBridgeTransactionById(req.params._id);
     return res.send(response);
   } catch (error) { 
     console.log('Error in routes: ', error)

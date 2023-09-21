@@ -4,6 +4,7 @@ import {
     PEGIN_OPCODE,
     PEGOUT_OPCODE,
     parseDepositPayload,
+    parsePayloadFromTransaction,
     buildDepositPayload,
     buildWithdrawalPayload,
     parseWithdrawalPayload,
@@ -13,7 +14,6 @@ import {
     getStacksSimpleHashOfDataToSign,
     getStacksAddressFromSignature,
     parseSbtcWalletAddress,
-    parseOutputs,
     readDepositValue,
     fromStorable,
     toStorable
@@ -24,6 +24,7 @@ export {
     PEGIN_OPCODE,
     PEGOUT_OPCODE,
     parseDepositPayload,
+    parsePayloadFromTransaction,
     buildDepositPayload,
     buildWithdrawalPayload,
     parseWithdrawalPayload,
@@ -33,7 +34,6 @@ export {
     getStacksSimpleHashOfDataToSign,
     getStacksAddressFromSignature,
     parseSbtcWalletAddress,
-    parseOutputs,
     readDepositValue,
     fromStorable,
     toStorable
@@ -140,15 +140,16 @@ import type {
     UTXO,
     SbtcAlphaEvent,
     PayloadType,
-    WithdrawalPayloadType,
-    DepositPayloadType,
     KeySet,
     WrappedPSBT,
     StxSignature,
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject,
-    ExchangeRate
+    ExchangeRate,
+    AuthorisationDataType,
+    DepositPayloadUIType,
+    WithdrawPayloadUIType
 } from './types/sbtc_types.js'
 
 export type {
@@ -164,15 +165,16 @@ export type {
     UTXO,
     SbtcAlphaEvent,
     PayloadType,
-    WithdrawalPayloadType,
-    DepositPayloadType,
     KeySet,
     WrappedPSBT,
     StxSignature,
     AddressObject,
     AddressMempoolObject,
     AddressHiroObject,
-    ExchangeRate
+    ExchangeRate,
+    AuthorisationDataType,
+    DepositPayloadUIType,
+    WithdrawPayloadUIType
 }
 import type {
     PoxInfo,

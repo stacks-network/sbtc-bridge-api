@@ -1,6 +1,6 @@
 import { getAddressInfo } from './rpc_wallet.js'
 import fetch from 'node-fetch';
-import { BASE_URL, OPTIONS, handleError } from '../../controllers/BitcoinRPCController.js'
+import { BASE_URL, OPTIONS, handleError } from '../../routes/bitcoin/BitcoinRPCController.js'
 import { checkAddressForNetwork } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 

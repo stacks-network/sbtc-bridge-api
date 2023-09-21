@@ -1,10 +1,9 @@
 import fetch from 'node-fetch';
-import { BASE_URL, OPTIONS } from '../../controllers/BitcoinRPCController.js'
+import { BASE_URL, OPTIONS } from '../../routes/bitcoin/BitcoinRPCController.js'
 import { getBlock } from './rpc_blockchain.js';
-import { fetchTransaction, fetchTransactionHex } from './mempool_api.js';
+import { fetchTransaction, fetchTransactionHex } from './api_mempool.js';
 import { getConfig } from '../config.js';
-import { readDepositValue, parseOutputs, parseSbtcWalletAddress } from 'sbtc-bridge-lib' 
-import type { PayloadType } from 'sbtc-bridge-lib';
+import { parsePayloadFromTransaction } from 'sbtc-bridge-lib';
 
 export async function sendRawTxRpc(hex:string) {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}]}`;
@@ -39,15 +38,10 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
   return res;
 }
  
-export async function fetchPegTxData(txid:string, verbose:boolean) {
-  const res = await fetchRawTx(txid, true);
-  //console.log('fetchPegTxData ', util.inspect(res, false, null, true /* enable colors */));
-  const sbtcWalletAddress = parseSbtcWalletAddress(getConfig().network, res.vout);
-  const pegInAmountSats = readDepositValue(res.vout);
-  const payload = {} as PayloadType;
-  payload.payload = parseOutputs(getConfig().network, res.vout[0], sbtcWalletAddress.bitcoinAddress, pegInAmountSats);
-  payload.sbtcWallet = sbtcWalletAddress.bitcoinAddress;
-  payload.burnBlockHeight = res.block.height;
-  return payload;
+export async function readPayloadData(txid:string, verbose:boolean) {
+  if (!txid) return
+  const txHex = await fetchTransactionHex(txid);
+  console.log('readPayloadData:txHex: ' + txHex);
+  return parsePayloadFromTransaction(getConfig().network, txHex);
 }
 

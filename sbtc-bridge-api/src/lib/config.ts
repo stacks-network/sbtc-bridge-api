@@ -19,7 +19,7 @@ const SIMNNET_CONFIG = {
   walletPath: '/wallet/SBTC-0001',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
   stacksApi: 'http://localhost:3999',
-  stacksExplorerUrl: 'http://localhost:8000',
+  stacksExplorerUrl: 'http://localhost:3000',
   bitcoinExplorerUrl: 'http://localhost:3002',
   mempoolUrl: 'http://localhost:18443',
   blockCypherUrl: 'http://localhost:18443',
@@ -43,12 +43,12 @@ const DEVNET_CONFIG = {
   walletPath: '/wallet/descwallet',
   network: 'testnet',
   sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.related-pink-tick',
-  stacksApi: 'http://devnet.stx.eco',
-  stacksExplorerUrl: 'http://devnet.stx.eco:8000/?chain=devnet',
+  stacksApi: 'https://api.testnet.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Devnet API',
+  publicAppName: 'sBTC Bridge Local Staging API',
   publicAppVersion: '1.0.0',
 }
 
@@ -128,7 +128,8 @@ let CONFIG: {
 
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = LINODE_TESTNET_CONFIG; //DEVNET_CONFIG;
-	else if (isSimnet()) CONFIG = SIMNNET_CONFIG;
+  else if (isLocalTestnet()) CONFIG = DEVNET_CONFIG;
+	else if (isLocalRegtest()) CONFIG = SIMNNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
 	else CONFIG = LINODE_TESTNET_CONFIG;
@@ -136,10 +137,9 @@ export function setConfigOnStart() {
 }
 
 function setOverrides() {
-  if (isSimnet() || isDev()) {
-    // below are injected from the server environment but overridden  
-    // with non secure values for local development. The mongo db 
-    // database is shared by simnet users.
+  console.log('================================================ >> ' + process.env.NODE_ENV)
+  if (isLocalRegtest() || isLocalTestnet()) {
+    // localhost params not provided by docker environment
     CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
     CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
     CONFIG.mongoUser = 'dockerdev1'
@@ -147,26 +147,11 @@ function setOverrides() {
     CONFIG.btcNode = 'http://localhost:18443' // ie not via docker network
     CONFIG.btcRpcUser = 'devnet'
     CONFIG.btcRpcPwd = 'devnet'
+    // private keys for testing ability to sign PSBTs..
     CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
     CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
-  }
-  if (isLinodeTestnet() || isLinodeMainnet() || isDev()) {
-    console.log('linode env.. changing CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
-    console.log('linode env.. changing CONFIG.mongoUser = ' + CONFIG.mongoUser)
-    console.log('linode env.. changing CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
-    console.log('linode env.. process.env.mongoDbName = ' + process.env.mongoDbName)
-    console.log('linode env.. process.env.BTC_NODE = ' + process.env.btcNode)
-    console.log('linode env.. changing CONFIG.btcNode = ' + CONFIG.btcNode)
-    console.log('linode env.. changing CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
-    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(0,2))
-    console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + CONFIG.btcSchnorrReveal.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
-    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(0,2))
-    console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + CONFIG.btcSchnorrReclaim.substring(CONFIG.btcSchnorrReveal.length-3,CONFIG.btcSchnorrReveal.length))
-  }
-  //console.log('process.env: ', process.env)
-  if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
-    console.log('================================================ >> ' + process.env.NODE_ENV)
-    // Not Trust Machines Kit - so override the btc connection params with platform values;
+  } else if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
+    // localhost params provided by docker environment
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
     CONFIG.mongoDbName = process.env.mongoDbName || '';
     CONFIG.mongoUser = process.env.mongoUser || ''
@@ -184,12 +169,17 @@ function setOverrides() {
   }
 }
 
-export function isSimnet() {
+export function isLocalRegtest() {
   const environ = process.env.NODE_ENV;
-  return (environ && environ === 'simnet')
+  return (environ && environ === 'local-regtest')
 }
 
-function isDev() {
+export function isLocalTestnet() {
+  const environ = process.env.NODE_ENV;
+  return (environ && environ === 'local-testnet')
+}
+
+export function isDev() {
   const environ = process.env.NODE_ENV;
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
 }

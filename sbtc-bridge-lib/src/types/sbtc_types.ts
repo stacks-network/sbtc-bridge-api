@@ -61,23 +61,17 @@ export type SbtcBalanceType = {
 };
 export type BridgeTransactionType = {
   _id?:string;
+  eventId?:string;
+  network:string
   originator: string;
+  uiPayload:DepositPayloadUIType|WithdrawPayloadUIType;
   status: number;
+	created: number;
+	updated: number;
   tries?: number;
-	updated?: number;
-  amount: number;
-  mode: string,
+  mode: string;
   requestType:string;
-  wallet?: string,
   btcTxid?: string;
-  senderAddress?: string;
-  fromBtcAddress: string;
-  reveal?: RevealOrReclaim;
-  reclaim?: RevealOrReclaim;
-  revealPub?: string;
-  reclaimPub?: string;
-  stacksAddress: string;
-  sbtcWalletAddress: string;
   commitTxScript?: CommitmentScriptDataType;
   vout0?: VoutI;
   vout?: VoutI;
@@ -203,27 +197,19 @@ export type SbtcAlphaEvent = {
 }
 
 export type PayloadType = {
-  sbtcWallet:string;
+  sbtcWallet?:string;
   burnBlockHeight?:number;
-  payload?:WithdrawalPayloadType|DepositPayloadType;
-}
-export type WithdrawalPayloadType = {
-  opcode: string;
-  stacksAddress: string;
-  signature: string;
-  amountSats: number;
-  dustAmount?: number;
-};
-export type DepositPayloadType = {
-  opcode: string;
-  prinType: number;
-  stacksAddress: string;
-  lengthOfCname: number;
+  opcode?: string;
+  prinType?: number;
+  stacksAddress?: string;
+  lengthOfCname?: number;
   cname?: string;
-  lengthOfMemo: number;
+  lengthOfMemo?: number;
   memo?: string;
-  revealFee: number;
+  revealFee?: number;
   amountSats: number;
+  signature?: string;
+  dustAmount?: number;
 };
 export type KeySet = {
   deposits: {
@@ -254,4 +240,24 @@ export type ExchangeRate = {
     sell: number;
     symbol: string;
     name: string;
+}
+
+export type AuthorisationDataType = {
+  signature: string;
+  publicKey: string;
+  stxAddress:string;
+  amountSats:number;
+}
+export interface PayloadUIType {
+  sbtcWalletPublicKey:string
+  reclaimPublicKey: string;
+  paymentPublicKey: string;
+}
+export interface DepositPayloadUIType extends PayloadUIType {
+  bitcoinAddress:string;
+  principal:string;
+  amountSats:number;
+}
+export interface WithdrawPayloadUIType extends DepositPayloadUIType {
+  signature?: string|undefined;
 }
