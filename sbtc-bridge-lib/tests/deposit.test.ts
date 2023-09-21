@@ -51,7 +51,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   it.concurrent('Check parsing and building deposit simple payload', async () => {
     const payloadUint8 = buildDepositPayload(btc.TEST_NETWORK, 5000, 'ST3N4AJFZZYC4BK99H53XP8KDGXFGQ2PRSPNET8TN', true, undefined);
     const payload = hex.encode(payloadUint8)
-    expect(payload).equals('3c051aea4549ffff9845cd298947db226d875f0b8ad8cd00000000000000001388')
+    expect(payload).equals('3c051aea4549ffff9845cd298947db226d875f0b8ad8cd000000000000001388')
     
     const parsedPayload = parseDepositPayload(payloadUint8);
     deepStrictEqual(parsedPayload, {
@@ -68,7 +68,7 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   })
 
   it.concurrent('Check parsing and building deposit with stacks principal', async () => {
-    const payload = buildDepositPayload(btc.TEST_NETWORK, 123456675456, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5', false, undefined);
+    const payload = buildDepositPayload(btc.TEST_NETWORK, 123456675456, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5', true, undefined);
     console.log('Check parsing and building deposit with contract payload: ', hex.encode(payload))
     const parsedPayload = parseDepositPayload(payload);
     deepStrictEqual(parsedPayload, {
@@ -84,8 +84,8 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     })
   })
 
-  it.concurrent('Check parsing and building deposit with contract payload', async () => {
-    const payload = buildDepositPayload(btc.TEST_NETWORK, 5000, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.contract-alpha', false, undefined);
+  it.concurrent('Check parse and build op_drop', async () => {
+    const payload = buildDepositPayload(btc.TEST_NETWORK, 5000, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.contract-alpha', true, undefined);
     console.log('Check parsing and building deposit with contract payload: ', hex.encode(payload))
     const parsedPayload = parseDepositPayload(payload);
     deepStrictEqual(parsedPayload, {
@@ -101,6 +101,23 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     })
   })
 
+  it.concurrent('Check parse and build op_return', async () => {
+    const payload = buildDepositPayload(btc.TEST_NETWORK, 5000, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.contract-alpha', false, undefined);
+    console.log('Check parsing and building deposit with contract payload: ', hex.encode(payload))
+    const parsedPayload = parseDepositPayload(payload);
+    deepStrictEqual(parsedPayload, {
+      amountSats: 0,
+      cname: 'contract-alpha',
+      lengthOfCname: 14,
+      lengthOfMemo: 0,
+      memo: undefined,
+      opcode: '3C',
+      prinType: 6,
+      revealFee: 0,
+      stacksAddress: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
+    })
+  })
+
   it.concurrent('Check parsing and building deposit with contract and memo payload', async () => {
     const payload = buildDepositPayload(btc.TEST_NETWORK, 5000, 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.contract', true, 'indefined');
     const parsedPayload = parseDepositPayload(payload);
@@ -108,8 +125,8 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
       amountSats: 0,
       cname: 'contract',
       lengthOfCname: 8,
-      lengthOfMemo: 9,
-      memo: 'indefined',
+      lengthOfMemo: 0,
+      memo: undefined,
       opcode: '3C',
       prinType: 6,
       revealFee: 5000,
@@ -123,10 +140,10 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const payload:PayloadType = parsePayloadFromTransaction('testnet', txHex);
     console.log('Parse deposit op_return:', payload)
     expect(payload.stacksAddress).equals('ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5')
-    expect(payload.prinType).equals(5)
     expect(payload.amountSats).equals(100)
     expect(payload.opcode).equals('3C')
     expect(payload.sbtcWallet).equals('tb1p68eyfa7nprcegz4xdj5q9msjy69xgshzckvy64cmwegfzu77v2wslah8ww')
+    expect(payload.prinType).equals(0)
   })
 
 })

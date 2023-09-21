@@ -74,15 +74,15 @@ function parseDepositPayloadNoMagic(d1:Uint8Array):PayloadType {
 	}
 
 	let current = 24 + lengthOfCname;
-	let memo;
-	const lengthOfMemo = parseInt(hex.encode(d1.subarray(current, current + 1)), 8);
-	if (lengthOfMemo > 0) {
-		memo = new TextDecoder().decode(d1.subarray(current + 1, lengthOfMemo + current + 1));
-	}
+	//let memo;
+	//const lengthOfMemo = parseInt(hex.encode(d1.subarray(current, current + 1)), 8);
+	//if (lengthOfMemo > 0) {
+	//	memo = new TextDecoder().decode(d1.subarray(current + 1, lengthOfMemo + current + 1));
+	//}
 
 	let revealFee = 0
-	if (d1.length > current + 1 + lengthOfMemo) {
-		current = current + 1 + lengthOfMemo;
+	if (d1.length > current + 1) { // + lengthOfMemo) {
+		//current = current + 1 + lengthOfMemo;
 		const rev = d1.subarray(current);
 		console.log('parseDepositPayloadNoMagic: ' + hex.encode(rev))
 		revealFee = bigUint64ToAmount(rev)
@@ -95,8 +95,8 @@ function parseDepositPayloadNoMagic(d1:Uint8Array):PayloadType {
 		stacksAddress,
 		lengthOfCname,
 		cname,
-		lengthOfMemo,
-		memo,
+		lengthOfMemo: 0,
+		memo: undefined,
 		revealFee,
 		amountSats: 0
 	};
@@ -221,13 +221,8 @@ export function buildDepositPayload(net:any, amountSats:number, address:string, 
 	const addr0Buf = (hex.decode(addr[0].toString(16)));
 	const addr1Buf = hex.decode(addr[1]);
 
-	console.log(addr)
-	console.log('addr0Buf: ' + hex.encode(addr0Buf))
-	console.log('address: ' + address)
-	console.log('opCodeBuf: ' + hex.encode(opCodeBuf))
-	
 	const cnameLength = new Uint8Array(1);
-	const memoLength = new Uint8Array(1);
+	//const memoLength = new Uint8Array(1);
 	const principalType = (address.indexOf('.') > -1) ? hex.decode('06') : hex.decode('05');
 	let buf1 = concat(opCodeBuf, principalType, addr0Buf, addr1Buf);
 	if (address.indexOf('.') > -1) {
@@ -329,14 +324,13 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 	const spendScr = btc.OutScript.decode(script0);
 	let payload = {} as PayloadType;
 	if (spendScr.type === 'unknown') {
-		payload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
-		payload = parsePayloadFromOutput(network, out0, payload.sbtcWallet);
+		//console.log('parsePayloadFromTransaction: payload.sbtcWallet: ' + payload.sbtcWallet);
+		const sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
+		payload = parsePayloadFromOutput(network, out0, sbtcWallet);
+		payload.sbtcWallet = sbtcWallet
 		payload.amountSats = Number(tx.getOutput(1).amount)
-	} else {
-		payload.sbtcWallet = getAddressFromOutScript('testnet', out0.script!)
-		payload = parsePayloadFromOutput(network, out0, payload.sbtcWallet);
-		payload.amountSats = Number(out0.amount)
 	}
+	console.log('parsePayloadFromTransaction: payload: ' + payload);
 	return payload;
 }
 
