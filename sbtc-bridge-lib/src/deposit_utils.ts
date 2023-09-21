@@ -3,7 +3,7 @@ import * as secp from '@noble/secp256k1';
 import * as P from 'micro-packed';
 import { hex } from '@scure/base';
 import type { BridgeTransactionType, DepositPayloadUIType, UTXO } from './types/sbtc_types.js' 
-import { toStorable, buildDepositPayload, buildDepositPayloadOpReturn } from './payload_utils.js' 
+import { toStorable, buildDepositPayload } from './payload_utils.js' 
 import { addInputs, getPegWalletAddressFromPublicKey, inputAmt } from './wallet_utils.js';
 
 const concat = P.concatBytes;
@@ -23,7 +23,9 @@ export const dust = 500;
 export function buildOpReturnDepositTransaction(network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, addressInfo:any) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
-	const data = buildDepositPayloadOpReturn(network, uiPayload.principal);
+	//const data = buildDepositPayloadOpReturn(network, uiPayload.principal);
+	const data = buildDepositPayload(network, 0, uiPayload.principal, false, undefined);
+
 	const txFees = calculateDepositFees(network, false, uiPayload.amountSats, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// no reveal fee for op_return
@@ -96,7 +98,8 @@ function buildData (network:string, sigOrPrin:string, revealFee:number, opDrop:b
 	if (opDrop) {
 		return buildDepositPayload(net, revealFee, sigOrPrin, opDrop, undefined);
 	}
-	return buildDepositPayloadOpReturn(net, sigOrPrin);
+	return buildDepositPayload(net, revealFee, sigOrPrin, opDrop, undefined);
+	//Alpha: return buildDepositPayloadOpReturn(net, sigOrPrin);
 }
 
 export function maxCommit(addressInfo:any) {

@@ -32,9 +32,9 @@ export async function connect() {
 	// operations on them.
 	const database = client.db(getConfig().mongoDbName);
 	sbtcContractEvents = database.collection('sbtcContractEvents');
-	await sbtcContractEvents.createIndex({'bitcoinTxid': 1}, { unique: true })
+	await sbtcContractEvents.createIndex({'contractId': 1, 'txid': 1}, { unique: true })
 	commitments = database.collection('commitments');
-	await commitments.createIndex({status: 1, amount: 1, fromBtcAddress: 1, originator: 1, sbtcWalletAddress: 1}, { unique: true })
+	await commitments.createIndex({btcTxid: 1}, { unique: true })
 	exchangeRates = database.collection('exchangeRates');
 	await exchangeRates.createIndex({currency: 1}, { unique: true })
 }

@@ -4,7 +4,7 @@ import { scanCommitments, savePeginCommit, scanBridgeTransactions, scanPeginRRTr
 import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../../lib/bitcoin/rpc_wallet.js";
 import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
-import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, DepositPayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, WithdrawalPayloadType } from 'sbtc-bridge-lib';
+import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, PayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { TransactionController } from "../bitcoin/BitcoinRPCController.js";
@@ -26,7 +26,7 @@ export class DepositsController {
   }
   
   @Get("/parse/deposit/:data")
-  public commitDeposit(data:string): DepositPayloadType {
+  public commitDeposit(data:string): PayloadType {
     const payload = parseDepositPayload(hex.decode(data));
 		return payload;
   }
@@ -39,7 +39,7 @@ export class DepositsController {
   }
   
   @Get("/parse/withdrawal/:data/:sbtcWallet")
-  public commitWithdrawal(data:string, sbtcWallet:string): WithdrawalPayloadType {
+  public commitWithdrawal(data:string, sbtcWallet:string): PayloadType {
     const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
 		return payload;
   }

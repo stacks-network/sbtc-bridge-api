@@ -8,10 +8,7 @@ import { getConfig } from '../../lib/config.js';
 import { fetchAddress } from '../../lib/bitcoin/api_mempool.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from './StacksRPCController.js';
-import { findContractEventsByFilter, countContractEvents, saveNewContractEvent } from '../../lib/data/db_models.js';
-import util from 'util'
 import type { PayloadType, SbtcContractDataType, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
-import { checkAddressForNetwork } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
 
 const limit = 10;

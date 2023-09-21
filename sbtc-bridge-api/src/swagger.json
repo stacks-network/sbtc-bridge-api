@@ -6,8 +6,15 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"DepositPayloadType": {
+			"PayloadType": {
 				"properties": {
+					"dustAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"signature": {
+						"type": "string"
+					},
 					"amountSats": {
 						"type": "number",
 						"format": "double"
@@ -39,44 +46,17 @@
 					},
 					"opcode": {
 						"type": "string"
-					}
-				},
-				"required": [
-					"amountSats",
-					"revealFee",
-					"lengthOfMemo",
-					"lengthOfCname",
-					"stacksAddress",
-					"prinType",
-					"opcode"
-				],
-				"type": "object"
-			},
-			"WithdrawalPayloadType": {
-				"properties": {
-					"dustAmount": {
+					},
+					"burnBlockHeight": {
 						"type": "number",
 						"format": "double"
 					},
-					"amountSats": {
-						"type": "number",
-						"format": "double"
-					},
-					"signature": {
-						"type": "string"
-					},
-					"stacksAddress": {
-						"type": "string"
-					},
-					"opcode": {
+					"sbtcWallet": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"amountSats",
-					"signature",
-					"stacksAddress",
-					"opcode"
+					"amountSats"
 				],
 				"type": "object"
 			},
@@ -411,7 +391,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/DepositPayloadType"
+									"$ref": "#/components/schemas/PayloadType"
 								}
 							}
 						}
@@ -476,7 +456,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/WithdrawalPayloadType"
+									"$ref": "#/components/schemas/PayloadType"
 								}
 							}
 						}

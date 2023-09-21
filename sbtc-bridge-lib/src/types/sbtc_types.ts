@@ -197,27 +197,19 @@ export type SbtcAlphaEvent = {
 }
 
 export type PayloadType = {
-  sbtcWallet:string;
+  sbtcWallet?:string;
   burnBlockHeight?:number;
-  payload?:WithdrawalPayloadType|DepositPayloadType;
-}
-export type WithdrawalPayloadType = {
-  opcode: string;
-  stacksAddress: string;
-  signature: string;
-  amountSats: number;
-  dustAmount?: number;
-};
-export type DepositPayloadType = {
-  opcode: string;
-  prinType: number;
-  stacksAddress: string;
-  lengthOfCname: number;
+  opcode?: string;
+  prinType?: number;
+  stacksAddress?: string;
+  lengthOfCname?: number;
   cname?: string;
-  lengthOfMemo: number;
+  lengthOfMemo?: number;
   memo?: string;
-  revealFee: number;
+  revealFee?: number;
   amountSats: number;
+  signature?: string;
+  dustAmount?: number;
 };
 export type KeySet = {
   deposits: {
