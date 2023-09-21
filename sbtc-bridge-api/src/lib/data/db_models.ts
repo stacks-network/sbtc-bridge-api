@@ -9,8 +9,15 @@ let peginRequest:Collection;
 let commitments:Collection;
   
 export async function connect() {
-	const uri = `mongodb+srv://${getConfig().mongoUser}:${getConfig().mongoPwd}@${getConfig().mongoDbUrl}/?retryWrites=true&w=majority`;
-	//console.log("Mongo: " + uri);
+	const environ = process.env.NODE_ENV;
+	var uri_prefix:string = 'mongodb+srv'
+	if (environ === 'test' || environ === 'development' || environ === 'dev') {
+	  // SRV URIs have the additional security requirements on hostnames.
+	  // A FQDN is not required for development.
+	  uri_prefix = 'mongodb'
+	}
+	const uri = `${uri_prefix}://${getConfig().mongoUser}:${getConfig().mongoPwd}@${getConfig().mongoDbUrl}/?retryWrites=true&w=majority`;
+	// console.log("Mongo: " + uri);
 
 	// The MongoClient is the object that references the connection to our
 	// datastore (Atlas, for example)
