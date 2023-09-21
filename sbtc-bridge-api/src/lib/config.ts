@@ -176,6 +176,11 @@ function setOverrides() {
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
     CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
     CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
+    CONFIG.sbtcContractId = process.env.sbtcContractId || '';
+    CONFIG.network = process.env.network || '';
+    CONFIG.stacksApi = process.env.stacksApi || '';
+    CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
+    CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
   }
 }
 
