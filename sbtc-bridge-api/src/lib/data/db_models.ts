@@ -1,21 +1,19 @@
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
-import { getConfig } from '../config.js';
-import { ExchangeRate } from 'sbtc-bridge-lib';
+import { getConfig, isDev } from '../config.js';
 
 let exchangeRates:Collection;
 let sbtcContractEvents:Collection;
 let commitments:Collection;
   
 export async function connect() {
-	const environ = process.env.NODE_ENV;
-	var uri_prefix:string = 'mongodb+srv'
-	if (environ === 'test' || environ === 'development' || environ === 'dev') {
+	let uriPrefix:string = 'mongodb+srv'
+	if (isDev()) {
 	  // SRV URIs have the additional security requirements on hostnames.
 	  // A FQDN is not required for development.
-	  uri_prefix = 'mongodb'
+	  uriPrefix = 'mongodb'
 	}
-	const uri = `${uri_prefix}://${getConfig().mongoUser}:${getConfig().mongoPwd}@${getConfig().mongoDbUrl}/?retryWrites=true&w=majority`;
+	const uri = `${uriPrefix}://${getConfig().mongoUser}:${getConfig().mongoPwd}@${getConfig().mongoDbUrl}/?retryWrites=true&w=majority`;
 	// console.log("Mongo: " + uri);
 
 	// The MongoClient is the object that references the connection to our
