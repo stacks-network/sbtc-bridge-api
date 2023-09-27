@@ -16,6 +16,48 @@ router.get("/blocks/count", async (req, res, next) => {
   }
 });
 
+/**
+ * getTxOutProof
+ */
+router.get("/blocks/gettxoutproof/:txs/:blockhash", async (req, res, next) => {
+  try {
+    const controller = new BlocksController();
+    const response = await controller.getTxOutProof(req.params.txs, req.params.blockhash);
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred in /blocks/gettxoutproof/:txs/:blockhash.') 
+  }
+});
+
+/**
+ * getBlock
+ */
+router.get("/blocks/block/:blockhash/:verbosity", async (req, res, next) => {
+  try {
+    const controller = new BlocksController();
+    const response = await controller.getBlock(req.params.blockhash, Number(req.params.verbosity));
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching /blocks/block/:blockhash/:verbosity.') 
+  }
+});
+
+/**
+ * getHeader
+ */
+router.get("/blocks/block-header/:blockhash/:verbosity", async (req, res, next) => {
+  try {
+    const controller = new BlocksController();
+    const response = await controller.getHeader(req.params.blockhash, Boolean(req.params.verbosity));
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching /blocks/block-header/:blockhash/:verbosity.') 
+  }
+});
+
 router.get("/blocks/info", async (req, res, next) => {
   try {
     const controller = new BlocksController();

@@ -28,6 +28,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     res = await fetchTransaction(txid);
     res.hex = await fetchTransactionHex(txid);
   }
+  /**
   if (res && verbose) {
     try {
       res.block = await getBlock(res.blockhash, 1)
@@ -35,6 +36,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
       console.log('Unable to get block info')
     }
   }
+   */
   return res;
 }
  

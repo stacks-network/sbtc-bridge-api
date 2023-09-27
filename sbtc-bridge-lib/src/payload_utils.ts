@@ -10,6 +10,7 @@ import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { recoverSignature } from "micro-stacks/connect";
 import { getAddressFromOutScript } from './wallet_utils.js';
+import { dust } from './withdraw_utils.js';
 
 const concat = P.concatBytes;
 
@@ -163,12 +164,13 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAdd
 	let signature = (hex.encode(d1.subarray(9, 74)));
 
 	//if (signature.startsWith('00')) signature = reverseSigBits(signature)
-    //console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
+    console.log('parseWithdrawalPayloadNoMagic bitcoinAddress: ', bitcoinAddress)
+    console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
 
 	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, bitcoinAddress);
-    //console.log('parseWithdrawalPayloadNoMagic msgHash: ' + msgHash)
+    console.log('parseWithdrawalPayloadNoMagic msgHash: ' + msgHash)
 	const pubKey = getPubkeySignature(hex.decode(msgHash), signature)
-    //console.log('parseWithdrawalPayloadNoMagic pubKey: ' + hex.encode(pubKey))
+    console.log('parseWithdrawalPayloadNoMagic pubKey: ' + hex.encode(pubKey))
 	const v = verifyMessageSignature({ signature, message: msgHash, publicKey: hex.encode(pubKey) })
     //console.log('parseWithdrawalPayloadNoMagic v: ' + v)
 
@@ -258,10 +260,11 @@ export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Ar
 	const amountBuf = amountToBigUint64(amount, 8);
 	//const amountRev = bigUint64ToAmount(amountBuf);
 	let data = concat(opCodeBuf, amountBuf, signature)
-	if (!opDrop) data = concat(magicBuf, opCodeBuf, amountBuf, signature);
+	if (!opDrop) data = concat(magicBuf, data);
 	return data;
 }
 
+/**
 export function parseSbtcWalletAddress(network:string, outputs:Array<any>) {
 	try {
 		// attempt 1: parse as mempool data structure
@@ -306,7 +309,7 @@ function parseSbtcWalletAddressFromBitcoinCore(network:string, outputs:Array<any
 	// addressFromPubkey(network, outputs[0].scriptPubKey)
 	return { bitcoinAddress, amountSats };
 }
-
+ */
 export function readDepositValue(outputs:Array<any>) {
 	let amountSats = 0;
 	if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
@@ -324,17 +327,16 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 	const spendScr = btc.OutScript.decode(script0);
 	let payload = {} as PayloadType;
 	if (spendScr.type === 'unknown') {
-		//console.log('parsePayloadFromTransaction: payload.sbtcWallet: ' + payload.sbtcWallet);
-		const sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
-		payload = parsePayloadFromOutput(network, out0, sbtcWallet);
-		payload.sbtcWallet = sbtcWallet
-		payload.amountSats = Number(tx.getOutput(1).amount)
+		const scriptPubKey = tx.getOutput(1).script
+		payload = parsePayloadFromOutput(network, out0, hex.encode(scriptPubKey!));
+		payload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
+		//payload.dust = Number(tx.getOutput(1).amount)
 	}
 	console.log('parsePayloadFromTransaction: payload: ' + payload);
 	return payload;
 }
 
-export function parsePayloadFromOutput(network:string, out0:any, bitcoinAddress:string):PayloadType {
+export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:string):PayloadType {
 	const d1 = out0.script.subarray(2) // strip the op type and data length
 	const witnessData = getMagicAndOpCode(d1);
 	witnessData.txType = out0.type;
@@ -344,7 +346,7 @@ export function parsePayloadFromOutput(network:string, out0:any, bitcoinAddress:
 		innerPayload = parseDepositPayload(d1);
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
+		innerPayload = parseWithdrawalPayload(network, d1, scriptPubKey)
 		return innerPayload;
 	} else {
 	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
@@ -394,16 +396,20 @@ function parseOutputsBitcoinCore(network:string, output0:any, bitcoinAddress:str
  */
 
 export function getDataToSign(network:string, amount:number, bitcoinAddress:string):Uint8Array {
-	const amtBuf = amountToBigUint64(amount, 8);
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const script = btc.OutScript.encode(btc.Address(net).decode(bitcoinAddress))
-	const data = concat(amtBuf, script);
-	return data;
+	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
+	tx.addOutputAddress(bitcoinAddress, BigInt(dust), net);
+	const amtBuf = amountToBigUint64(amount, 8);
+	const data = concat(amtBuf, tx.getOutput(0).script!);
+	const dataLen = hex.decode(data.length.toString(8));
+	return concat(dataLen, data);
 }
 
 export function getStacksSimpleHashOfDataToSign(network:string, amount:number, bitcoinAddress:string):string {
 	const dataToSign = getDataToSign(network, amount, bitcoinAddress);
 	const msgHash = hashMessage(hex.encode(dataToSign));
+	console.log('getStacksSimpleHashOfDataToSign:dataToSign: ' + hex.encode(dataToSign))
+	console.log('getStacksSimpleHashOfDataToSign:msgHash: ' + hex.encode(msgHash))
 	return hex.encode(msgHash);
 }
 
@@ -420,41 +426,14 @@ function reverseSigBits (signature:string) {
 }
 
 function getPubkeySignature(messageHash:Uint8Array, signature:string) {
-	//console.log('getStacksAddressFromSignature: messageHash: ' + hex.encode(messageHash))
-	//console.log('getStacksAddressFromSignature: signature: ' + signature)
-	let pubkey;
-	try {
-		//console.log('=============================================================')
-		const recBits = (signature.substring(signature.length - 2));
-		//let signature = signature.substring(2)
-		//console.log('getPubkeySignature1: recBits: ' + ' ' + recBits)
-		// works for Hiro sig but not unit test sig ?
-		const sigM = recoverSignature({ signature: signature, mode: 'rsv' }); // vrs to rsv
-		let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
-		sig = sig.addRecoveryBit(Number(recBits)); // sometime 0 sometiimes 1 ??
-		//console.log('getPubkeySignature1: recovery: ', sig)
-		const pubkeyM = sig.recoverPublicKey(messageHash);
-		//console.log('getPubkeySignature11: Hiro: messageHash: ' + hex.encode(messageHash))
-		pubkey = hex.decode(pubkeyM.toHex());
-		//console.log('getPubkeySignature11: Hiro: pubkey: ' + hex.encode(pubkey))
-	} catch (err:any) {
-		//console.log('=============================================================')
-		//console.log('getPubkeySignature2: error: ' + ' ' + err.message)
-		const recBits = (signature.substring(0, 2));
-		const sigM = recoverSignature({ signature: signature, mode: 'rsv' }); // vrs to rsv
-		//console.log('getPubkeySignature2: sigM: ', sigM)
-		let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
-
-		sig = sig.addRecoveryBit(Number(recBits)); // sometime 0 sometiimes 1 ??
-		//console.log('getPubkeySignature2: recovery: ', sig)
-		const pubkeyM = sig.recoverPublicKey(messageHash);
-		//console.log('getPubkeySignature2: Hiro: messageHash: ' + hex.encode(messageHash))
-		pubkey = hex.decode(pubkeyM.toHex());
-		//console.log('getPubkeySignature2: Hiro: pubkey: ' + hex.encode(pubkey))
-	}
-	return pubkey
+	const sigM = recoverSignature({ signature: signature, mode: 'vrs' }); // vrs to rsv
+	let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
+	sig = sig.addRecoveryBit(0);
+	const pubkeyM = sig.recoverPublicKey(messageHash);
+	const pubkey = hex.decode(pubkeyM.toHex());
+	console.log(pubkeyM.toHex())
+	return pubkey;
 }
-
 
 export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string) {
 	const pubkey = getPubkeySignature(messageHash, signature)
@@ -468,7 +447,7 @@ export function getStacksAddressFromPubkey(pubkey:Uint8Array) {
 		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
-	//console.log('getStacksAddressFromSignature: addresses: ', addresses)
+	console.log('getStacksAddressFromSignature: addresses: ', addresses)
 	return addresses;
 }
 

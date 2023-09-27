@@ -199,6 +199,7 @@ export type SbtcAlphaEvent = {
 export type PayloadType = {
   sbtcWallet?:string;
   burnBlockHeight?:number;
+  spendingAddress?: string;
   opcode?: string;
   prinType?: number;
   stacksAddress?: string;

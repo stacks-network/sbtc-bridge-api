@@ -4,12 +4,15 @@ import { scanCommitments, savePeginCommit, scanBridgeTransactions, scanPeginRRTr
 import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
 import { validateAddress } from "../../lib/bitcoin/rpc_wallet.js";
 import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
-import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, PayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload } from 'sbtc-bridge-lib';
+import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, PayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parsePayloadFromTransaction } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { TransactionController } from "../bitcoin/BitcoinRPCController.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
+import { fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js";
+import { parsePayloadFromOutput } from "sbtc-bridge-lib/dist/payload_utils.js";
+import { getAddressFromOutScript } from "sbtc-bridge-lib/dist/wallet_utils.js";
 
 export interface BalanceI {
   balance: number;
@@ -43,6 +46,14 @@ export class DepositsController {
     const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
 		return payload;
   }
+  
+
+  @Get("/parse/tx/:txid")
+  public async parseTransaction(txid:string): Promise<PayloadType> {
+    const txHex = await fetchTransactionHex(txid);
+    return loc_parsePayloadFromTransaction(getConfig().network, txHex);
+  }
+  
   
 
   public async findPeginRequests(): Promise<any> {
@@ -142,4 +153,22 @@ export class SbtcWalletController {
   public async fetchSbtcWalletAddress(): Promise<any> {
     return await fetchSbtcWalletAddress();
   }
+}
+
+
+
+function loc_parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
+  const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txHex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
+  const out0 = tx.getOutput(0);
+  const script0 = out0.script!
+  const spendScr = btc.OutScript.decode(script0);
+  let payload = {} as PayloadType;
+  if (spendScr.type === 'unknown') {
+    const scriptPubKey = tx.getOutput(1).script
+    payload = parsePayloadFromOutput(network, out0, hex.encode(scriptPubKey!));
+    payload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
+    //payload.dust = Number(tx.getOutput(1).amount)
+  }
+  console.log('parsePayloadFromTransaction: payload: ' + payload);
+  return payload;
 }

@@ -1,7 +1,7 @@
 import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../../lib/bitcoin/rpc_transaction.js';
 import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../../lib/bitcoin/rpc_wallet.js";
-import { getBlockChainInfo, getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
+import { getBlockHeader, getBlockChainInfo, getBlockCount, getBlock, getTxOutProof } from "../../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../../lib/bitcoin/api_mempool.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../../lib/bitcoin/api_blockcypher.js";
 import { findBridgeTransactionById } from "../../lib/data/db_models.js";
@@ -38,7 +38,8 @@ export async function handleError (response:any, message:string) {
   }
 }
 
-export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode.substring(7)}${getConfig().walletPath}`;
+//export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode.substring(7)}${getConfig().walletPath}`;
+export const BASE_URL = `http://${getConfig().btcRpcUser}:${getConfig().btcRpcPwd}@${getConfig().btcNode}${getConfig().walletPath}`;
 
 export const OPTIONS = {
   method: "POST",
@@ -366,9 +367,22 @@ export class BlocksController {
     public async getInfo(): Promise<any> {
       return getBlockChainInfo();
   }
-  //@Get("/count")
-    public async getCount(): Promise<any> {
-      return getBlockCount();
+  @Get("/gettxoutproof/:txs/:blockhash")
+  public async getTxOutProof(txs:string, blockhash:string): Promise<any> {
+    return getTxOutProof(txs.split(','), blockhash);
+  }
+
+  @Get("/block/:blockhash/:verbosity")
+  public async getBlock(blockhash:string, verbosity:number): Promise<any> {
+    return getBlock(blockhash, verbosity);
+  }
+
+  @Get("/block-header/:blockhash/:verbosity")
+  public async getHeader(blockhash:string, verbosity:boolean): Promise<any> {
+    return getBlockHeader(blockhash, verbosity);
+  }
+  public async getCount(): Promise<any> {
+    return getBlockCount();
   }
 }
 
