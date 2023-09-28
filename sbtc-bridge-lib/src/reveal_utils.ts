@@ -29,7 +29,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 		if (!peginRequest.commitTxScript.address) throw new Error('Incorrect data passed')
 		if (!script.tapMerkleRoot) throw new Error('Incorrect data passed')
 		if (!script.tapInternalKey) throw new Error('Incorrect data passed')
-		const sbtcWalletAddrScript = btc.Address(net).decode(outAddr)
+		const sbtcWalletAddrScript = btc.Address(net).decode(outAddr!)
 		if (sbtcWalletAddrScript.type !== 'tr') throw new Error('Taproot required')
 		//const fromBtcAddressScript = btc.Address(net).decode(peginRequest.uiPayload.bitcoinAddress);
 		//if (fromBtcAddressScript.type !== 'tr') throw new Error('Taproot required')
@@ -132,7 +132,7 @@ export function buildRevealOrReclaimTransaction (network:string, txFee:number, r
 		amount = peginRequest.uiPayload.amountSats + feeUtxo?.value - fee;
 	}
 	 */
-	tx.addOutputAddress(outAddr, BigInt(amount), net);
+	tx.addOutputAddress(outAddr!, BigInt(amount), net);
 
 	/**
 	 */

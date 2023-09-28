@@ -26,7 +26,7 @@ export function buildOpReturnWithdrawTransaction(network:string, uiPayload:Withd
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, false)
-	const txFees = calculateWithdrawFees(network, false, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, data)
+	const txFees = calculateWithdrawFees(network, false, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress!, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, data)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, 0, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
@@ -49,7 +49,7 @@ export function buildOpDropWithdrawTransaction (network:string, uiPayload:Withdr
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
-	const txFees = calculateWithdrawFees(network, true, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, undefined)
+	const txFees = calculateWithdrawFees(network, true, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress!, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, undefined)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, true)
