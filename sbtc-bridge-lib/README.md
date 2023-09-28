@@ -36,7 +36,7 @@ npm publish
 
 #### deposit_utils.ts
 
-**buildOpReturnDepositTransaction**
+##### buildOpReturnDepositTransaction
 
 Builds the PSBT the user signs to initiate deposit via op_return
 
@@ -47,7 +47,7 @@ Builds the PSBT the user signs to initiate deposit via op_return
 - @param stacksAddress the stacks address to materialise sBTC
 - @returns Transaction from @scure/btc-signer
 
-**buildOpDropDepositTransaction**
+##### buildOpDropDepositTransaction
 
 Builds the PSBT the user signs to initiate deposit via op_drop
 
@@ -60,7 +60,7 @@ Builds the PSBT the user signs to initiate deposit via op_drop
 
 #### withdraw_utils.ts
 
-**buildOpReturnWithdrawTransaction**
+##### buildOpReturnWithdrawTransaction
 
 Builds the PSBT the user signs to initiate withdrawal via op_return
 
@@ -71,7 +71,7 @@ Builds the PSBT the user signs to initiate withdrawal via op_return
 - @param commitTxAddress
 - @returns Transaction from @scure/btc-signer
 
-**buildOpDropWithdrawTransaction**
+##### buildOpDropWithdrawTransaction
 
 Builds the PSBT the user signs to initiate withdrawal via op_drop
 
@@ -84,7 +84,7 @@ Builds the PSBT the user signs to initiate withdrawal via op_drop
 
 #### payload_utils.ts
 
-**buildDepositPayload**
+##### buildDepositPayload
 
 Builds the data to be transmitted in a deposit request
 
@@ -95,7 +95,7 @@ Builds the data to be transmitted in a deposit request
 - @param memo
 - @returns Uint8Array
 
-**buildWithdrawalPayload**
+##### buildWithdrawalPayload
 
 Builds the data to be transmitted in a withdraw request
 
@@ -105,7 +105,7 @@ Builds the data to be transmitted in a withdraw request
 - @param opDrop
 - @returns Uint8Array
 
-**parsePayloadFromTransaction**
+##### parsePayloadFromTransaction
 
 Takes raw transaction hex extracts the sBTC data and returns it in a PayloadType
 
@@ -113,7 +113,7 @@ Takes raw transaction hex extracts the sBTC data and returns it in a PayloadType
 - @param txHex
 - @returns PayloadType
 
-**getDataToSign**
+##### getDataToSign
 
 The data the user needs to sign to issue a withdrawal request
 
@@ -122,20 +122,20 @@ The data the user needs to sign to issue a withdrawal request
 - @param bitcoinAddress
 - @returns Uint8Array
 
-**getStacksAddressFromSignature**
+##### getStacksAddressFromSignature
 
 - @param messageHash
 - @param signature
 - @returns string
 
-**toStorable**
+##### toStorable
 
 Converts taproot script and leaf data structure to hex for easy storage.
 
 - @param script
 - @returns CommitmentScriptDataType
 
-**fromStorable**
+##### fromStorable
 
 Creates a deep clone of the taproot script path data.
 
@@ -144,7 +144,7 @@ Creates a deep clone of the taproot script path data.
 
 #### wallet_utils.ts
 
-**getAddressFromOutScript**
+##### getAddressFromOutScript
 
 getAddressFromOutScript converts a script to an address
 
@@ -152,17 +152,43 @@ getAddressFromOutScript converts a script to an address
 - @param script: Uint8Array
 - @returns address as string
 
-**toXOnly**
+##### toXOnly
 
 converts compressed public key to x-only form for schnorr compatibility
 
 - @param pubkey
 - @returns pubkey as string
 
-**getPegWalletAddressFromPublicKey**
+##### getPegWalletAddressFromPublicKey
 
 Converts the sBTC peg wallet public key to a taproot segwit v2 address.
 
 - @param network
 - @param sbtcWalletPublicKey
 - @returns address as string
+
+#### merkle_utils.ts
+
+Adapted from [Medium article](https://medium.com/coinmonks/merkle-tree-a-simple-explanation-and-implementation-48903442bc08#:~:text=The%20use%20of%20Merkle%20Tree,block%20or%20the%20whole%20blockchain.)
+##### getParametersForProof
+
+- @param txIdNormal
+- @param txHex
+- @param block
+- @returns TxMinedParameters
+
+generateMerkleRoot calculates the merkle root of the passed in txid hashes
+
+- @param {Array<string>} hashes
+- @returns TxMinedParameters
+
+generateMerkleTree calculates the merkle root of the passed in txid hashes
+
+- @param {Array<string>} hashes
+- @returns TxMinedParameters
+
+generateMerkleProof calculates the merkle proof of the passed in txid and hashes
+
+- @param {Array<string>} hash
+- @param {Array<string>} hashes
+- @returns TxMinedParameters

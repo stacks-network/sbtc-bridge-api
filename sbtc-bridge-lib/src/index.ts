@@ -1,4 +1,24 @@
 import {
+    getParametersForProof,
+    headerHex,
+    hashPair,
+    getLeafNodeDirectionInMerkleTree,
+    generateMerkleRoot,
+    generateMerkleTree,
+    generateMerkleProof,
+    ensureEven
+} from './proofs/merkle_utils.js'
+export {
+    getParametersForProof,
+    headerHex,
+    hashPair,
+    getLeafNodeDirectionInMerkleTree,
+    generateMerkleRoot,
+    generateMerkleTree,
+    generateMerkleProof,
+    ensureEven
+} 
+import {
     MAGIC_BYTES_TESTNET,
     MAGIC_BYTES_MAINNET,
     PEGIN_OPCODE,
@@ -145,7 +165,8 @@ import type {
     ExchangeRate,
     AuthorisationDataType,
     DepositPayloadUIType,
-    WithdrawPayloadUIType
+    WithdrawPayloadUIType,
+    TxMinedParameters
 } from './types/sbtc_types.js'
 
 export type {
@@ -170,7 +191,8 @@ export type {
     ExchangeRate,
     AuthorisationDataType,
     DepositPayloadUIType,
-    WithdrawPayloadUIType
+    WithdrawPayloadUIType,
+    TxMinedParameters
 }
 import type {
     PoxInfo,
