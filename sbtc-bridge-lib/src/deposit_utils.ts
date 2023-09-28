@@ -2,6 +2,7 @@ import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
 import * as P from 'micro-packed';
 import { hex } from '@scure/base';
+import type { Transaction } from '@scure/btc-signer' 
 import type { BridgeTransactionType, DepositPayloadUIType, UTXO } from './types/sbtc_types.js' 
 import { toStorable, buildDepositPayload } from './payload_utils.js' 
 import { addInputs, getPegWalletAddressFromPublicKey, inputAmt } from './wallet_utils.js';
@@ -11,27 +12,28 @@ const concat = P.concatBytes;
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 export const revealPayment = 10001
 export const dust = 500;
+
 /**
- * 
- * @param network 
+ * buildOpReturnDepositTransaction:Transaction
+ * @param network (devnet|testnet|mainnet)
  * @param uiPayload:DepositPayloadUIType
  * @param btcFeeRates current rates
  * @param addressInfo the utxos to spend from
  * @param stacksAddress the stacks address to materialise sBTC
- * @returns 
+ * @returns Transaction from @scure/btc-signer
  */
-export function buildOpReturnDepositTransaction(network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, addressInfo:any) {
+export function buildOpReturnDepositTransaction(network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, addressInfo:any):Transaction {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
 	//const data = buildDepositPayloadOpReturn(network, uiPayload.principal);
 	const data = buildDepositPayload(network, 0, uiPayload.principal, false, undefined);
 
-	const txFees = calculateDepositFees(network, false, uiPayload.amountSats, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress, data)
+	const txFees = calculateDepositFees(network, false, uiPayload.amountSats, btcFeeRates.feeInfo, addressInfo, sbtcWalletAddress!, data)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// no reveal fee for op_return
 	addInputs(network, uiPayload.amountSats, 0, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
-	tx.addOutputAddress(sbtcWalletAddress, BigInt(uiPayload.amountSats), net);
+	tx.addOutputAddress(sbtcWalletAddress!, BigInt(uiPayload.amountSats), net);
 	const changeAmount = inputAmt(tx) - (uiPayload.amountSats + txFees[1]); 
 	if (changeAmount > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(changeAmount), net);
 	return tx;
@@ -39,11 +41,11 @@ export function buildOpReturnDepositTransaction(network:string, uiPayload:Deposi
 
 /**
  * @param network 
- * @param uiPayload:DepositPayloadUIType
- * @param btcFeeRates current rates
- * @param addressInfo the utxos to spend from
- * @param commitTxAddress the commitment address - contains the taproot data and the payload
- * @returns transaction object
+ * @param uiPayload 
+ * @param btcFeeRates 
+ * @param addressInfo 
+ * @param commitTxAddress 
+ * @returns Transaction from @scure/btc-signer
  */
 export function buildOpDropDepositTransaction (network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, addressInfo:any, commitTxAddress:string) {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;

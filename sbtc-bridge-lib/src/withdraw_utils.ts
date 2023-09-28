@@ -13,6 +13,14 @@ const privKey = hex.decode('0101010101010101010101010101010101010101010101010101
 export const revealPayment = 10001
 export const dust = 500
 
+/**
+ * 
+ * @param network 
+ * @param uiPayload 
+ * @param addressInfo 
+ * @param btcFeeRates 
+ * @returns Transaction from @scure/btc-signer
+ */
 export function buildOpReturnWithdrawTransaction(network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
@@ -28,6 +36,15 @@ export function buildOpReturnWithdrawTransaction(network:string, uiPayload:Withd
 	return tx;
 }
 
+/**
+ * 
+ * @param network 
+ * @param uiPayload 
+ * @param addressInfo 
+ * @param btcFeeRates 
+ * @param originator 
+ * @returns 
+ */
 export function buildOpDropWithdrawTransaction (network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any, originator:string) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;

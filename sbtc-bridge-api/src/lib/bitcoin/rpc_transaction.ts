@@ -1,12 +1,11 @@
 import fetch from 'node-fetch';
 import { BASE_URL, OPTIONS } from '../../routes/bitcoin/BitcoinRPCController.js'
-import { getBlock } from './rpc_blockchain.js';
 import { fetchTransaction, fetchTransactionHex } from './api_mempool.js';
 import { getConfig } from '../config.js';
 import { parsePayloadFromTransaction } from 'sbtc-bridge-lib';
 
-export async function sendRawTxRpc(hex:string) {
-  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}]}`;
+export async function sendRawTxRpc(hex:string, maxFeeRate:number):Promise<any> {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}", ${maxFeeRate}]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
   const result = await response.text();

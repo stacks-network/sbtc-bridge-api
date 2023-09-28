@@ -260,7 +260,7 @@ router.get("/tx/:txid/hex", async (req, res, next) => {
     const controller = new TransactionController();
     const response = await controller.fetchTransactionHex(req.params.txid);
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.') 
   }
@@ -271,7 +271,7 @@ router.post("/tx/sendrawtx", async (req, res, next) => {
     console.log('/btc/tx/sendrawtx', req.body);
     const tx = req.body;
     const controller = new TransactionController();
-    const result = await controller.sendRawTransaction(tx.hex);
+    const result = await controller.sendRawTransaction(tx.hex, tx.maxFeeRate || 0);
     console.log('/btc/tx/sendrawtx', result);
     return res.send(result);
   } catch (error) {

@@ -192,6 +192,12 @@ export enum PrincipalType {
 	CONTRACT = '06'
 }
 
+/**
+ * 
+ * @param net 
+ * @param address 
+ * @returns 
+ */
 export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array {
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
@@ -215,6 +221,15 @@ export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array 
 	return concat(magicBuf, buf1)
 }
 
+/**
+ * 
+ * @param net 
+ * @param amountSats 
+ * @param address 
+ * @param opDrop 
+ * @param memo 
+ * @returns 
+ */
 export function buildDepositPayload(net:any, amountSats:number, address:string, opDrop:boolean, memo:string|undefined):Uint8Array {
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
@@ -254,6 +269,14 @@ export function buildDepositPayload(net:any, amountSats:number, address:string, 
 	return buf1;
 }
 
+/**
+ * 
+ * @param net 
+ * @param amount 
+ * @param signature 
+ * @param opDrop 
+ * @returns 
+ */
 export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Array, opDrop:boolean):Uint8Array {
 	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
@@ -320,6 +343,12 @@ export function readDepositValue(outputs:Array<any>) {
 	return amountSats;
 }
 
+/**
+ * 
+ * @param network 
+ * @param txHex 
+ * @returns 
+ */
 export function parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
 	const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txHex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
 	const out0 = tx.getOutput(0);
@@ -395,6 +424,13 @@ function parseOutputsBitcoinCore(network:string, output0:any, bitcoinAddress:str
 }
  */
 
+/**
+ * 
+ * @param network 
+ * @param amount 
+ * @param bitcoinAddress 
+ * @returns 
+ */
 export function getDataToSign(network:string, amount:number, bitcoinAddress:string):Uint8Array {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
@@ -435,6 +471,12 @@ function getPubkeySignature(messageHash:Uint8Array, signature:string) {
 	return pubkey;
 }
 
+/**
+ * 
+ * @param messageHash 
+ * @param signature 
+ * @returns 
+ */
 export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string) {
 	const pubkey = getPubkeySignature(messageHash, signature)
 	return getStacksAddressFromPubkey(pubkey);
@@ -493,7 +535,12 @@ export function fromStorable(script:any) {
 	if (typeof script.tweakedPubkey !== 'string') return clone
 	return codifyScript(clone, true)
 }
-  
+
+/**
+ * 
+ * @param script
+ * @returns 
+ */
 export function toStorable(script:any) {
 	//const copied = JSON.parse(JSON.stringify(script));
 	return codifyScript(script, false)

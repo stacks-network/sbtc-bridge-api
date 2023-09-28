@@ -278,7 +278,13 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 	}
 }
 
-export function getAddressFromOutScript(network:string, script: Uint8Array) {
+/**
+ * getAddressFromOutScript converts a script to an address
+ * @param network:string 
+ * @param script: Uint8Array 
+ * @returns address as string
+ */
+export function getAddressFromOutScript(network:string, script: Uint8Array):string {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const outputScript = btc.OutScript.decode(script);
   
@@ -349,10 +355,21 @@ export function inputAmt (tx:btc.Transaction) {
 	return amt;
 }
 
+/**
+ * 
+ * @param pubkey 
+ * @returns 
+ */
 export function toXOnly(pubkey: string): string {
     return hex.encode(hex.decode(pubkey).subarray(1, 33))
 }
 
+/**
+ * 
+ * @param network 
+ * @param sbtcWalletPublicKey 
+ * @returns 
+ */
 export function getPegWalletAddressFromPublicKey (network:string, sbtcWalletPublicKey:string) {
 	if (!sbtcWalletPublicKey) return
 	let net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;

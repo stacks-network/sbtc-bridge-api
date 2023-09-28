@@ -177,7 +177,7 @@ export class TransactionController {
     }
     const signedTx = wrappedPsbt.signedTransaction;
     try {
-      const result = await this.sendRawTransaction(signedTx);
+      const result = await this.sendRawTransaction(signedTx, 0);
       console.log(result)
       wrappedPsbt.broadcastResult = result;
       const pegin:BridgeTransactionType = await findBridgeTransactionById(wrappedPsbt.depositId);
@@ -239,9 +239,13 @@ export class TransactionController {
   }
 
   //@Post("/sendrawtx")
-  public async sendRawTransaction(hex:string): Promise<any> {
+  public async sendRawTransaction(hex:string, maxFeeRate:number): Promise<any> {
       try {
-        const resp =  await sendRawTxRpc(hex);
+        const resp =  await sendRawTxRpc(hex, maxFeeRate);
+        if (resp && resp.error && resp.error.code) {
+          console.log('sendRawTransaction:sendRawTxRpc: ', resp)
+          throw new Error('Local rpc call failed.. try external service')
+        }
         console.log('sendRawTransaction 1: bitcoin core:', resp);
         return resp;
       } catch (err) {
