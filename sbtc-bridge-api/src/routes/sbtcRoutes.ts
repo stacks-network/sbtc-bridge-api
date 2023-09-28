@@ -51,6 +51,17 @@ router.get("/parse/withdrawal/:data/:sbtcWallet", async (req, res, next) => {
   }
 });
 
+router.get("/parse/tx/:txid", async (req, res, next) => {
+  try {
+    const controller = new DepositsController();
+    const response = await controller.parseTransaction(req.params.txid);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 
 router.get("/address/:address/balance", async (req, res, next) => {
   try {
@@ -276,4 +287,4 @@ router.get("/bridgetx/:_id", async (req, res, next) => {
   }
 });
 
-export { router as stacksRoutes }
+export { router as sbtcRoutes }

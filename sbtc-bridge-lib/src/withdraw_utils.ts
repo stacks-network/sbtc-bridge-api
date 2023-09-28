@@ -13,6 +13,14 @@ const privKey = hex.decode('0101010101010101010101010101010101010101010101010101
 export const revealPayment = 10001
 export const dust = 500
 
+/**
+ * 
+ * @param network 
+ * @param uiPayload 
+ * @param addressInfo 
+ * @param btcFeeRates 
+ * @returns Transaction from @scure/btc-signer
+ */
 export function buildOpReturnWithdrawTransaction(network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
@@ -20,14 +28,23 @@ export function buildOpReturnWithdrawTransaction(network:string, uiPayload:Withd
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, false)
 	const txFees = calculateWithdrawFees(network, false, addressInfo, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, data)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
+	addInputs(network, uiPayload.amountSats, 0, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
 	const change = inputAmt(tx) - (dust + txFees[1]);
+	tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(dust), net);
 	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
-	tx.addOutputAddress(sbtcWalletAddress, BigInt(dust), net);
 	return tx;
 }
 
+/**
+ * 
+ * @param network 
+ * @param uiPayload 
+ * @param addressInfo 
+ * @param btcFeeRates 
+ * @param originator 
+ * @returns 
+ */
 export function buildOpDropWithdrawTransaction (network:string, uiPayload:WithdrawPayloadUIType, addressInfo:any, btcFeeRates:any, originator:string) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
@@ -36,18 +53,15 @@ export function buildOpDropWithdrawTransaction (network:string, uiPayload:Withdr
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, addressInfo.utxos, uiPayload.paymentPublicKey);
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, true)
-	const csvScript = getWithdrawScript(network, data, sbtcWalletAddress, uiPayload.bitcoinAddress);
+	const csvScript = getOpDropWithdrawRequest(network, uiPayload, originator);
+	//(network, data, sbtcWalletAddress, uiPayload.bitcoinAddress);
 	if (!csvScript ) throw new Error('script required!');
-	getOpDropWithdrawRequest(network, uiPayload, originator);
-	tx.addOutput({ script: csvScript.script, amount: BigInt(dust) });
+	
+	tx.addOutput({ script: csvScript.commitTxScript!.script, amount: BigInt(0) });
+	tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(dust), net);
 	const change = inputAmt(tx) - (dust + txFees[1]);
 	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
 	return tx;
-}
-
-export function dataToSign(network:string, amount:number, fromBtcAddress:string) {
-	const data = getDataToSign(network, amount, fromBtcAddress)
-	return hex.encode(data);
 }
 
 export function calculateWithdrawFees(network:string, opDrop:boolean, addressInfo:any, amount:number, feeInfo:{ low_fee_per_kb:number, medium_fee_per_kb:number, high_fee_per_kb:number }, sbtcWalletAddress:string, changeAddress:string, paymentPublicKey:string, data:Uint8Array|undefined) {
@@ -125,7 +139,7 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
 
 	const scripts =  [
 	  { script: btc.Script.encode([data, 'DROP', pk1U, 'CHECKSIG']) },
-	  { script: btc.Script.encode([pk2U, 'CHECKSIG']) }
+	  { script: btc.Script.encode(['IF', 144, 'CHECKSEQUENCEVERIFY', 'DROP', pk2U, 'CHECKSIG', 'ENDIF']) }
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
 	// convert unit8 arrays to hex strings for transportation.

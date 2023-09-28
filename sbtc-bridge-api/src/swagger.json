@@ -47,6 +47,9 @@
 					"opcode": {
 						"type": "string"
 					},
+					"spendingAddress": {
+						"type": "string"
+					},
 					"burnBlockHeight": {
 						"type": "number",
 						"format": "double"
@@ -345,6 +348,109 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
+		"/bridge-api/{network}/v1/btc/blocks/gettxoutproof/{txs}/{blockhash}": {
+			"get": {
+				"operationId": "GetTxOutProof",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txs",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "blockhash",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/blocks/block/{blockhash}/{verbosity}": {
+			"get": {
+				"operationId": "GetBlock",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "blockhash",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "verbosity",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/btc/blocks/block-header/{blockhash}/{verbosity}": {
+			"get": {
+				"operationId": "GetHeader",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "blockhash",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "verbosity",
+						"required": true,
+						"schema": {
+							"type": "boolean"
+						}
+					}
+				]
+			}
+		},
 		"/bridge-api/{network}/v1/sbtc/build/deposit/{stxAddress}/{revealFee}": {
 			"get": {
 				"operationId": "CommitDepositData",
@@ -475,6 +581,34 @@
 					{
 						"in": "path",
 						"name": "sbtcWallet",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/sbtc/parse/tx/{txid}": {
+			"get": {
+				"operationId": "ParseTransaction",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PayloadType"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txid",
 						"required": true,
 						"schema": {
 							"type": "string"

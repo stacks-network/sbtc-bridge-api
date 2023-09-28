@@ -13,7 +13,6 @@ import {
     getDataToSign,
     getStacksSimpleHashOfDataToSign,
     getStacksAddressFromSignature,
-    parseSbtcWalletAddress,
     readDepositValue,
     fromStorable,
     toStorable
@@ -33,7 +32,6 @@ export {
     getDataToSign,
     getStacksSimpleHashOfDataToSign,
     getStacksAddressFromSignature,
-    parseSbtcWalletAddress,
     readDepositValue,
     fromStorable,
     toStorable
@@ -63,7 +61,6 @@ export {
 } 
 
 import {
-    dataToSign,
     calculateWithdrawFees,
     getWithdrawScript,
     getOpDropWithdrawRequest,
@@ -72,7 +69,6 @@ import {
     buildOpReturnWithdrawTransaction
 } from './withdraw_utils.js'
 export {
-    dataToSign,
     calculateWithdrawFees,
     getWithdrawScript,
     getOpDropWithdrawRequest,

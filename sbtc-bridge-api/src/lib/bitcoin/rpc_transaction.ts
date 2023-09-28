@@ -1,12 +1,11 @@
 import fetch from 'node-fetch';
 import { BASE_URL, OPTIONS } from '../../routes/bitcoin/BitcoinRPCController.js'
-import { getBlock } from './rpc_blockchain.js';
 import { fetchTransaction, fetchTransactionHex } from './api_mempool.js';
 import { getConfig } from '../config.js';
 import { parsePayloadFromTransaction } from 'sbtc-bridge-lib';
 
-export async function sendRawTxRpc(hex:string) {
-  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}]}`;
+export async function sendRawTxRpc(hex:string, maxFeeRate:number):Promise<any> {
+  const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}", ${maxFeeRate}]}`;
   OPTIONS.body = dataString;
   const response = await fetch(BASE_URL, OPTIONS);
   const result = await response.text();
@@ -28,6 +27,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
     res = await fetchTransaction(txid);
     res.hex = await fetchTransactionHex(txid);
   }
+  /**
   if (res && verbose) {
     try {
       res.block = await getBlock(res.blockhash, 1)
@@ -35,6 +35,7 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
       console.log('Unable to get block info')
     }
   }
+   */
   return res;
 }
  

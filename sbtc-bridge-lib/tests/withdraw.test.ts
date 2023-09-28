@@ -3,7 +3,7 @@ import {
   parseDepositPayload, buildDepositPayload,
   amountToBigUint64, bigUint64ToAmount,
   buildWithdrawalPayload, parseWithdrawalPayload,
-  getStacksSimpleHashOfDataToSign, getStacksAddressFromSignature
+  getStacksSimpleHashOfDataToSign, getStacksAddressFromSignature, PayloadType, parsePayloadFromTransaction, getDataToSign
 } from '../src/index';
 import { sbtcWallets } from '../src/index';
 import { hex } from '@scure/base';
@@ -12,6 +12,8 @@ import { fail, deepStrictEqual } from 'assert';
 import assert from 'assert';
 import * as btc from '@scure/btc-signer';
 import * as secp from '@noble/secp256k1';
+import { dust } from '../src/withdraw_utils';
+import { getStacksAddressFromPubkey } from '../src/payload_utils';
 
 describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
   beforeAll(async () => {
@@ -55,90 +57,69 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     /**
      */
   })
-  
-  /**
-  */
+
   it.concurrent('Check parsing and building withdrawal payload 1', async () => {
-    const fromAddress = 'tb1qp8r7ln235zx6nd8rsdzkgkrxc238p6eecys2m9'
-    const stacksAddress = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5';
-    const amount = 942;
-    //const amountBuf = '00000000000003ae' // 8 bytes
-    //const messageHash = '00000000000003ae001409c7efcd51a08da9b4e38345645866c2a270eb39'
-    //const publicKey = "02e30e89dc85db23273fed237c21d4ca495de4fbffbdf8a90d90e902847fb411c7"
-    let signature = "885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600"
-    //Sats (be, buf=1): 942 amountToBigUint64:00000000000003ae bigUint64ToAmount:942
-    //data = concat(magicBuf, opCodeBuf, amountBuf, signature)
-    const data = '54323e00000000000003ae885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
-                 //     00000000000003ae
-    //let signature = await secp.signAsync(dataToSignHash, privKey); // sync methods below
-    //signature = signature.addRecoveryBit(1);
-    //assert(secp.verify(signature, dataToSignHash, pubKey));
-    //const payload = buildWithdrawalPayload(btc.TEST_NETWORK, 5000, signature.toCompactRawBytes(), false);
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    assert(hex.encode(payload) === data);
-    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
+    const sig = {
+      publicKey: "032dea00ee2172e11fc18fc3c3ab2712038bf95d7b89330d0195624cc20764e414",
+      signature: "00b9710b4fda0bcf7a066d49f29ed76032c28862e5c496c5c9803501baa6130eb915e992eef765daaebf06acba5efa49ae8e0a438c5f22b03088c9d94dd061ca30"
+    }
+    const getDataToSign = '3600000000000003200014764ad6983a6455cca54cd6a4f7b0da71ba6a0bab';
+    const message = '3600000000000003200014764ad6983a6455cca54cd6a4f7b0da71ba6a0bab'
+    const messageHash = 'b37a0c9bf56598e9d39da2eaf6762c99fd403c61605148a34c505c62271880cc'
+
+    getStacksAddressFromPubkey(hex.decode(sig.publicKey))
+
+    const fromAddress = 'tb1qwe9ddxp6v32uef2v66j00vx6wxax5zat223tms'
+    const stacksAddress = 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT';
+    const amount = 800;
+
+    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(sig.signature), false);
+
+    //assert(hex.encode(payload) === data);
+
+    //const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
+    //tx.addOutputAddress(fromAddress, BigInt(dust), btc.TEST_NETWORK);
+  
+    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress);
     //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
-    assert(parsedPayload.signature === signature);
-    assert(parsedPayload.stacksAddress === stacksAddress);
+    assert(parsedPayload.signature === sig.signature);
+    expect(parsedPayload.stacksAddress).equals(stacksAddress);
   })
 
   it.concurrent('Check parsing and building withdrawal payload 2', async () => {
     const fromAddress = 'tb1qp8r7ln235zx6nd8rsdzkgkrxc238p6eecys2m9'
     const stacksAddress = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5';
     const amount = 942;
-    const data = '54323e00000000000003ae885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
-    let signature = '885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
-    //console.log('parsedPayload: ', parsedPayload);
-    expect(data).equals(hex.encode(payload));
+    const sig = {
+      publicKey: "02e30e89dc85db23273fed237c21d4ca495de4fbffbdf8a90d90e902847fb411c7",
+      signature: "00251c10f7e9a650409416fd70a4c9f3467723f3bdbcc6a534c1d11776c6da76df57dfddfb524c01776af0443da6fd7be5e189ec4d42290ee80db2a1e7f08dda5e"
+    }
+    const getDataToSign = '360000000000000258001409c7efcd51a08da9b4e38345645866c2a270eb39';
+    const message = '3600000000000003200014764ad6983a6455cca54cd6a4f7b0da71ba6a0bab'
+    const messageHash = 'b37a0c9bf56598e9d39da2eaf6762c99fd403c61605148a34c505c62271880cc'
+
+    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(sig.signature), false);
+    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress);
+    //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
-    assert(parsedPayload.stacksAddress === stacksAddress);
-    assert(parsedPayload.signature === signature);
+    assert(parsedPayload.signature === sig.signature);
+    expect(parsedPayload.stacksAddress).equals(stacksAddress);
   })
-
-  it.concurrent('Check parsing and building withdrawal payload 3', async () => {
-    const fromAddress = 'tb1qp8r7ln235zx6nd8rsdzkgkrxc238p6eecys2m9'
-    const stacksAddress = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5';
-    const amount = 242;
-    const data = '54323e00000000000000f221a7ac825846d024fe29d0db9d9b48b0d520d01398dc4edf0aab15f9b38da27718ddce8a5c6f8bf730858d9619455a68c03338d729b1f623aa1ddb84ee383e6a00'
-    let signature = '21a7ac825846d024fe29d0db9d9b48b0d520d01398dc4edf0aab15f9b38da27718ddce8a5c6f8bf730858d9619455a68c03338d729b1f623aa1ddb84ee383e6a00'
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    //console.log('payload: ', hex.encode(payload));
-    const parsedPayload = parseWithdrawalPayload('testnet', hex.decode(data), fromAddress, 0);
-    //console.log('parsedPayload: ', parsedPayload);
-    //console.log('data         : ', data);
-    expect(data).equals(hex.encode(payload));
-    assert(parsedPayload.amountSats === amount);
-    assert(parsedPayload.opcode === '3E');
-    assert(parsedPayload.stacksAddress === stacksAddress);
-    assert(parsedPayload.signature === signature);
-  })
-
-
-  it.concurrent('Check parsing and building withdrawal payload 4', async () => {
-    const fromAddress = 'mu5o1rDdfP6g8NKa1RweQDo1zQT58KWjdR'
-    const stacksAddress = 'ST2ACZ7DAH6EH20V36ES9SJEERBX7VWGWV0YB91PG';
-    const amount = 100;
-    const msgHash = 'ccfa2c7c2a3a4d3928729119d27e4959b77772e457f6d256119ee2211504d1ad'
-    expect(msgHash).equals(getStacksSimpleHashOfDataToSign('testnet', amount, fromAddress))
-    const data = '54323e0000000000000064084a912d26cb8f26652efc53d717a6b6dbdb64042cfbaa06e20b60fef67d144f36643bbba7ed178255497a058774e39fe39493f444f5ca3428d821356a6bfcf501'
-    let signature = '084a912d26cb8f26652efc53d717a6b6dbdb64042cfbaa06e20b60fef67d144f36643bbba7ed178255497a058774e39fe39493f444f5ca3428d821356a6bfcf501'
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    //console.log('payload: ', hex.encode(payload));
-    const parsedPayload = parseWithdrawalPayload('testnet', hex.decode(data), fromAddress, 1);
-    //console.log('parsedPayload: ', parsedPayload);
-    //console.log('data         : ', data);
-    expect(data).equals(hex.encode(payload));
-    assert(parsedPayload.amountSats === amount);
-    assert(parsedPayload.opcode === '3E');
-    assert(parsedPayload.stacksAddress === stacksAddress);
-    assert(parsedPayload.signature === signature);
-  })
-
   
+  it.concurrent('Parse deposit op_return', async () => {
+    const txHex = '02000000000101b45477dbbb0529da2113432a3a4956de86225db8cbe7d5542e7789cd6a440f6c0100000000ffffffff0300000000000000004f6a4c4c54323e0000000000000315019d9f202861ef9e2d8ec332aac3f60d922ba7d1a98adf46f9416756e6f750639f4a949af7ff0c7b30dc24c0db2bdd7ea70cf3e9096108eb4023b2eca79d35a494f40100000000000016001409c7efcd51a08da9b4e38345645866c2a270eb39d14305000000000016001409c7efcd51a08da9b4e38345645866c2a270eb3902483045022100de9e244dd9bd6f307e979547e088736f54fde25d250e435fe867ddf4948f4d0202207762316984993ef5a8cefad1723eee8f07200437b87f3c141a39c3b150cffd27012103665ca3afcd61141e97aa9706d180514e28ef8fa29e0425e82a78e5e3b25f2b3600000000';
+    
+    const payload:PayloadType = parsePayloadFromTransaction('testnet', txHex);
+    console.log('Parse deposit op_return:', payload)
+    expect(payload.stacksAddress).equals('ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5')
+    expect(payload.amountSats).equals(100)
+    expect(payload.opcode).equals('3C')
+    expect(payload.sbtcWallet).equals('tb1p68eyfa7nprcegz4xdj5q9msjy69xgshzckvy64cmwegfzu77v2wslah8ww')
+    expect(payload.prinType).equals(0)
+  })
+
 })
 

@@ -9,7 +9,7 @@ import { connect, getExchangeRates } from './lib/data/db_models.js'
 import { WebSocketServer } from 'ws'
 import { configRoutes } from './routes/configRoutes.js'
 import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
-import { stacksRoutes } from './routes/stacksRoutes.js'
+import { sbtcRoutes } from './routes/sbtcRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
@@ -53,7 +53,7 @@ app.use((req, res, next) => {
 
 app.use('/bridge-api/:network/v1/config', configRoutes);
 app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
-app.use('/bridge-api/:network/v1/sbtc', stacksRoutes);
+app.use('/bridge-api/:network/v1/sbtc', sbtcRoutes);
 app.use('/bridge-api/:network/v1/events', eventsRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
