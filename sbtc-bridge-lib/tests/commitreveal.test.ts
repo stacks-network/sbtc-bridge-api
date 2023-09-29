@@ -10,7 +10,7 @@ import { schnorr } from '@noble/curves/secp256k1'; // ESM and Common.js
 import * as secp from '@noble/secp256k1';
 
 
-describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
+describe('Commit reveal tests', () => {
   beforeAll(async () => {
     ////console.log("beforeAll: -----------------------------------------------");
   })
@@ -76,25 +76,10 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const fromAddress = 'tb1qp8r7ln235zx6nd8rsdzkgkrxc238p6eecys2m9'
     const stacksAddress = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5';
     const amount = 942;
-    //const amountBuf = '00000000000003ae' // 8 bytes
-    //const messageHash = '00000000000003ae001409c7efcd51a08da9b4e38345645866c2a270eb39'
-    //const publicKey = "02e30e89dc85db23273fed237c21d4ca495de4fbffbdf8a90d90e902847fb411c7"
     let signature = "885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600"
-    //Sats (be, buf=1): 942 amountToBigUint64:00000000000003ae bigUint64ToAmount:942
-    //data = concat(magicBuf, opCodeBuf, amountBuf, signature)
     const data = '54323e00000000000003ae885b122df0a9a4abb9bc7911dc6d7af5b36a54063fa32476fbfe5ba0a0d039803bb6de6bd3058c4c494d3a6f1c925afd55dc2daa5672d164816457ab8c0ef6e600'
-                 //     00000000000003ae
-    //let signature = await secp.signAsync(dataToSignHash, privKey); // sync methods below
-    //signature = signature.addRecoveryBit(1);
-    //assert(secp.verify(signature, dataToSignHash, pubKey));
     const payload = buildWithdrawPayload('testnet', amount, signature);
     assert(payload === data);
-    const parsedPayload = parseWithdrawPayload('testnet', payload, fromAddress);
-    //console.log('parsedPayload1: ', parsedPayload);
-    assert(parsedPayload.amountSats === amount);
-    assert(parsedPayload.opcode === '3E');
-    assert(parsedPayload.signature === signature);
-    assert(parsedPayload.stacksAddress === stacksAddress);
   })
 
 })

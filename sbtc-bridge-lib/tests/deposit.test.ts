@@ -8,7 +8,7 @@ import { fail, deepStrictEqual } from 'assert';
 import * as btc from '@scure/btc-signer';
 import { parsePayloadFromTransaction } from '../src/payload_utils';
 
-describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
+describe('Deposit tests', () => {
   beforeAll(async () => {
   })
 

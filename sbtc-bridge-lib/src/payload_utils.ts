@@ -143,23 +143,24 @@ export function bigUint64ToAmount(buf:Uint8Array):number {
 	return Number(amt);
 }
 
-export function parseWithdrawPayload(network:string, d0:string, bitcoinAddress:string):PayloadType {
+export function parseWithdrawPayload(network:string, d0:string, bitcoinAddress:string, sigMode: 'rsv'|'vrs'):PayloadType {
 	const d1 = hex.decode(d0)
 	const magicOp = getMagicAndOpCode(d1);
 	if (magicOp.magic) {
-		return parseWithdrawalPayloadNoMagic(network, d1.subarray(2), bitcoinAddress);
+		return parseWithdrawalPayloadNoMagic(network, d1.subarray(2), bitcoinAddress, sigMode);
 	}
-	return parseWithdrawalPayloadNoMagic(network, d1, bitcoinAddress);
+	return parseWithdrawalPayloadNoMagic(network, d1, bitcoinAddress, sigMode);
 }
 
-function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAddress:string):PayloadType {
+function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAddress:string, sigMode: 'rsv'|'vrs'):PayloadType {
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3E') throw new Error('Wrong opcode for withdraw: should be 3E was ' + opcode)
 	const amtB = d1.subarray(1, 9)
 	const amountSats = bigUint64ToAmount(amtB);
 	let signature = (hex.encode(d1.subarray(9, 74)));
 	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, bitcoinAddress);
-	const pubKey = getPubkeySignature(hex.decode(msgHash), signature)
+	const pubKey = getPubkeySignature(hex.decode(msgHash), signature, sigMode)
+	console.log('parseWithdrawalPayloadNoMagic:pubKey: ' + hex.encode(pubKey))
 	const stxAddresses = getStacksAddressFromPubkey(pubKey);
 	const stacksAddress = (network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
 	return {
@@ -281,17 +282,25 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 	let payload = {} as PayloadType;
 	if (spendScr.type === 'unknown') {
 		const scriptPubKey = tx.getOutput(1).script
-		payload = parsePayloadFromOutput(network, out0, hex.encode(scriptPubKey!));
-		payload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
+		const bitcoinAddress = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
+		console.log('parsePayloadFromTransaction:addr', bitcoinAddress)
+		payload = parsePayloadFromOutput(network, out0, bitcoinAddress);
+		payload.sbtcWallet = bitcoinAddress
+		if (payload.opcode === '3C') payload.amountSats = Number(tx.getOutput(1).amount)
 		//payload.dust = Number(tx.getOutput(1).amount)
 	}
 	console.log('parsePayloadFromTransaction: payload: ' + payload);
 	return payload;
 }
 
-export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:string):PayloadType {
-	const d1 = out0.script.subarray(2) as Uint8Array // strip the op type and data length
-	const witnessData = getMagicAndOpCode(d1);
+export function parsePayloadFromOutput(network:string, out0:any, bitcoinAddress:string):PayloadType {
+	let d1 = out0.script.subarray(5) as Uint8Array // strip the op type and data length
+	let witnessData = getMagicAndOpCode(d1);
+	if (witnessData.opcode !== '3C' && witnessData.opcode !== '3E') {
+		d1 = out0.script.subarray(2) as Uint8Array // strip the op type and data length
+		witnessData = getMagicAndOpCode(d1);
+	}
+	console.log('parsePayloadFromTransaction:witnessData', witnessData)
 	witnessData.txType = out0.type;
 
 	let innerPayload:PayloadType;
@@ -299,7 +308,7 @@ export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:st
 		innerPayload = parseDepositPayload(d1);
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawPayload(network, hex.encode(d1), scriptPubKey)
+		innerPayload = parseWithdrawPayload(network, hex.encode(d1), bitcoinAddress, 'vrs')
 		return innerPayload;
 	} else {
 	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
@@ -316,6 +325,7 @@ export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:st
 export function getDataToSign(network:string, amount:number, bitcoinAddress:string):Uint8Array {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
+	console.log('getDataToSign:bitcoinAddress: ' + bitcoinAddress)
 	tx.addOutputAddress(bitcoinAddress, BigInt(dust), net);
 	const amtBuf = amountToBigUint64(amount, 8);
 	const data = concat(amtBuf, tx.getOutput(0).script!);
@@ -343,10 +353,14 @@ function reverseSigBits (signature:string) {
 	return signature
 }
 
-function getPubkeySignature(messageHash:Uint8Array, signature:string) {
-	const sigM = recoverSignature({ signature: signature, mode: 'vrs' }); // vrs to rsv
+function getPubkeySignature(messageHash:Uint8Array, signature:string, sigMode:'vrs'|'rsv'|undefined) {
+	const sigM = recoverSignature({ signature: signature, mode: sigMode }); // vrs to rsv
 	let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
-	sig = sig.addRecoveryBit(0);
+	const recBit = parseInt(hex.encode(hex.decode(signature).subarray(0,1)))
+	console.log('getPubkeySignature:signature' + signature)
+	console.log('getPubkeySignature:recBit' + recBit)
+	console.log('getPubkeySignature:sigMode' + sigMode)
+	sig = sig.addRecoveryBit(recBit);
 	const pubkeyM = sig.recoverPublicKey(messageHash);
 	const pubkey = hex.decode(pubkeyM.toHex());
 	console.log(pubkeyM.toHex())
@@ -360,7 +374,12 @@ function getPubkeySignature(messageHash:Uint8Array, signature:string) {
  * @returns 
  */
 export function getStacksAddressFromSignature(messageHash:Uint8Array, signature:string) {
-	const pubkey = getPubkeySignature(messageHash, signature)
+	const pubkey = getPubkeySignature(messageHash, signature, 'vrs')
+	return getStacksAddressFromPubkey(pubkey);
+}
+
+export function getStacksAddressFromSignatureRsv(messageHash:Uint8Array, signature:string) {
+	const pubkey = getPubkeySignature(messageHash, signature, 'rsv')
 	return getStacksAddressFromPubkey(pubkey);
 }
 
@@ -371,7 +390,7 @@ export function getStacksAddressFromPubkey(pubkey:Uint8Array) {
 		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
-	console.log('getStacksAddressFromSignature: addresses: ', addresses)
+	console.log('getStacksAddressFromPubkey: addresses: ', addresses)
 	return addresses;
 }
 

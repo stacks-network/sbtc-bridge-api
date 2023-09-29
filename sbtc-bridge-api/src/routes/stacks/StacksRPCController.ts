@@ -40,7 +40,7 @@ export class DepositsController {
   
   @Get("/parse/withdrawal/:data/:sbtcWallet")
   public commitWithdrawal(data:string, sbtcWallet:string): PayloadType {
-    const payload = parseWithdrawPayload(getConfig().network, data, sbtcWallet);
+    const payload = parseWithdrawPayload(getConfig().network, data, sbtcWallet, 'vrs');
 		return payload;
   }
   
