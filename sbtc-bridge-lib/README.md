@@ -36,76 +36,89 @@ npm publish
 
 #### deposit_utils.ts
 
-**buildOpReturnDepositTransaction**
+##### buildDepositTransaction
 
 Builds the PSBT the user signs to initiate deposit via op_return
 
-- @param network (devnet|testnet|mainnet)
+- @param network (testnet|mainnet)
 - @param uiPayload:DepositPayloadUIType
 - @param btcFeeRates current rates
-- @param addressInfo the utxos to spend from
+- @param utxos the utxos to spend from - usually correspond to the utxo set from the web wallet payment address
 - @param stacksAddress the stacks address to materialise sBTC
 - @returns Transaction from @scure/btc-signer
 
-**buildOpDropDepositTransaction**
+##### buildDepositTransactionOpDrop
 
 Builds the PSBT the user signs to initiate deposit via op_drop
 
 - @param network
 - @param uiPayload:DepositPayloadUIType
 - @param btcFeeRates
-- @param addressInfo
-- @param commitTxAddress
+- @param utxos the utxos to spend from - usually correspond to the utxo set from the web wallet payment address
+- @param commitTxAddress - the commitment or funding address for the commit / reveal (op_drop) transactions
 - @returns Transaction from @scure/btc-signer
 
 #### withdraw_utils.ts
 
-**buildOpReturnWithdrawTransaction**
+##### buildWithdrawTransaction
 
 Builds the PSBT the user signs to initiate withdrawal via op_return
 
 - @param network
 - @param uiPayload:WithdrawPayloadUIType
+- @param utxos the utxos to spend from - usually correspond to the utxo set from the web wallet payment address
 - @param btcFeeRates
-- @param addressInfo
-- @param commitTxAddress
 - @returns Transaction from @scure/btc-signer
 
-**buildOpDropWithdrawTransaction**
+##### buildWithdrawTransactionOpDrop
 
 Builds the PSBT the user signs to initiate withdrawal via op_drop
 
-- @param network
-- @param uiPayload :WithdrawPayloadUIType
-- @param addressInfo
+- @param network (testnet|mainnet)
+- @param uiPayload (WithdrawPayloadUIType)
+- @param utxos the utxos to spend from - usually correspond to the utxo set from the web wallet payment address
 - @param btcFeeRates
-- @param originator
+- @param originator - the originating users stacks address
 - @returns Transaction from @scure/btc-signer
 
 #### payload_utils.ts
 
-**buildDepositPayload**
+##### buildDepositPayload
 
 Builds the data to be transmitted in a deposit request
 
-- @param net
-- @param amountSats
-- @param address
-- @param opDrop
-- @param memo
-- @returns Uint8Array
+- @param network (testnet|mainnet)
+- @param stacksAddress (address or contract principal)
+- @returns string (hex encoded data)
 
-**buildWithdrawalPayload**
+##### buildDepositPayloadOpDrop
+
+Builds the data to be transmitted in a deposit request via op_drop mechanism
+
+- @param network (testnet|mainnet)
+- @param stacksAddress (address or contract principal)
+- @param revealFee (fee for the reveal transaction)
+- @returns string (hex encoded data)
+
+##### buildWithdrawPayload
 
 Builds the data to be transmitted in a withdraw request
 
-- @param net
+- @param network (testnet|mainnet)
 - @param amount
 - @param signature
-- @param opDrop
 - @returns Uint8Array
 
-**parsePayloadFromTransaction**
+##### buildWithdrawPayloadOpDrop
+
+Builds the data to be transmitted in a commit/reveal withdraw request
+
+- @param network (testnet|mainnet)
+- @param amount
+- @param signature
+- @returns string
+
+##### parsePayloadFromTransaction
 
 Takes raw transaction hex extracts the sBTC data and returns it in a PayloadType
 
@@ -113,7 +126,7 @@ Takes raw transaction hex extracts the sBTC data and returns it in a PayloadType
 - @param txHex
 - @returns PayloadType
 
-**getDataToSign**
+##### getDataToSign
 
 The data the user needs to sign to issue a withdrawal request
 
@@ -122,20 +135,20 @@ The data the user needs to sign to issue a withdrawal request
 - @param bitcoinAddress
 - @returns Uint8Array
 
-**getStacksAddressFromSignature**
+##### getStacksAddressFromSignature
 
 - @param messageHash
 - @param signature
 - @returns string
 
-**toStorable**
+##### toStorable
 
 Converts taproot script and leaf data structure to hex for easy storage.
 
 - @param script
 - @returns CommitmentScriptDataType
 
-**fromStorable**
+##### fromStorable
 
 Creates a deep clone of the taproot script path data.
 
@@ -144,7 +157,7 @@ Creates a deep clone of the taproot script path data.
 
 #### wallet_utils.ts
 
-**getAddressFromOutScript**
+##### getAddressFromOutScript
 
 getAddressFromOutScript converts a script to an address
 
@@ -152,17 +165,44 @@ getAddressFromOutScript converts a script to an address
 - @param script: Uint8Array
 - @returns address as string
 
-**toXOnly**
+##### toXOnly
 
 converts compressed public key to x-only form for schnorr compatibility
 
 - @param pubkey
 - @returns pubkey as string
 
-**getPegWalletAddressFromPublicKey**
+##### getPegWalletAddressFromPublicKey
 
 Converts the sBTC peg wallet public key to a taproot segwit v2 address.
 
 - @param network
 - @param sbtcWalletPublicKey
 - @returns address as string
+
+#### merkle_utils.ts
+
+Adapted from [Medium article](https://medium.com/coinmonks/merkle-tree-a-simple-explanation-and-implementation-48903442bc08#:~:text=The%20use%20of%20Merkle%20Tree,block%20or%20the%20whole%20blockchain.)
+
+##### getParametersForProof
+
+- @param txIdNormal
+- @param txHex
+- @param block
+- @returns TxMinedParameters
+
+generateMerkleRoot calculates the merkle root of the passed in txid hashes
+
+- @param {Array<string>} hashes
+- @returns TxMinedParameters
+
+generateMerkleTree calculates the merkle root of the passed in txid hashes
+
+- @param {Array<string>} hashes
+- @returns TxMinedParameters
+
+generateMerkleProof calculates the merkle proof of the passed in txid and hashes
+
+- @param {Array<string>} hash
+- @param {Array<string>} hashes
+- @returns TxMinedParameters

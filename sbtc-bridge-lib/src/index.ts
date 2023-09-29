@@ -1,4 +1,24 @@
 import {
+    getParametersForProof,
+    headerHex,
+    hashPair,
+    getLeafNodeDirectionInMerkleTree,
+    generateMerkleRoot,
+    generateMerkleTree,
+    generateMerkleProof,
+    ensureEven
+} from './proofs/merkle_utils.js'
+export {
+    getParametersForProof,
+    headerHex,
+    hashPair,
+    getLeafNodeDirectionInMerkleTree,
+    generateMerkleRoot,
+    generateMerkleTree,
+    generateMerkleProof,
+    ensureEven
+} 
+import {
     MAGIC_BYTES_TESTNET,
     MAGIC_BYTES_MAINNET,
     PEGIN_OPCODE,
@@ -6,8 +26,10 @@ import {
     parseDepositPayload,
     parsePayloadFromTransaction,
     buildDepositPayload,
-    buildWithdrawalPayload,
-    parseWithdrawalPayload,
+    buildDepositPayloadOpDrop,
+    buildWithdrawPayload,
+    buildWithdrawPayloadOpDrop,
+    parseWithdrawPayload,
     amountToBigUint64,
     bigUint64ToAmount,
     getDataToSign,
@@ -15,7 +37,8 @@ import {
     getStacksAddressFromSignature,
     readDepositValue,
     fromStorable,
-    toStorable
+    toStorable,
+    parsePayloadFromOutput
 } from './payload_utils.js'
 export {
     MAGIC_BYTES_TESTNET,
@@ -25,8 +48,10 @@ export {
     parseDepositPayload,
     parsePayloadFromTransaction,
     buildDepositPayload,
-    buildWithdrawalPayload,
-    parseWithdrawalPayload,
+    buildDepositPayloadOpDrop,
+    buildWithdrawPayload,
+    buildWithdrawPayloadOpDrop,
+    parseWithdrawPayload,
     amountToBigUint64,
     bigUint64ToAmount,
     getDataToSign,
@@ -34,7 +59,8 @@ export {
     getStacksAddressFromSignature,
     readDepositValue,
     fromStorable,
-    toStorable
+    toStorable,
+    parsePayloadFromOutput
 } 
 import {
     buildRevealOrReclaimTransaction
@@ -45,36 +71,30 @@ export {
 
 import {
     maxCommit,
-    calculateDepositFees,
-    getOpDropDepositRequest,
-    getOpReturnDepositRequest,
-    buildOpReturnDepositTransaction,
-    buildOpDropDepositTransaction
+    getBridgeDepositOpDrop,
+    getBridgeDeposit,
+    buildDepositTransaction,
+    buildDepositTransactionOpDrop
 } from './deposit_utils.js'
 export {
     maxCommit,
-    calculateDepositFees,
-    getOpDropDepositRequest,
-    getOpReturnDepositRequest,
-    buildOpReturnDepositTransaction,
-    buildOpDropDepositTransaction
+    getBridgeDepositOpDrop,
+    getBridgeDeposit,
+    buildDepositTransaction,
+    buildDepositTransactionOpDrop
 } 
 
 import {
-    calculateWithdrawFees,
-    getWithdrawScript,
-    getOpDropWithdrawRequest,
-    getOpReturnWithdrawRequest,
-    buildOpDropWithdrawTransaction,
-    buildOpReturnWithdrawTransaction
+    getBridgeWithdrawOpDrop,
+    getBridgeWithdraw,
+    buildWithdrawTransactionOpDrop,
+    buildWithdrawTransaction
 } from './withdraw_utils.js'
 export {
-    calculateWithdrawFees,
-    getWithdrawScript,
-    getOpDropWithdrawRequest,
-    getOpReturnWithdrawRequest,
-    buildOpDropWithdrawTransaction,
-    buildOpReturnWithdrawTransaction
+    getBridgeWithdrawOpDrop,
+    getBridgeWithdraw,
+    buildWithdrawTransactionOpDrop,
+    buildWithdrawTransaction
 } 
 
 import {
@@ -110,7 +130,8 @@ import {
     addInputs,
     inputAmt,
     toXOnly,
-    getPegWalletAddressFromPublicKey
+    getPegWalletAddressFromPublicKey,
+    getAddressFromOutScript
 } from './wallet_utils.js'
 export {
     sbtcWallets, 
@@ -120,7 +141,8 @@ export {
     addInputs,
     inputAmt,
     toXOnly,
-    getPegWalletAddressFromPublicKey
+    getPegWalletAddressFromPublicKey,
+    getAddressFromOutScript
 }
 
 import type {
@@ -145,7 +167,8 @@ import type {
     ExchangeRate,
     AuthorisationDataType,
     DepositPayloadUIType,
-    WithdrawPayloadUIType
+    WithdrawPayloadUIType,
+    TxMinedParameters
 } from './types/sbtc_types.js'
 
 export type {
@@ -170,7 +193,8 @@ export type {
     ExchangeRate,
     AuthorisationDataType,
     DepositPayloadUIType,
-    WithdrawPayloadUIType
+    WithdrawPayloadUIType,
+    TxMinedParameters
 }
 import type {
     PoxInfo,

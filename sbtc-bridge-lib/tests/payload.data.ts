@@ -17,10 +17,7 @@ export const commit1:BridgeTransactionType = {
   tries: 1,
   mode: 'op_drop',
   requestType: 'wrap',
-  wallet: "p2tr(TAPROOT_UNSPENDABLE_KEY, [{ script: Script.encode([data, 'DROP', revealPubK, 'CHECKSIG']) }, { script: Script.encode([reclaimPubKey, 'CHECKSIG']) }], this.net, true)",
   originator: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
-  stacksAddress: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5',
-  sbtcWalletAddress: 'tb1pf74xr0x574farj55t4hhfvv0vpc9mpgerasawmf5zk9suauckugqdppqe8',
   commitTxScript: {
     address: 'tb1psg523kqaf2x3thrg383hgvt2vpnezawk0dkefvums9h3pzy5vqgs5q6m96',
     script: '51208228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011',
@@ -71,7 +68,6 @@ export const commit1:BridgeTransactionType = {
     tapMerkleRoot: '2943476902121eb80d5edc5dd36fbb7357817fc3f750112157b54e92ba2da905',
     tweakedPubkey: '8228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011'
   },
-  updated: 1684244026379,
   btcTxid: 'bd38134b03a8b2072fba68ad013e2065df67b10f99fbbf3dea8c366b1c43b123',
   vout: {
     scriptpubkey: '51208228a8d81d4a8d15dc6889e374316a60679175d67b6d94b39b816f1088946011',
@@ -80,6 +76,4 @@ export const commit1:BridgeTransactionType = {
     scriptpubkey_address: 'tb1psg523kqaf2x3thrg383hgvt2vpnezawk0dkefvums9h3pzy5vqgs5q6m96',
     value: 6555
   },
-  revealPub: '',
-  reclaimPub: ''
 }

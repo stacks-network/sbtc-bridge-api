@@ -2,7 +2,7 @@ import { fetchAddressTransactions, fetchTransaction, fetchTransactionHex, fetchU
 import { updateBridgeTransaction, findBridgeTransactionsByFilter, saveNewBridgeTransaction, findContractEventsByFilter } from '../data/db_models.js';
 import type { BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { buildDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
+import { buildDepositPayloadOpDrop, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { getConfig } from '../config.js';
 import { hex } from '@scure/base';
 import { getAddressFromOutScript } from 'sbtc-bridge-lib/dist/wallet_utils.js';
@@ -199,8 +199,6 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
         } else {
           if (tx.vout[0].scriptpubkey_type === 'v1_p2tr') {
             if (isUnspent(tx.vout[0].scriptpubkey_address, tx.txid)) {
-              const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-              const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
               const peginRequest:BridgeTransactionType = {
                 btcTxid: tx.txid,
                 network: 'testnet',
@@ -208,7 +206,7 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
                 updated: new Date().getTime(),
                 uiPayload: {
                   amountSats: tx.vout[0].value,
-                  principal: hex.encode(data),
+                  principal: stxAddress,
                   bitcoinAddress: btcAddress,
                   reclaimPublicKey: '',
                   paymentPublicKey: '',

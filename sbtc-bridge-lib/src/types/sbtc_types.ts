@@ -262,3 +262,12 @@ export interface DepositPayloadUIType extends PayloadUIType {
 export interface WithdrawPayloadUIType extends DepositPayloadUIType {
   signature?: string|undefined;
 }
+export type TxMinedParameters = {
+  proofElements:Array<any>;
+  height: number;
+  txIndex: number;
+  headerHex:string;
+  txIdR:string;
+  treeDepth:number;
+}
+
