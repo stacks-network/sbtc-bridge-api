@@ -143,7 +143,8 @@ export function bigUint64ToAmount(buf:Uint8Array):number {
 	return Number(amt);
 }
 
-export function parseWithdrawalPayload(network:string, d1:Uint8Array, bitcoinAddress:string):PayloadType {
+export function parseWithdrawPayload(network:string, d0:string, bitcoinAddress:string):PayloadType {
+	const d1 = hex.decode(d0)
 	const magicOp = getMagicAndOpCode(d1);
 	if (magicOp.magic) {
 		return parseWithdrawalPayloadNoMagic(network, d1.subarray(2), bitcoinAddress);
@@ -152,37 +153,19 @@ export function parseWithdrawalPayload(network:string, d1:Uint8Array, bitcoinAdd
 }
 
 function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAddress:string):PayloadType {
-	//console.log('parseWithdrawalPayloadNoMagic: d1: ', hex.encode(d1))
 	const opcode = hex.encode(d1.subarray(0,1)).toUpperCase();
 	if (opcode !== '3E') throw new Error('Wrong opcode for withdraw: should be 3E was ' + opcode)
-    //console.log('parseWithdrawalPayloadNoMagic opcode: ', opcode)
 	const amtB = d1.subarray(1, 9)
-    //console.log('parseWithdrawalPayloadNoMagic amountSats: ', hex.encode(amtB))
 	const amountSats = bigUint64ToAmount(amtB);
-    //console.log('parseWithdrawalPayloadNoMagic amtB: ', hex.encode(amtB))
-    //console.log('parseWithdrawalPayloadNoMagic amountSats: ', amountSats)
 	let signature = (hex.encode(d1.subarray(9, 74)));
-
-	//if (signature.startsWith('00')) signature = reverseSigBits(signature)
-    console.log('parseWithdrawalPayloadNoMagic bitcoinAddress: ', bitcoinAddress)
-    console.log('parseWithdrawalPayloadNoMagic signature: ', signature)
-
 	const msgHash = getStacksSimpleHashOfDataToSign(network, amountSats, bitcoinAddress);
-    console.log('parseWithdrawalPayloadNoMagic msgHash: ' + msgHash)
 	const pubKey = getPubkeySignature(hex.decode(msgHash), signature)
-    console.log('parseWithdrawalPayloadNoMagic pubKey: ' + hex.encode(pubKey))
-	const v = verifyMessageSignature({ signature, message: msgHash, publicKey: hex.encode(pubKey) })
-    //console.log('parseWithdrawalPayloadNoMagic v: ' + v)
-
-	//console.log('parseWithdrawalPayloadNoMagic msgHash: ', msgHash)
 	const stxAddresses = getStacksAddressFromPubkey(pubKey);
-	//console.log('const stxAddresses = getStacksAddressFromSignature(hex.decode(msgHash), signature, compression);')
-	//console.log('stxAddresses: ', stxAddresses)
 	const stacksAddress = (network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
 	return {
 		opcode,
 		stacksAddress,
-		signature: (signature),
+		signature,
 		amountSats
 	};
 }
@@ -192,45 +175,17 @@ export enum PrincipalType {
 	CONTRACT = '06'
 }
 
-/**
- * 
- * @param net 
- * @param address 
- * @returns 
- */
-export function buildDepositPayloadOpReturn(net:any, address:string):Uint8Array {
-	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
-	const opCodeBuf = hex.decode(PEGIN_OPCODE);
-	const addr = c32addressDecode(address.split('.')[0])
-	const addr0Buf = hex.decode(addr[0].toString(16));
-	const addr1Buf = hex.decode(addr[1]);
-
-	const cnameLength = new Uint8Array(1);
-	const principalType = (address.indexOf('.') > -1) ? hex.decode(PrincipalType.CONTRACT.valueOf()) : hex.decode(PrincipalType.STANDARD.valueOf());
-	let buf1 = concat(opCodeBuf, addr0Buf, addr1Buf);
-	if (address.indexOf('.') > -1) {
-		const cnameBuf = new TextEncoder().encode(address.split('.')[1]);
-		const cnameLen = hex.decode(cnameBuf.length.toString(8));
-		if (cnameBuf.length > 40) throw new Error('Contract name is too long - max 40 characters')
-		buf1 = concat(buf1, cnameLen, cnameBuf);
-	} else {
-		cnameLength.fill(0);
-		buf1 = concat(buf1, cnameLength);
-	}
-
-	return concat(magicBuf, buf1)
+export function buildDepositPayload(network:string, stacksAddress:string):string {
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	return buildDepositPayloadInternal(net, 0, stacksAddress, false)
 }
 
-/**
- * 
- * @param net 
- * @param amountSats 
- * @param address 
- * @param opDrop 
- * @param memo 
- * @returns 
- */
-export function buildDepositPayload(net:any, amountSats:number, address:string, opDrop:boolean, memo:string|undefined):Uint8Array {
+export function buildDepositPayloadOpDrop(network:string, stacksAddress:string, revealFee:number):string {
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	return buildDepositPayloadInternal(net, revealFee, stacksAddress, true)
+}
+
+function buildDepositPayloadInternal(net:any, amountSats:number, address:string, opDrop:boolean):string {
 	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
 	const addr = c32addressDecode(address.split('.')[0])
@@ -265,74 +220,43 @@ export function buildDepositPayload(net:any, amountSats:number, address:string, 
 		buf1 = concat(buf1, feeBuf)
 	}
 	
-	if (!opDrop) return concat(magicBuf, buf1)
-	return buf1;
+	if (!opDrop) return hex.encode(concat(magicBuf, buf1))
+	return hex.encode(buf1);
 }
 
 /**
- * 
- * @param net 
+ * @param network (testnet|mainnet)
  * @param amount 
  * @param signature 
- * @param opDrop 
  * @returns 
  */
-export function buildWithdrawalPayload(net:any, amount:number, signature:Uint8Array, opDrop:boolean):Uint8Array {
+export function buildWithdrawPayload(network:string, amount:number, signature:string):string {
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	return buildWithdrawPayloadInternal(net, amount, signature, false)
+}
+
+/**
+ * Withdrawal using commit reveal (op_drop) pattern
+ * @param network (testnet|mainnet)
+ * @param amount 
+ * @param signature 
+ * @returns 
+ */
+export function buildWithdrawPayloadOpDrop(network:string, amount:number, signature:string):string {
+	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	return buildWithdrawPayloadInternal(net, amount, signature, true)
+}
+
+function buildWithdrawPayloadInternal(net:any, amount:number, signature:string, opDrop:boolean):string {
 	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
 	const amountBuf = amountToBigUint64(amount, 8);
 	//const amountRev = bigUint64ToAmount(amountBuf);
-	let data = concat(opCodeBuf, amountBuf, signature)
-	if (!opDrop) data = concat(magicBuf, data);
-	return data;
+	const data = concat(opCodeBuf, amountBuf, hex.decode(signature))
+	if (!opDrop) return hex.encode(concat(magicBuf, data));
+	return hex.encode(data);
 }
 
-/**
-export function parseSbtcWalletAddress(network:string, outputs:Array<any>) {
-	try {
-		// attempt 1: parse as mempool data structure
-		return parseSbtcWalletAddressFromMempool(network, outputs)
-	} catch (err:any) {
-		return parseSbtcWalletAddressFromBitcoinCore(network, outputs)
-	}
-}
-
-function parseSbtcWalletAddressFromMempool(network:string, outputs:Array<any>) {
-	// attempt 1: parse as mempool data structure
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	let amountSats;
-	let bitcoinAddress;
-	if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
-	  	amountSats = (outputs[1].value.index('.') > -1) ? bitcoinToSats(outputs[1].value) : outputs[1].value;
-		bitcoinAddress = outputs[1].scriptPubKey.address;
-	} else {
-		const scriptHex = outputs[0].scriptPubKey.asm.split(' ')[6];
-		const encscript = btc.OutScript.decode(hex.decode(scriptHex));
-		amountSats = (outputs[0].value.index('.') > -1) ? bitcoinToSats(outputs[1].value) : outputs[1].value;
-		bitcoinAddress = btc.Address(net).encode(encscript);
-	}
-	// addressFromPubkey(network, outputs[0].scriptPubKey)
-	return { bitcoinAddress, amountSats };
-}
-
-function parseSbtcWalletAddressFromBitcoinCore(network:string, outputs:Array<any>) {
-	// attempt 1: parse as mempool data structure
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	let amountSats;
-	let bitcoinAddress;
-	if (outputs[0].scriptpubkey_type.toLowerCase() === 'op_return') {
-	  	amountSats = outputs[1].value;
-		bitcoinAddress = outputs[1].scriptpubkey_address;
-	} else {
-		const scriptHex = outputs[0].scriptpubkey_asm.split(' ')[6];
-		const encscript = btc.OutScript.decode(hex.decode(scriptHex));
-	  	amountSats = outputs[0].value;
-		bitcoinAddress = btc.Address(net).encode(encscript);  
-	}
-	// addressFromPubkey(network, outputs[0].scriptPubKey)
-	return { bitcoinAddress, amountSats };
-}
- */
 export function readDepositValue(outputs:Array<any>) {
 	let amountSats = 0;
 	if (outputs[0].scriptPubKey.type.toLowerCase() === 'nulldata') {
@@ -366,7 +290,7 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 }
 
 export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:string):PayloadType {
-	const d1 = out0.script.subarray(2) // strip the op type and data length
+	const d1 = out0.script.subarray(2) as Uint8Array // strip the op type and data length
 	const witnessData = getMagicAndOpCode(d1);
 	witnessData.txType = out0.type;
 
@@ -375,54 +299,12 @@ export function parsePayloadFromOutput(network:string, out0:any, scriptPubKey:st
 		innerPayload = parseDepositPayload(d1);
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawalPayload(network, d1, scriptPubKey)
+		innerPayload = parseWithdrawPayload(network, hex.encode(d1), scriptPubKey)
 		return innerPayload;
 	} else {
 	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
 	}
 }
-
-/**
-export function parseOutputs(network:string, output0:any, bitcoinAddress:string, amountSats: number) {
-	if (output0.scriptpubkey_type) return parseOutputsBitcoinCore(network, output0, bitcoinAddress, amountSats)
-	const d1 = hex.decode(output0.scriptPubKey.asm.split(' ')[1]);
-	const witnessData = getMagicAndOpCode(d1);
-	witnessData.txType = output0.scriptPubKey.type;
-
-	let innerPayload:PayloadType;
-	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1);
-		return innerPayload;
-	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
-		return innerPayload;
-	} else {
-	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
-	}
-}
-function parseOutputsBitcoinCore(network:string, output0:any, bitcoinAddress:string, amountSats: number) {
-	const outType = output0.scriptpubkey_type;
-  	const txType = (outType === 'nulldata' || outType === 'op_return') ? 'nulldata' : outType;
-	const outAsm = output0.scriptpubkey_asm;
-  	//console.log('parseOutputsBitcoinCore: outAsm: ' + outAsm);
-  	//console.log('parseOutputsBitcoinCore: outType: ' + outType);
-	const d1 = hex.decode(outAsm.split(' ')[2]);
-  	//console.log('parseOutputsBitcoinCore: outType: ' + outType);
-	const witnessData = getMagicAndOpCode(d1);
-	witnessData.txType = txType;
-
-	let innerPayload:WithdrawalPayloadType|PayloadType;
-	if (witnessData.opcode === '3C') {
-		innerPayload = parseDepositPayload(d1);
-		return innerPayload;
-	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawalPayload(network, d1, bitcoinAddress)
-		return innerPayload;
-	} else {
-	  throw new Error('Wrong opcode : expected: 3A or 3C :  receved: ' + witnessData.opcode)
-	}
-}
- */
 
 /**
  * 

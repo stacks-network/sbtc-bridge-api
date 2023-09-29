@@ -2,7 +2,7 @@ import * as secp from '@noble/secp256k1';
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import * as P from 'micro-packed';
-import { buildDepositPayload } from './payload_utils.js'
+import { buildDepositPayloadOpDrop } from './payload_utils.js'
 
 const concat = P.concatBytes;
 
@@ -44,8 +44,8 @@ export function approxTxFees(network:string, utxos:any, changeAddress:string, pa
 		});
 	}
 	if (tx.inputsLength === 0) throw new Error('No confirmed UTXOs')
-	const data = buildDepositPayload(net, 1000, 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT', true, undefined);
-	tx.addOutput({ script: btc.Script.encode(['RETURN', data]), amount: BigInt(0) });
+	const data = buildDepositPayloadOpDrop(network, 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT', 1000);
+	tx.addOutput({ script: btc.Script.encode(['RETURN', hex.decode(data)]), amount: BigInt(0) });
 	//tx.addOutput({ script: btc.OutScript.encode(btc.Address(net).decode(payeeAddress)), amount });
 	tx.addOutputAddress(payeeAddress, BigInt(500), net);
 	const changeAmount = Math.floor(0);

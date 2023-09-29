@@ -26,8 +26,10 @@ import {
     parseDepositPayload,
     parsePayloadFromTransaction,
     buildDepositPayload,
-    buildWithdrawalPayload,
-    parseWithdrawalPayload,
+    buildDepositPayloadOpDrop,
+    buildWithdrawPayload,
+    buildWithdrawPayloadOpDrop,
+    parseWithdrawPayload,
     amountToBigUint64,
     bigUint64ToAmount,
     getDataToSign,
@@ -35,7 +37,8 @@ import {
     getStacksAddressFromSignature,
     readDepositValue,
     fromStorable,
-    toStorable
+    toStorable,
+    parsePayloadFromOutput
 } from './payload_utils.js'
 export {
     MAGIC_BYTES_TESTNET,
@@ -45,8 +48,10 @@ export {
     parseDepositPayload,
     parsePayloadFromTransaction,
     buildDepositPayload,
-    buildWithdrawalPayload,
-    parseWithdrawalPayload,
+    buildDepositPayloadOpDrop,
+    buildWithdrawPayload,
+    buildWithdrawPayloadOpDrop,
+    parseWithdrawPayload,
     amountToBigUint64,
     bigUint64ToAmount,
     getDataToSign,
@@ -54,7 +59,8 @@ export {
     getStacksAddressFromSignature,
     readDepositValue,
     fromStorable,
-    toStorable
+    toStorable,
+    parsePayloadFromOutput
 } 
 import {
     buildRevealOrReclaimTransaction
@@ -65,36 +71,30 @@ export {
 
 import {
     maxCommit,
-    calculateDepositFees,
-    getOpDropDepositRequest,
-    getOpReturnDepositRequest,
-    buildOpReturnDepositTransaction,
-    buildOpDropDepositTransaction
+    getBridgeDepositOpDrop,
+    getBridgeDeposit,
+    buildDepositTransaction,
+    buildDepositTransactionOpDrop
 } from './deposit_utils.js'
 export {
     maxCommit,
-    calculateDepositFees,
-    getOpDropDepositRequest,
-    getOpReturnDepositRequest,
-    buildOpReturnDepositTransaction,
-    buildOpDropDepositTransaction
+    getBridgeDepositOpDrop,
+    getBridgeDeposit,
+    buildDepositTransaction,
+    buildDepositTransactionOpDrop
 } 
 
 import {
-    calculateWithdrawFees,
-    getWithdrawScript,
-    getOpDropWithdrawRequest,
-    getOpReturnWithdrawRequest,
-    buildOpDropWithdrawTransaction,
-    buildOpReturnWithdrawTransaction
+    getBridgeWithdrawOpDrop,
+    getBridgeWithdraw,
+    buildWithdrawTransactionOpDrop,
+    buildWithdrawTransaction
 } from './withdraw_utils.js'
 export {
-    calculateWithdrawFees,
-    getWithdrawScript,
-    getOpDropWithdrawRequest,
-    getOpReturnWithdrawRequest,
-    buildOpDropWithdrawTransaction,
-    buildOpReturnWithdrawTransaction
+    getBridgeWithdrawOpDrop,
+    getBridgeWithdraw,
+    buildWithdrawTransactionOpDrop,
+    buildWithdrawTransaction
 } 
 
 import {
@@ -130,7 +130,8 @@ import {
     addInputs,
     inputAmt,
     toXOnly,
-    getPegWalletAddressFromPublicKey
+    getPegWalletAddressFromPublicKey,
+    getAddressFromOutScript
 } from './wallet_utils.js'
 export {
     sbtcWallets, 
@@ -140,7 +141,8 @@ export {
     addInputs,
     inputAmt,
     toXOnly,
-    getPegWalletAddressFromPublicKey
+    getPegWalletAddressFromPublicKey,
+    getAddressFromOutScript
 }
 
 import type {

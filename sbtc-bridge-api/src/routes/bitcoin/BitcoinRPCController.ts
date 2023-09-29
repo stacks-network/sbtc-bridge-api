@@ -12,7 +12,7 @@ import { hex, base64 } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer'
 import type { KeySet, WrappedPSBT, BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { toStorable, getStacksAddressFromSignature, buildDepositPayload, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
+import { toStorable, getStacksAddressFromSignature, buildDepositPayloadOpDrop, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { verifyMessageSignatureRsv } from '@stacks/encryption';
 import { hashMessage } from '@stacks/encryption';
 import { updateBridgeTransaction } from '../../lib/data/db_models.js';
@@ -219,9 +219,9 @@ export class TransactionController {
 		console.log('reclaimAddr.pubkey: ' + keys.deposits.reclaimPubKey)
 		console.log('revealAddr.pubkey: ' + keys.deposits.revealPubKey)
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
+    const data = buildDepositPayloadOpDrop(getConfig().network, stxAddress, revealFee);
 		const scripts =  [
-			{ script: btc.Script.encode([data, 'DROP', hex.decode(keys.deposits.revealPubKey), 'CHECKSIG']) },
+			{ script: btc.Script.encode([hex.decode(data), 'DROP', hex.decode(keys.deposits.revealPubKey), 'CHECKSIG']) },
 			{ script: btc.Script.encode([hex.decode(keys.deposits.reclaimPubKey), 'CHECKSIG']) }
 		]
 		const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);

@@ -2,17 +2,15 @@ import { Get, Route } from "tsoa";
 import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalances, fetchSbtcWalletAddress } from './stacks_helper.js';
 import { scanCommitments, savePeginCommit, scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
-import { validateAddress } from "../../lib/bitcoin/rpc_wallet.js";
 import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
-import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayload, PayloadType, parseDepositPayload, buildWithdrawalPayload, parseWithdrawalPayload, parsePayloadFromTransaction } from 'sbtc-bridge-lib';
+import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayloadOpDrop, PayloadType, parseDepositPayload, parseWithdrawPayload, parsePayloadFromTransaction, buildWithdrawPayloadOpDrop } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { TransactionController } from "../bitcoin/BitcoinRPCController.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js";
-import { parsePayloadFromOutput } from "sbtc-bridge-lib/dist/payload_utils.js";
-import { getAddressFromOutScript } from "sbtc-bridge-lib/dist/wallet_utils.js";
+import { getAddressFromOutScript, parsePayloadFromOutput } from "sbtc-bridge-lib";
 
 export interface BalanceI {
   balance: number;
@@ -24,8 +22,8 @@ export class DepositsController {
   @Get("/build/deposit/:stxAddress/:revealFee")
   public commitDepositData(stxAddress:string, revealFee:number): string {
     const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildDepositPayload(net, revealFee, stxAddress, true, undefined);
-		return hex.encode(data);
+    const data = buildDepositPayloadOpDrop(getConfig().network, stxAddress, revealFee);
+		return data;
   }
   
   @Get("/parse/deposit/:data")
@@ -36,14 +34,13 @@ export class DepositsController {
   
   @Get("/build/withdrawal/:signature/:amount")
   public commitWithdrawalData(signature:string, amount:number): string {
-    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-    const data = buildWithdrawalPayload(net, amount, hex.decode(signature), true);
-		return hex.encode(data);
+    const data = buildWithdrawPayloadOpDrop(getConfig().network, amount, signature);
+		return data
   }
   
   @Get("/parse/withdrawal/:data/:sbtcWallet")
   public commitWithdrawal(data:string, sbtcWallet:string): PayloadType {
-    const payload = parseWithdrawalPayload(getConfig().network, hex.decode(data), sbtcWallet);
+    const payload = parseWithdrawPayload(getConfig().network, data, sbtcWallet);
 		return payload;
   }
   

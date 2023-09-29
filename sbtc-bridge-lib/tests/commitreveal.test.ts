@@ -1,7 +1,7 @@
 import { beforeAll, beforeEach, expect, describe, it } from 'vitest'
 import { 
   amountToBigUint64, bigUint64ToAmount,
-  buildWithdrawalPayload, parseWithdrawalPayload,
+  buildWithdrawPayload, parseWithdrawPayload,
 } from '../src/index';
 import { hex } from '@scure/base';
 import assert from 'assert';
@@ -87,10 +87,9 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     //let signature = await secp.signAsync(dataToSignHash, privKey); // sync methods below
     //signature = signature.addRecoveryBit(1);
     //assert(secp.verify(signature, dataToSignHash, pubKey));
-    //const payload = buildWithdrawalPayload(btc.TEST_NETWORK, 5000, signature.toCompactRawBytes(), false);
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(signature), false);
-    assert(hex.encode(payload) === data);
-    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress, 0);
+    const payload = buildWithdrawPayload('testnet', amount, signature);
+    assert(payload === data);
+    const parsedPayload = parseWithdrawPayload('testnet', payload, fromAddress);
     //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');

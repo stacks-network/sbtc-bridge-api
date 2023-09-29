@@ -1,18 +1,12 @@
 import { beforeAll, beforeEach, expect, describe, it } from 'vitest'
 import { 
-  parseDepositPayload, buildDepositPayload,
   amountToBigUint64, bigUint64ToAmount,
-  buildWithdrawalPayload, parseWithdrawalPayload,
-  getStacksSimpleHashOfDataToSign, getStacksAddressFromSignature, PayloadType, parsePayloadFromTransaction, getDataToSign
+  buildWithdrawPayload, parseWithdrawPayload,
+  PayloadType, parsePayloadFromTransaction
 } from '../src/index';
-import { sbtcWallets } from '../src/index';
 import { hex } from '@scure/base';
-import { commit1 } from './payload.data';
-import { fail, deepStrictEqual } from 'assert';
 import assert from 'assert';
 import * as btc from '@scure/btc-signer';
-import * as secp from '@noble/secp256k1';
-import { dust } from '../src/withdraw_utils';
 import { getStacksAddressFromPubkey } from '../src/payload_utils';
 
 describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
@@ -73,14 +67,14 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const stacksAddress = 'ST1NXBK3K5YYMD6FD41MVNP3JS1GABZ8TRVX023PT';
     const amount = 800;
 
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(sig.signature), false);
+    const payload = buildWithdrawPayload('testnet', amount, sig.signature);
 
     //assert(hex.encode(payload) === data);
 
     //const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
     //tx.addOutputAddress(fromAddress, BigInt(dust), btc.TEST_NETWORK);
   
-    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress);
+    const parsedPayload = parseWithdrawPayload('testnet', payload, fromAddress);
     //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
@@ -100,8 +94,8 @@ describe('bitcoin rpc suite - requires bitcoin core running on testnet', () => {
     const message = '3600000000000003200014764ad6983a6455cca54cd6a4f7b0da71ba6a0bab'
     const messageHash = 'b37a0c9bf56598e9d39da2eaf6762c99fd403c61605148a34c505c62271880cc'
 
-    const payload = buildWithdrawalPayload(btc.TEST_NETWORK, amount, hex.decode(sig.signature), false);
-    const parsedPayload = parseWithdrawalPayload('testnet', payload, fromAddress);
+    const payload = buildWithdrawPayload('testnet', amount, sig.signature);
+    const parsedPayload = parseWithdrawPayload('testnet', payload, fromAddress);
     //console.log('parsedPayload1: ', parsedPayload);
     assert(parsedPayload.amountSats === amount);
     assert(parsedPayload.opcode === '3E');
