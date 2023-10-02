@@ -53,8 +53,8 @@ export class TransactionController {
   public getKeys(): KeySet {
     return {
       deposits: {
-        revealPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReveal)),
-        reclaimPubKey: hex.encode(schnorr.getPublicKey(getConfig().btcSchnorrReclaim)),
+        revealPubKey: hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReveal)),
+        reclaimPubKey: hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReclaim)),
         oraclePubKey: '' 
       }
     }
@@ -150,9 +150,9 @@ export class TransactionController {
   
     try {
       if (wrappedPsbt.txtype === 'reclaim') {
-        transaction.sign(hex.decode(getConfig().btcSchnorrReclaim));
+        transaction.sign(hex.decode(process.env.btcSchnorrReclaim));
       } else if (wrappedPsbt.txtype === 'reveal') {
-        transaction.sign(hex.decode(getConfig().btcSchnorrReveal));
+        transaction.sign(hex.decode(process.env.btcSchnorrReveal));
       }
       console.log('sign: signed');
       transaction.finalize();
