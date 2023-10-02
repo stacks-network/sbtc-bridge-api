@@ -3,7 +3,7 @@
 Indexes and caches contract data to make the api client application faster
 and more flexible.
 
-API [documentation](https://bridge.stx.eco/bridge-api/docs/).
+API [documentation](https://bridge.sbtc.tech/bridge-api/docs/).
 
 ## Development
 
@@ -49,7 +49,7 @@ docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NOD
 
 ## Swagger API Docs
 
-See https://bridge.stx.eco/bridge-api/docs/#/
+See https://bridge.sbtc.tech/bridge-api/docs/#/
 
 ## Deployment
 

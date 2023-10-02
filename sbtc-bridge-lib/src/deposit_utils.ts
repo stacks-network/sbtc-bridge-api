@@ -22,9 +22,9 @@ export const dust = 500;
  * @param stacksAddress the stacks address to materialise sBTC
  * @returns Transaction from @scure/btc-signer
  */
-export function buildDepositTransaction(network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, utxos:Array<UTXO>):Transaction {
+export function buildDepositTransaction(network:string, sbtcWalletPublicKey:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, utxos:Array<UTXO>):Transaction {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
+	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, sbtcWalletPublicKey)
 	const data = buildDepositPayload(network, uiPayload.principal);
 
 	const txFees = calculateDepositFees(network, false, uiPayload.amountSats, btcFeeRates.feeInfo, utxos, sbtcWalletAddress!, hex.decode(data))
@@ -71,12 +71,12 @@ export function getBridgeDeposit(network:string, uiPayload:DepositPayloadUIType,
 	return req;
 }
 
-export function getBridgeDepositOpDrop(network:string, uiPayload:DepositPayloadUIType, originator:string):BridgeTransactionType {
+export function getBridgeDepositOpDrop(network:string, sbtcWalletPublicKey:string, uiPayload:DepositPayloadUIType, originator:string):BridgeTransactionType {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	
 	const data = buildData(network, uiPayload.principal, uiPayload.amountSats);
 	const scripts =  [
-		{ script: btc.Script.encode([hex.decode(data), 'DROP', hex.decode(uiPayload.sbtcWalletPublicKey), 'CHECKSIG']) },
+		{ script: btc.Script.encode([hex.decode(data), 'DROP', hex.decode(sbtcWalletPublicKey), 'CHECKSIG']) },
 		{ script: btc.Script.encode(['IF', 144, 'CHECKSEQUENCEVERIFY', 'DROP', hex.decode(uiPayload.reclaimPublicKey), 'CHECKSIG', 'ENDIF']) },
 	]
 	const script = btc.p2tr(btc.TAPROOT_UNSPENDABLE_KEY, scripts, net, true);
