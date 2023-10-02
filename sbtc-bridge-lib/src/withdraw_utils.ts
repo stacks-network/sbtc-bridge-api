@@ -21,10 +21,10 @@ export const dust = 500
  * @param btcFeeRates 
  * @returns Transaction from @scure/btc-signer
  */
-export function buildWithdrawTransaction(network:string, uiPayload:WithdrawPayloadUIType, utxos:Array<UTXO>, btcFeeRates:any) {
+export function buildWithdrawTransaction(network:string, sbtcWalletPublicKey:string, uiPayload:WithdrawPayloadUIType, utxos:Array<UTXO>, btcFeeRates:any) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
+	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, sbtcWalletPublicKey)
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature, false)
 	const txFees = calculateWithdrawFees(network, false, utxos, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress!, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, hex.decode(data))
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
@@ -45,14 +45,14 @@ export function buildWithdrawTransaction(network:string, uiPayload:WithdrawPaylo
  * @param originator 
  * @returns 
  */
-export function buildWithdrawTransactionOpDrop (network:string, uiPayload:WithdrawPayloadUIType, utxos:Array<UTXO>, btcFeeRates:any, originator:string) {
+export function buildWithdrawTransactionOpDrop (network:string, sbtcWalletPublicKey:string, uiPayload:WithdrawPayloadUIType, utxos:Array<UTXO>, btcFeeRates:any, originator:string) {
 	if (!uiPayload.signature) throw new Error('Signature of output 2 scriptPubKey is required');
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, uiPayload.sbtcWalletPublicKey)
+	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, sbtcWalletPublicKey)
 	const txFees = calculateWithdrawFees(network, true, utxos, uiPayload.amountSats, btcFeeRates, sbtcWalletAddress!, uiPayload.bitcoinAddress, uiPayload.paymentPublicKey, undefined)
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, utxos, uiPayload.paymentPublicKey);
-	const csvScript = getBridgeWithdrawOpDrop(network, uiPayload, originator);
+	const csvScript = getBridgeWithdrawOpDrop(network, sbtcWalletPublicKey, uiPayload, originator);
 	//(network, data, sbtcWalletAddress, uiPayload.bitcoinAddress);
 	if (!csvScript ) throw new Error('script required!');
 	
@@ -129,11 +129,11 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
 }
 */
 
-  export function getBridgeWithdrawOpDrop(network:string, uiPayload:WithdrawPayloadUIType, originator:string):BridgeTransactionType {
+  export function getBridgeWithdrawOpDrop(network:string, sbtcWalletPublicKey:string, uiPayload:WithdrawPayloadUIType, originator:string):BridgeTransactionType {
 	const data = buildData(network, uiPayload.amountSats, uiPayload.signature!, true);
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	
-	let pk1U = hex.decode(uiPayload.sbtcWalletPublicKey)
+	let pk1U = hex.decode(sbtcWalletPublicKey)
 	let pk2U = hex.decode(uiPayload.reclaimPublicKey)
 	if (pk1U.length === 33) pk1U = pk1U.subarray(1)
 	if (pk2U.length === 33) pk2U = pk2U.subarray(1)

@@ -71,10 +71,6 @@ if (isDev() || isLocalRegtest() || isLocalTestnet()) {
   console.log('linode env.. changing CONFIG.mongoPwd = ' + getConfig().mongoPwd.substring(0,2))
   console.log('linode env.. changing CONFIG.btcNode = ' + getConfig().btcNode)
   console.log('linode env.. changing CONFIG.btcRpcUser = ' + getConfig().btcRpcUser)
-  console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + getConfig().btcSchnorrReveal.substring(0,2))
-  console.log('linode env.. changing CONFIG.btcSchnorrReveal = ' + getConfig().btcSchnorrReveal.substring(getConfig().btcSchnorrReveal.length-3, getConfig().btcSchnorrReveal.length))
-  console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + getConfig().btcSchnorrReclaim.substring(0,2))
-  console.log('linode env.. changing CONFIG.btcSchnorrReclaim = ' + getConfig().btcSchnorrReclaim.substring(getConfig().btcSchnorrReveal.length-3, getConfig().btcSchnorrReveal.length))
 }
 
 async function connectToMongoCloud() {

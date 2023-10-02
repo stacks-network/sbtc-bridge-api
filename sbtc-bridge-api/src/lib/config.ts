@@ -11,8 +11,6 @@ const SIMNNET_CONFIG = {
   btcNode: 'http://localhost:18443',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
   host: 'http://localhost', 
   port: PORT,
   network: 'simnet',
@@ -36,8 +34,6 @@ const DEVNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem', 
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
@@ -61,8 +57,6 @@ const LINODE_TESTNET_CONFIG = {
   btcNode: 'bitcoind.testnet.stacks.co',
   btcRpcUser: 'blockstack',
   btcRpcPwd: 'blockstacksystem',
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
@@ -86,8 +80,6 @@ const LINODE_MAINNET_CONFIG = {
   btcNode: '',
   btcRpcUser: '',
   btcRpcPwd: '',
-  btcSchnorrReveal: '',
-  btcSchnorrReclaim: '',
   host: 'http://localhost',
   port: 3020,
   network: 'mainnet',
@@ -110,8 +102,6 @@ let CONFIG: {
   btcNode: string; 
   btcRpcUser: string; 
   btcRpcPwd: string; 
-  btcSchnorrReveal: string; 
-  btcSchnorrReclaim: string; 
   host: string; 
   port: number; 
   walletPath: string; 
@@ -148,8 +138,6 @@ function setOverrides() {
     CONFIG.btcRpcUser = 'devnet'
     CONFIG.btcRpcPwd = 'devnet'
     // private keys for testing ability to sign PSBTs..
-    CONFIG.btcSchnorrReveal = '93a7e5ecde5eccc4fd858dfcf7d92011eade103600de0e8122d6fc5ffedf962d'
-    CONFIG.btcSchnorrReclaim = 'eb80b7f63eb74a215b6947b479e154a83cf429691dceab272c405b1614efb98c'    
   } else if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
     // localhost params provided by docker environment
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
@@ -159,8 +147,6 @@ function setOverrides() {
     CONFIG.btcNode = process.env.btcNode || '';
     CONFIG.btcRpcUser = process.env.btcRpcUser || '';
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
-    CONFIG.btcSchnorrReveal = process.env.btcSchnorrReveal || '';
-    CONFIG.btcSchnorrReclaim = process.env.btcSchnorrReclaim || '';
     CONFIG.sbtcContractId = process.env.sbtcContractId || '';
     CONFIG.network = process.env.network || '';
     CONFIG.stacksApi = process.env.stacksApi || '';
