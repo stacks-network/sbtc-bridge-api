@@ -145,29 +145,11 @@ router.get("/events/:page", async (req, res, next) => {
  * @returns 
  */
 router.get("/init-ui", async (req, res, next) => {
-  try {
-    const controller1 = new SbtcWalletController();
-    const sbtcContractData = await controller1.fetchSbtcContractData();
-    //checkAddressForNetwork(getConfig().network, sbtcContractData.sbtcWalletAddress)
-    const controller2 = new TransactionController();
-    const keys = await controller2.getKeys();
-    const controller3 = new WalletController();
-    const controller = new BlocksController();
-    const btcFeeRates = await controller.getFeeEstimate();
-
-    const response = {
-      keys,
-      sbtcContractData,
-      btcFeeRates
-    }
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.')
-  }
+  const controller = new SbtcWalletController();
+  return res.send(await controller.initUi());
 });
 
-/**
+/** 
  * fetchs sbtc contract data
  * @returns 
  */

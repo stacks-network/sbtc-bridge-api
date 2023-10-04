@@ -6,7 +6,7 @@ import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransacti
 import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayloadOpDrop, PayloadType, parseDepositPayload, parseWithdrawPayload, parsePayloadFromTransaction, buildWithdrawPayloadOpDrop } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
-import { TransactionController } from "../bitcoin/BitcoinRPCController.js";
+import { BlocksController, TransactionController, WalletController } from "../bitcoin/BitcoinRPCController.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js";
@@ -15,6 +15,7 @@ import { getAddressFromOutScript, parsePayloadFromOutput } from "sbtc-bridge-lib
 export interface BalanceI {
   balance: number;
 }
+let cachedUIObject:any;
 
 @Route("/bridge-api/:network/v1/sbtc")
 export class DepositsController {
@@ -103,9 +104,36 @@ export class DepositsController {
   }
 }
 
-
 @Route("/bridge-api/:network/v1/sbtc")
 export class SbtcWalletController {
+
+  public async initUiCache(): Promise<any> {
+    try {
+      console.log('Adding [keys, sbtcContractData, btcFeeRates] data to cache')
+      const sbtcContractData = await this.fetchSbtcContractData();
+      const controller2 = new TransactionController();
+      const keys = await controller2.getKeys();
+      const rates = await controller2.getRates();
+      const controller = new BlocksController();
+      const btcFeeRates = await controller.getFeeEstimate();
+
+      cachedUIObject = {
+        keys,
+        sbtcContractData,
+        btcFeeRates,
+        rates
+      }
+    } catch (error) {
+      console.log('Error in route initUiCache: ', error)
+    }
+    return cachedUIObject;
+  }
+
+  @Get("/init-ui")
+  public async initUi(): Promise<any> {
+    if (!cachedUIObject) await this.initUiCache()
+    return cachedUIObject;
+  }
 
   @Get("/address/:address/balance")
   public async fetchUserSbtcBalance(address:string): Promise<BalanceI> {

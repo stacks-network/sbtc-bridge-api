@@ -8,15 +8,13 @@ import { getConfig } from '../../lib/config.js';
 import { fetchAddress } from '../../lib/bitcoin/api_mempool.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from './StacksRPCController.js';
-import type { PayloadType, SbtcContractDataType, AddressObject, AddressMempoolObject } from 'sbtc-bridge-lib';
+import { type PayloadType, type SbtcContractDataType, type AddressObject, type AddressMempoolObject, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib';
 import * as btc from '@scure/btc-signer';
 
 const limit = 10;
 
 const noArgMethods = [
-  'get-coordinator-data',
   'get-bitcoin-wallet-public-key',
-  'get-supply',
   'get-token-uri',
   'get-total-supply',
   'get-decimals',
@@ -42,8 +40,7 @@ export async function fetchNoArgsReadOnly():Promise<SbtcContractDataType> {
       response = await callContractReadOnly(data);
       resolveArg(result, response, funcname)
     } catch (err:any) {
-      console.log('Error fetching sbtc alpha data from sbtc contrcat')
-      //throw new Error('Error fetching sbtc alpha data from sbtc contrcat: ' + err.message)
+      console.log('Error fetching sbtc alpha data from sbtc contract arg: ' + funcname)
     }
   }
   result.contractId = contractId;
@@ -56,22 +53,20 @@ function resolveArg(result:SbtcContractDataType, response:any, arg:string) {
     current = response.value.value
   }
   switch (arg) {
-    case 'get-coordinator-data':
-      result.coordinator = response.value.value;
-      break;
     case 'get-bitcoin-wallet-public-key':
       //console.log('get-bitcoin-wallet-public-key: response: ', response)
       try {
         const fullPK = response.value.value.split('x')[1];
+        result.sbtcWalletAddress = getPegWalletAddressFromPublicKey(getConfig().network, fullPK)
         // converting to x-only..
-        result.sbtcWalletPublicKey = fullPK;
-        try {
-          const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
-          const trObj = btc.p2tr(fullPK.substring(1), undefined, net);
-          if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
-        } catch (err:any) {
-          console.log('get-bitcoin-wallet-public-key: getting key: ' + fullPK)
-        }
+        //result.sbtcWalletPublicKey = fullPK;
+        //try {
+        //  const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+        //  const trObj = btc.p2tr(fullPK.substring(1), undefined, net);
+        //  if (trObj.type === 'tr') result.sbtcWalletAddress = trObj.address;
+       //} catch (err:any) {
+        //  console.log('get-bitcoin-wallet-public-key: getting key: ' + fullPK)
+        //}
       } catch(err) {
         console.log('get-bitcoin-wallet-public-key: current: ', current)
         console.log('get-bitcoin-wallet-public-key: err: ', err)
