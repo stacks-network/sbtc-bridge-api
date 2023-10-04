@@ -53,8 +53,8 @@ export class TransactionController {
   public getKeys(): KeySet {
     return {
       deposits: {
-        revealPubKey: hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReveal)),
-        reclaimPubKey: hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReclaim)),
+        revealPubKey: (process.env.btcSchnorrReveal) ? hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReveal)) : '',
+        reclaimPubKey: (process.env.btcSchnorrReclaim) ? hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReclaim)) : '',
         oraclePubKey: '' 
       }
     }
@@ -240,27 +240,31 @@ export class TransactionController {
 
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string, maxFeeRate:number): Promise<any> {
-      try {
-        const resp =  await sendRawTxRpc(hex, maxFeeRate);
-        if (resp && resp.error && resp.error.code) {
-          console.log('sendRawTransaction:sendRawTxRpc: ', resp)
-          throw new Error('Local rpc call failed.. try external service')
+    try {
+      const resp =  await sendRawTxRpc(hex, maxFeeRate);
+      if (resp && resp.error && resp.error.code) {
+        if (resp.error.code === -27) { // Transaction already in block chain
+          return resp;
         }
-        console.log('sendRawTransaction 1: bitcoin core:', resp);
+        console.log('sendRawTransaction:sendRawTxRpc: ', resp)
+        throw new Error('Local rpc call failed.. try external service')
+      }
+      console.log('sendRawTransaction 1: bitcoin core:', resp);
+      return resp;
+    } catch (err) {
+      try {
+        console.log('sendRawTransaction 2: rpc error: ', err);
+        console.log('sendRawTransaction 2: trying mempool: ');
+        const resp = await sendRawTxDirectMempool(hex);
+        console.log('sendRawTransaction 2: sendRawTxDirectMempool: ', resp);
         return resp;
       } catch (err) {
-        try {
-          console.log('sendRawTransaction 2: trying mempool: ');
-          const resp = await sendRawTxDirectMempool(hex);
-          console.log('sendRawTransaction 2: sendRawTxDirectMempool: ', resp);
-          return resp;
-        } catch (err) {
-          console.log('sendRawTransaction 2: trying block cypher: ');
-          const resp = await sendRawTxDirectBlockCypher(hex);
-          console.log('sendRawTransaction 3: sendRawTxDirectBlockCypher: ', resp);
-          return resp;
-        }
+        console.log('sendRawTransaction 3: mempool error: ', err);
+        const resp = await sendRawTxDirectBlockCypher(hex);
+        console.log('sendRawTransaction 3: sendRawTxDirectBlockCypher: ', resp);
+        return resp;
       }
+    }
   }
 }
  

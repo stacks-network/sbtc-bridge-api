@@ -38,7 +38,7 @@ const DEVNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.related-pink-tick',
+  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -61,7 +61,7 @@ const LINODE_TESTNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.romeo-bridge',
+  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -84,7 +84,7 @@ const LINODE_MAINNET_CONFIG = {
   port: 3020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.related-pink-tick',
+  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -154,7 +154,7 @@ function setOverrides() {
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
   }
   if (isLocalTestnet()) {
-    CONFIG.btcNode = 'http://localhost:18332' // ie not via docker network
+    CONFIG.btcNode = 'localhost:18332' // ie not via docker network
   }
 }
 
