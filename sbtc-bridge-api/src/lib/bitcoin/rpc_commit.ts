@@ -2,7 +2,7 @@ import { fetchAddressTransactions, fetchTransaction, fetchTransactionHex, fetchU
 import { updateBridgeTransaction, findBridgeTransactionsByFilter, saveNewBridgeTransaction, findContractEventsByFilter } from '../data/db_models.js';
 import type { BridgeTransactionType, CommitmentScriptDataType } from 'sbtc-bridge-lib'
 import * as btc from '@scure/btc-signer';
-import { buildDepositPayloadOpDrop, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
+import { getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib' 
 import { getConfig } from '../config.js';
 import { hex } from '@scure/base';
 import { getAddressFromOutScript } from 'sbtc-bridge-lib/dist/wallet_utils.js';
