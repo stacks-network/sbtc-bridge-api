@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, expect, describe, it } from 'vitest'
 import { 
-  parseDepositPayload, buildDepositPayloadOpDrop, buildDepositPayload, PayloadType
+  parseDepositPayload, buildDepositPayloadOpDrop, buildDepositPayload, PayloadType, getPegWalletAddressFromPublicKey
 } from '../src/index';
 import { base58, hex } from '@scure/base';
 import { commit1 } from './payload.data';
@@ -23,6 +23,14 @@ describe('Deposit tests', () => {
     pk = pk.subarray(1)
     expect(pk.length).equals(33)
     expect(hex.encode(pk)).equals('6e16df46e3ca6e21dfcb69cb50836766d378f9eef4fba0ec85022f5f880f463901')
+  })
+
+  it.concurrent('Convert wif to private key', async () => {
+    const sbtcPublicKey = '02e30e89dc85db23273fed237c21d4ca495de4fbffbdf8a90d90e902847fb411c7';
+    const addr = getPegWalletAddressFromPublicKey('testnet', sbtcPublicKey)
+    if (!addr) fail() 
+    expect(addr.length).equals(32)
+    expect(addr).equals('tb1puv8gnhy9mv3jw0ldyd7zr4x2f9w7f7llhhu2jrvsaypggla5z8rs6hg0pk')
   })
 
   it.concurrent('Check parsing deposit payload fails for out of date payload', async () => {

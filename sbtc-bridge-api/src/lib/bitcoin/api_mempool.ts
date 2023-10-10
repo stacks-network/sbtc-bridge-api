@@ -79,7 +79,7 @@ export async function fetchUTXOs(address:string) {
     //checkAddressForNetwork(getConfig().network, address)
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
     const response = await fetch(url);
-    if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
+    //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
     const result = await response.json();
     return result;
   } catch(err) {

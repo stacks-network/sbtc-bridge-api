@@ -43,7 +43,7 @@ export const exchangeRates = cron.schedule('*/5 * * * *', (fireDate) => {
 });
 
 export const initUiCacheJob = cron.schedule('*/3 * * * *', (fireDate) => {
-  console.log('Running: exchangeRates at: ' + fireDate);
+  console.log('Running: initUiCacheJob at: ' + fireDate);
   const controller = new SbtcWalletController();
   controller.initUiCache()
 });
