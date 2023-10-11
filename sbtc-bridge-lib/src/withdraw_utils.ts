@@ -10,6 +10,7 @@ import { addInputs, getPegWalletAddressFromPublicKey, inputAmt, toXOnly } from '
 const concat = P.concatBytes;
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
+export const fullfillmentFee = 500
 export const revealPayment = 10001
 export const dust = 500
 
@@ -30,8 +31,9 @@ export function buildWithdrawTransaction(network:string, sbtcWalletPublicKey:str
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, 0, tx, false, utxos, uiPayload.paymentPublicKey);
 	tx.addOutput({ script: btc.Script.encode(['RETURN', hex.decode(data)]), amount: BigInt(0) });
-	const change = inputAmt(tx) - (dust + txFees[1]);
+	const change = inputAmt(tx) - (fullfillmentFee + dust + txFees[1]);
 	tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(dust), net);
+	tx.addOutputAddress(sbtcWalletAddress!, BigInt(fullfillmentFee), net);
 	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
 	return tx;
 }
@@ -58,7 +60,8 @@ export function buildWithdrawTransactionOpDrop (network:string, sbtcWalletPublic
 	
 	tx.addOutput({ script: csvScript.commitTxScript!.script, amount: BigInt(0) });
 	tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(dust), net);
-	const change = inputAmt(tx) - (dust + txFees[1]);
+	tx.addOutputAddress(sbtcWalletAddress!, BigInt(fullfillmentFee), net);
+	const change = inputAmt(tx) - (fullfillmentFee + dust + txFees[1]);
 	if (change > 0) tx.addOutputAddress(uiPayload.bitcoinAddress, BigInt(change), net);
 	return tx;
 }

@@ -58,6 +58,7 @@ function resolveArg(result:SbtcContractDataType, response:any, arg:string) {
       try {
         const fullPK = response.value.value.split('x')[1];
         result.sbtcWalletAddress = getPegWalletAddressFromPublicKey(getConfig().network, fullPK)
+        result.sbtcWalletPublicKey = fullPK
         // converting to x-only..
         //result.sbtcWalletPublicKey = fullPK;
         //try {

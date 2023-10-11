@@ -15,11 +15,15 @@ export const dust = 500;
 
 /**
  * buildDepositTransaction:Transaction
- * @param network (devnet|testnet|mainnet)
+ * @param network (testnet|mainnet)
+ * @param sbtcWalletPublicKey - the sbtc wallet public to sending the deposit to
  * @param uiPayload:DepositPayloadUIType
- * @param btcFeeRates current rates
- * @param utxos the utxos to spend from
- * @param stacksAddress the stacks address to materialise sBTC
+ * - uiPayload.principal - stacks address or contract principal to mint to
+ * - uiPayload.amountSats - amount in sats of sBTC to mint (and bitcoin to deposit)
+ * - uiPayload.bitcoinAddress - address for users change - the users cardinal/payment address
+ * - uiPayload.paymentPublicKey - public key for users change - the users cardinal/payment public key (only needed for xverse)
+ * - btcFeeRates current fee rate estimates - see endpoint /bridge-api/testnet/v1/sbtc/init-ui
+ * - utxos the users utxos to spend from - from mempool/blockstream
  * @returns Transaction from @scure/btc-signer
  */
 export function buildDepositTransaction(network:string, sbtcWalletPublicKey:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, utxos:Array<UTXO>):Transaction {
