@@ -376,17 +376,12 @@ export function getPegWalletAddressFromPublicKey (network:string, sbtcWalletPubl
 	//if (network === 'development' || network === 'simnet') {
 	//	net = { bech32: 'bcrt', pubKeyHash: 0x6f, scriptHash: 0xc4, wif: 0 }
 	//}
-	//sbtcContractData.coordinator?.key?.value?.split('x')[1];
 	const fullPK = hex.decode(sbtcWalletPublicKey);
 	let xOnlyKey = fullPK;
 	if (fullPK.length === 33) {
 		xOnlyKey = fullPK.subarray(1)
 	}
-	const addr = btc.Address(net).encode({type: 'tr', pubkey: xOnlyKey})
-	return addr;
-	//const trObj = btc.p2tr(xOnlyKey, undefined, net);
-	//if (trObj.type === 'tr') 
-	//const addr = trObj.address
-
-	//const assumeTweakedPubKey = hex.decode(xOnlyKey);
+	//const addr = btc.Address(net).encode({type: 'tr', pubkey: xOnlyKey})
+	const trObj = btc.p2tr(xOnlyKey, undefined, net);
+	return trObj.address;
 }
