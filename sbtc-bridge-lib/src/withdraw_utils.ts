@@ -4,7 +4,7 @@ import * as P from 'micro-packed';
 import { hex } from '@scure/base';
 import type { KeySet, BridgeTransactionType, UTXO, WithdrawPayloadUIType } from './types/sbtc_types.js' 
 import { buildWithdrawPayloadOpDrop, toStorable } from './payload_utils.js' 
-import { getDataToSign, buildWithdrawPayload, amountToBigUint64, bigUint64ToAmount } from './payload_utils.js' 
+import { buildWithdrawPayload, amountToBigUint64, bigUint64ToAmount } from './payload_utils.js' 
 import { addInputs, getPegWalletAddressFromPublicKey, inputAmt, toXOnly } from './wallet_utils.js';
 
 const concat = P.concatBytes;
@@ -177,10 +177,6 @@ export function getWithdrawScript (network:string, data:Uint8Array, sbtcWalletAd
   }
   
   function buildData(network:string, amount:number, signature:string, opDrop:boolean):string {
-	const sats = amount;
-	const amt = amountToBigUint64(amount, 8)
-	const tamt = bigUint64ToAmount(amt)
-	console.log('Sats (be, buf=1): ' + sats + ' amountToBigUint64:' + hex.encode(amt) + ' bigUint64ToAmount:' + tamt)
 	if (opDrop) return buildWithdrawPayloadOpDrop(network, amount, signature)
 	return buildWithdrawPayload(network, amount, signature)
   }

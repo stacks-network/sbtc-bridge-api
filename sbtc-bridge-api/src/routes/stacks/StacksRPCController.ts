@@ -10,7 +10,6 @@ import { BlocksController, TransactionController, WalletController } from "../bi
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js";
-import { getAddressFromOutScript, parsePayloadFromOutput } from "sbtc-bridge-lib";
 
 export interface BalanceI {
   balance: number;
@@ -183,17 +182,7 @@ export class SbtcWalletController {
 
 
 function loc_parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
-  const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txHex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
-  const out0 = tx.getOutput(0);
-  const script0 = out0.script!
-  const spendScr = btc.OutScript.decode(script0);
-  let payload = {} as PayloadType;
-  if (spendScr.type === 'unknown') {
-    const scriptPubKey = tx.getOutput(1).script
-    payload = parsePayloadFromOutput(network, out0, hex.encode(scriptPubKey!));
-    payload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
-    //payload.dust = Number(tx.getOutput(1).amount)
-  }
+  let payload:PayloadType = parsePayloadFromTransaction(network, txHex);
   console.log('parsePayloadFromTransaction: payload: ' + payload);
   return payload;
 }

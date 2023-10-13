@@ -251,9 +251,10 @@ export function buildWithdrawPayloadOpDrop(network:string, amount:number, signat
 function buildWithdrawPayloadInternal(net:any, amount:number, signature:string, opDrop:boolean):string {
 	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
-	const amountBuf = amountToBigUint64(amount, 8);
+	///const amountBuf = amountToBigUint64(amount, 8);
+	const amountBytes = P.U64BE.encode(BigInt(amount));
 	//const amountRev = bigUint64ToAmount(amountBuf);
-	const data = concat(opCodeBuf, amountBuf, hex.decode(signature))
+	const data = concat(opCodeBuf, amountBytes, hex.decode(signature))
 	if (!opDrop) return hex.encode(concat(magicBuf, data));
 	return hex.encode(data);
 }
@@ -277,15 +278,13 @@ export function readDepositValue(outputs:Array<any>) {
 export function parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
 	const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txHex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
 	const out0 = tx.getOutput(0);
-	const script0 = out0.script!
+	const script0 = out0.script as Uint8Array
 	const spendScr = btc.OutScript.decode(script0);
 	let payload = {} as PayloadType;
 	if (spendScr.type === 'unknown') {
-		const scriptPubKey = tx.getOutput(1).script
-		const bitcoinAddress = getAddressFromOutScript('testnet', tx.getOutput(1).script!)
-		console.log('parsePayloadFromTransaction:addr', bitcoinAddress)
-		payload = parsePayloadFromOutput(network, out0, bitcoinAddress);
-		payload.sbtcWallet = bitcoinAddress
+		if (!tx.getOutput(1) || !tx.getOutput(1).script) throw new Error('no output 1')
+		
+		payload = parsePayloadFromOutput(network, tx);
 		if (payload.opcode === '3C') payload.amountSats = Number(tx.getOutput(1).amount)
 		//payload.dust = Number(tx.getOutput(1).amount)
 	}
@@ -293,25 +292,35 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 	return payload;
 }
 
-export function parsePayloadFromOutput(network:string, out0:any, bitcoinAddress:string):PayloadType {
-	let d1 = out0.script.subarray(5) as Uint8Array // strip the op type and data length
+export function parsePayloadFromOutput(network:string, tx:btc.Transaction):PayloadType {
+	const out0 = tx.getOutput(0)
+	let d1 = out0.script?.subarray(5) as Uint8Array // strip the op type and data length
 	let witnessData = getMagicAndOpCode(d1);
 	if (witnessData.opcode !== '3C' && witnessData.opcode !== '3E') {
-		d1 = out0.script.subarray(2) as Uint8Array // strip the op type and data length
+		d1 = out0.script?.subarray(2) as Uint8Array // strip the op type and data length
 		witnessData = getMagicAndOpCode(d1);
 	}
 	console.log('parsePayloadFromTransaction:witnessData', witnessData)
-	witnessData.txType = out0.type;
+	witnessData.txType = btc.OutScript.decode(out0.script as Uint8Array).type;
 
-	let innerPayload:PayloadType;
+	let innerPayload:PayloadType = {} as PayloadType;
 	if (witnessData.opcode === '3C') {
 		innerPayload = parseDepositPayload(d1);
+		innerPayload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
+		//innerPayload.spendingAddress = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		innerPayload = parseWithdrawPayload(network, hex.encode(d1), bitcoinAddress, 'vrs')
+		const recipient = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
+		try {
+			innerPayload = parseWithdrawPayload(network, hex.encode(d1), recipient, 'vrs')
+		} catch (err:any) {
+			innerPayload = parseWithdrawPayload(network, hex.encode(d1), recipient, 'rsv')
+		}
+		if (tx.outputsLength > 2) innerPayload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(2).script as Uint8Array)
+		innerPayload.spendingAddress = recipient
 		return innerPayload;
 	} else {
-	  throw new Error('Wrong opcode : expected: 3A or 3C :  recieved: ' + witnessData.opcode)
+	  throw new Error('Wrong opcode : expected: 3E or 3C :  recieved: ' + witnessData.opcode)
 	}
 }
 
@@ -322,22 +331,24 @@ export function parsePayloadFromOutput(network:string, out0:any, bitcoinAddress:
  * @param bitcoinAddress 
  * @returns 
  */
-export function getDataToSign(network:string, amount:number, bitcoinAddress:string):Uint8Array {
+export function getDataToSign (network:string, amount:number, bitcoinAddress:string):string {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	console.log('getDataToSign:bitcoinAddress: ' + bitcoinAddress)
-	tx.addOutputAddress(bitcoinAddress, BigInt(dust), net);
-	const amtBuf = amountToBigUint64(amount, 8);
-	const data = concat(amtBuf, tx.getOutput(0).script!);
-	const dataLen = hex.decode(data.length.toString(8));
-	return concat(dataLen, data);
+	//console.log('getDataToSign:bitcoinAddress: ' + bitcoinAddress)
+	tx.addOutputAddress(bitcoinAddress, BigInt(amount), net);
+	//const amtBuf = amountToBigUint64(amount, 8);
+	const amountBytes = P.U64BE.encode(BigInt(amount));
+	const data = concat(amountBytes, tx.getOutput(0).script!);
+	//const dataLen = (amountToUint8(data.length, 1));
+	//return data //concat(dataLen, data);
+	return `Withdraw request for ${amount} satoshis to the bitcoin address ${bitcoinAddress} (${hex.encode(data)})`;
 }
 
 export function getStacksSimpleHashOfDataToSign(network:string, amount:number, bitcoinAddress:string):string {
 	const dataToSign = getDataToSign(network, amount, bitcoinAddress);
-	const msgHash = hashMessage(hex.encode(dataToSign));
-	console.log('getStacksSimpleHashOfDataToSign:dataToSign: ' + hex.encode(dataToSign))
-	console.log('getStacksSimpleHashOfDataToSign:msgHash: ' + hex.encode(msgHash))
+	const msgHash = hashMessage(dataToSign);
+	//console.log('getStacksSimpleHashOfDataToSign:dataToSign: ' + hex.encode(dataToSign))
+	//console.log('getStacksSimpleHashOfDataToSign:msgHash: ' + hex.encode(msgHash))
 	return hex.encode(msgHash);
 }
 
@@ -357,13 +368,13 @@ function getPubkeySignature(messageHash:Uint8Array, signature:string, sigMode:'v
 	const sigM = recoverSignature({ signature: signature, mode: sigMode }); // vrs to rsv
 	let sig = new secp.Signature(sigM.signature.r, sigM.signature.s);
 	const recBit = parseInt(hex.encode(hex.decode(signature).subarray(0,1)))
-	console.log('getPubkeySignature:signature' + signature)
-	console.log('getPubkeySignature:recBit' + recBit)
-	console.log('getPubkeySignature:sigMode' + sigMode)
+	//console.log('getPubkeySignature:signature' + signature)
+	//console.log('getPubkeySignature:recBit' + recBit)
+	//console.log('getPubkeySignature:sigMode' + sigMode)
 	sig = sig.addRecoveryBit(recBit);
 	const pubkeyM = sig.recoverPublicKey(messageHash);
 	const pubkey = hex.decode(pubkeyM.toHex());
-	console.log(pubkeyM.toHex())
+	//console.log(pubkeyM.toHex())
 	return pubkey;
 }
 

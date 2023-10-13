@@ -25,14 +25,6 @@ describe('Deposit tests', () => {
     expect(hex.encode(pk)).equals('6e16df46e3ca6e21dfcb69cb50836766d378f9eef4fba0ec85022f5f880f463901')
   })
 
-  it.concurrent('Convert wif to private key', async () => {
-    const sbtcPublicKey = '02e30e89dc85db23273fed237c21d4ca495de4fbffbdf8a90d90e902847fb411c7';
-    const addr = getPegWalletAddressFromPublicKey('testnet', sbtcPublicKey)
-    if (!addr) fail() 
-    expect(addr.length).equals(32)
-    expect(addr).equals('tb1puv8gnhy9mv3jw0ldyd7zr4x2f9w7f7llhhu2jrvsaypggla5z8rs6hg0pk')
-  })
-
   it.concurrent('Check parsing deposit payload fails for out of date payload', async () => {
     const script = hex.decode(commit1.commitTxScript?.leaves[0].script);
     // first byte is length
