@@ -334,13 +334,9 @@ export function parsePayloadFromOutput(network:string, tx:btc.Transaction):Paylo
 export function getDataToSign (network:string, amount:number, bitcoinAddress:string):string {
 	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
-	//console.log('getDataToSign:bitcoinAddress: ' + bitcoinAddress)
 	tx.addOutputAddress(bitcoinAddress, BigInt(amount), net);
-	//const amtBuf = amountToBigUint64(amount, 8);
 	const amountBytes = P.U64BE.encode(BigInt(amount));
 	const data = concat(amountBytes, tx.getOutput(0).script!);
-	//const dataLen = (amountToUint8(data.length, 1));
-	//return data //concat(dataLen, data);
 	return `Withdraw request for ${amount} satoshis to the bitcoin address ${bitcoinAddress} (${hex.encode(data)})`;
 }
 
