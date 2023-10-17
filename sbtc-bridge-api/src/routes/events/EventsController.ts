@@ -1,5 +1,6 @@
-import { Route } from "tsoa";
-import { saveAllSbtcEvents } from './events_helper.js';
+import { Get, Route } from "tsoa";
+import { findSbtcEvents, findSbtcEventsByFilter, indexSbtcEvent, saveAllSbtcEvents, saveSbtcEvents } from './events_helper.js';
+import { SbtcClarityEvent } from "sbtc-bridge-lib/dist/types/sbtc_types.js";
 
 export interface BalanceI {
   balance: number;
@@ -9,25 +10,30 @@ export interface BalanceI {
 export class EventsController {
 
   //@Get("/events/save")
-  public async readAllEvents(): Promise<any> {
-    return await saveAllSbtcEvents();
+  public async readAllEvents(): Promise<Array<SbtcClarityEvent>> {
+    return await findSbtcEvents(0);
   }
 
   /**
-  //@Get("/events/index/stacks/:txid")
+   */
+  @Get("/index/stacks/:txid")
   public async indexSbtcEvent(txid:string): Promise<any> {
     return await indexSbtcEvent(txid);
   }
 
-  //@Get("/events/save/:page")
-  public async saveSbtcEvents(page:number): Promise<any> {
+  @Get("/save/:page")
+  public async saveSbtcEvents(page:number): Promise<Array<SbtcClarityEvent>> {
     return await saveSbtcEvents(page);
   }
 
-  //@Get("/events/:page")
-  public async findSbtcEvents(page:number): Promise<any> {
+  @Get("/filter/:name/:value")
+  public async findSbtcEventsByFilter(name:string, value:string): Promise<Array<SbtcClarityEvent>> {
+    return await findSbtcEventsByFilter({name: value});
+  }
+
+  @Get("/:page")
+  public async findSbtcEvents(page:number): Promise<Array<SbtcClarityEvent>> {
     return await findSbtcEvents(page);
   }
-   */
 
 }

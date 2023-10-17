@@ -2,7 +2,8 @@ import fetch from 'node-fetch';
 import { BASE_URL, OPTIONS } from '../../routes/bitcoin/BitcoinRPCController.js'
 import { fetchTransaction, fetchTransactionHex } from './api_mempool.js';
 import { getConfig } from '../config.js';
-import { parsePayloadFromTransaction } from 'sbtc-bridge-lib';
+import { PayloadType, parsePayloadFromTransaction } from 'sbtc-bridge-lib';
+import { getBlock } from './rpc_blockchain.js';
 
 export async function sendRawTxRpc(hex:string, maxFeeRate:number):Promise<any> {
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"sendrawtransaction","params":["${hex}", ${maxFeeRate}]}`;
@@ -39,10 +40,18 @@ export async function fetchRawTx(txid:string, verbose:boolean) {
   return res;
 }
  
-export async function readPayloadData(txid:string, verbose:boolean) {
+export async function readPayloadData(txid:string) {
   if (!txid) return
   const txHex = await fetchTransactionHex(txid);
-  console.log('readPayloadData:txHex: ' + txHex);
-  return parsePayloadFromTransaction(getConfig().network, txHex);
+  const tx = await fetchTransaction(txid);
+  console.log('readPayloadData:tx: ', tx);
+  const block = await getBlock(tx.status.block_hash, 1);
+  console.log('readPayloadData:block: ', block);
+  const txIndex = block.tx.findIndex((id) => id === txid)
+  const payload:PayloadType = parsePayloadFromTransaction(getConfig().network, txHex);
+  payload.txIndex = txIndex
+  payload.burnBlockHeight = tx.status.block_height
+  payload.burnBlockTime = tx.status.block_time
+  return payload;
 }
 

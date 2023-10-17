@@ -8,6 +8,7 @@ import fetch from 'node-fetch';
 import { findContractEventsByFilter, countContractEvents, saveNewContractEvent } from '../../lib/data/db_models.js';
 import util from 'util'
 import type { PayloadType } from 'sbtc-bridge-lib';
+import { SbtcClarityEvent } from "sbtc-bridge-lib/dist/types/sbtc_types.js";
 
 const limit = 10;
 
@@ -20,13 +21,14 @@ export async function indexSbtcEvent(txid:string) {
     return await indexEvents(result.events.filter((o:any) => o.event_type === 'smart_contract_log'));
   } catch (err:any) {
     console.log('err indexSbtcEvent: ' + err);
-    return [];
+    return new Array<SbtcClarityEvent>;
   }
 }
 
 export async function saveAllSbtcEvents() {
   try {
     let offset = await countContractEvents();
+    console.log('saveAllSbtcEvents offset: ' + offset);
     let events:Array<any>;
     do {
       events = await saveSbtcEvents(offset);
@@ -55,10 +57,13 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
 async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
+      console.log('event ', event);
       const edata:any = cvToJSON(deserializeCV(event.contract_log.value.hex));
-      console.log('event ' + event.contract_log.value.repr);
-      //console.log('edata.value.payload.value ', edata.value.payload.value);
-      const payloadData:PayloadType = await readPayloadData(edata.value.payload.value, true);
+      const eventType = edata.value.notification.value;
+      const eventTxId = edata.value.payload.value.split('x')[1];
+      //console.log('edata ', edata);
+      const payloadData:PayloadType = await readPayloadData(eventTxId);
+      payloadData.eventType = eventType;
       console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
 
       let newEvent = {
@@ -69,7 +74,8 @@ async function indexEvents(sbtcEvents:Array<any>) {
         payloadData,
       };
       const result = await saveNewContractEvent(newEvent);
-      console.log('saveSbtcEvents: saved one: ' + result, newEvent.payloadData);
+      console.log('saveSbtcEvents: saved result: ', result);
+      console.log('saveSbtcEvents: saved payloadData: ', newEvent.payloadData);
       
     } catch (err:any) {
       console.log('indexEvents: Error: ', err); //util.inspect(err, false, null, true /* enable colors */));
@@ -80,4 +86,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
 
 export async function findSbtcEvents(offset:number):Promise<any> {
   return findContractEventsByFilter({});
+}
+export async function findSbtcEventsByFilter(filter:any):Promise<any> {
+  return findContractEventsByFilter(filter);
 }

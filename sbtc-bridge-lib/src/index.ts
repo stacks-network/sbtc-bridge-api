@@ -168,7 +168,8 @@ import type {
     AuthorisationDataType,
     DepositPayloadUIType,
     WithdrawPayloadUIType,
-    TxMinedParameters
+    TxMinedParameters,
+    SbtcClarityEvent
 } from './types/sbtc_types.js'
 
 export type {
@@ -194,7 +195,8 @@ export type {
     AuthorisationDataType,
     DepositPayloadUIType,
     WithdrawPayloadUIType,
-    TxMinedParameters
+    TxMinedParameters,
+    SbtcClarityEvent
 }
 import type {
     PoxInfo,

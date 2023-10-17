@@ -28,6 +28,40 @@ export type SbtcMiniContractDataI = {
   burnHeight?: number;
 };
 
+export type SbtcClarityEvent = {
+  _id: string;
+  contractId: string;
+  eventIndex: number;
+  txid: string;
+  bitcoinTxid: {
+    notification: { type: string; value: string; },
+    payload: {
+      type: string;
+      value: string;
+    }
+  },
+  payloadData: PayloadType;
+}
+export type PayloadType = {
+  sbtcWallet?:string;
+  txIndex?: number;
+  burnBlockHeight?:number;
+  burnBlockTime?:number;
+  spendingAddress?: string;
+  opcode?: string;
+  prinType?: number;
+  stacksAddress?: string;
+  lengthOfCname?: number;
+  cname?: string;
+  lengthOfMemo?: number;
+  memo?: string;
+  revealFee?: number;
+  amountSats: number;
+  signature?: string;
+  dustAmount?: number;
+  eventType?: string;
+};
+
 export type SbtcContractDataType = {
   coordinator?: { addr: { value: string }, key:string };
   contractId: string;
@@ -196,22 +230,6 @@ export type SbtcAlphaEvent = {
   payloadData:PayloadType;
 }
 
-export type PayloadType = {
-  sbtcWallet?:string;
-  burnBlockHeight?:number;
-  spendingAddress?: string;
-  opcode?: string;
-  prinType?: number;
-  stacksAddress?: string;
-  lengthOfCname?: number;
-  cname?: string;
-  lengthOfMemo?: number;
-  memo?: string;
-  revealFee?: number;
-  amountSats: number;
-  signature?: string;
-  dustAmount?: number;
-};
 export type KeySet = {
   deposits: {
     revealPubKey: string;

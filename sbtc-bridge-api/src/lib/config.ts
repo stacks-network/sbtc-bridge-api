@@ -31,20 +31,20 @@ const DEVNET_CONFIG = {
   mongoDbName: '',
   mongoUser: '',
   mongoPwd: '',
-  btcNode: 'bitcoind.testnet.stacks.co',
-  btcRpcUser: 'blockstack',
-  btcRpcPwd: 'blockstacksystem', 
+  btcNode: 'bitcoin',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet', 
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
-  network: 'testnet',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-1',
-  stacksApi: 'https://api.testnet.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
-  bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
-  mempoolUrl: 'https://mempool.space/testnet/api',
+  network: 'devnet',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
+  stacksApi: 'http://stacks-api',
+  stacksExplorerUrl: 'http://stacks-explorer',
+  bitcoinExplorerUrl: 'http://mempool-web/testnet/api',
+  mempoolUrl: 'http://mempool-web/testnet/api',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  publicAppName: 'sBTC Bridge Local Staging API',
+  publicAppName: 'sBTC Bridge Devnet',
   publicAppVersion: '1.0.0',
 }
 
@@ -61,7 +61,7 @@ const LINODE_TESTNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/SBTC-0003',
   network: 'testnet',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-1',
+  sbtcContractId: 'ST3ACFZ2XKFPKAFD9YY92ZP0Y4QN6MTX3H20C27NY.asset',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
@@ -84,7 +84,7 @@ const LINODE_MAINNET_CONFIG = {
   port: 3020,
   network: 'mainnet',
   walletPath: '/wallet/SBTC-0003',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-1',
+  sbtcContractId: 'ST3ACFZ2XKFPKAFD9YY92ZP0Y4QN6MTX3H20C27NY.asset',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.co',
   bitcoinExplorerUrl: 'https://mempool.space/api',
@@ -117,8 +117,8 @@ let CONFIG: {
 };
 
 export function setConfigOnStart() {
-	if (isDev()) CONFIG = LINODE_TESTNET_CONFIG; //DEVNET_CONFIG;
-  else if (isLocalTestnet()) CONFIG = DEVNET_CONFIG;
+	if (isDev()) CONFIG = DEVNET_CONFIG;
+  else if (isLocalTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLocalRegtest()) CONFIG = SIMNNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
