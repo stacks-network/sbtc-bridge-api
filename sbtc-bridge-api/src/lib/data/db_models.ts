@@ -79,13 +79,13 @@ export async function countContractEvents () {
 	return await sbtcContractEvents.countDocuments();
 }
 
-export async function saveNewContractEvent (newEvent:any) {
+export async function saveNewContractEvent(newEvent:any) {
 	const result = await sbtcContractEvents.insertOne(newEvent);
 	return result;
 }
 
 export async function findContractEventsByFilter(filter:any|undefined) {
-	return await sbtcContractEvents.find(filter).sort({'pegData.burnBlockHeight': -1}).toArray();
+	return await sbtcContractEvents.find(filter).sort({'payloadData.eventType': -1}).toArray();
 }
 
 export async function saveNewBridgeTransaction (pegin:any) {

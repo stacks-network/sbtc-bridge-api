@@ -59,7 +59,7 @@ export class DepositsController {
   }
 
   public async findPeginRequestsByStacksAddress(stacksAddress:string): Promise<any> {
-    const result = await findBridgeTransactionsByFilter({ stacksAddress });
+    const result = await findBridgeTransactionsByFilter({ 'payloadData.stacksAddress': stacksAddress });
     return result;
   }
 

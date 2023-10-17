@@ -8,6 +8,9 @@
 		"schemas": {
 			"PayloadType": {
 				"properties": {
+					"eventType": {
+						"type": "string"
+					},
 					"dustAmount": {
 						"type": "number",
 						"format": "double"
@@ -50,7 +53,15 @@
 					"spendingAddress": {
 						"type": "string"
 					},
+					"burnBlockTime": {
+						"type": "number",
+						"format": "double"
+					},
 					"burnBlockHeight": {
+						"type": "number",
+						"format": "double"
+					},
+					"txIndex": {
 						"type": "number",
 						"format": "double"
 					},
@@ -331,6 +342,74 @@
 					"sbtcWalletAddress",
 					"contractOwner",
 					"contractId"
+				],
+				"type": "object"
+			},
+			"SbtcClarityEvent": {
+				"properties": {
+					"payloadData": {
+						"$ref": "#/components/schemas/PayloadType"
+					},
+					"bitcoinTxid": {
+						"properties": {
+							"payload": {
+								"properties": {
+									"value": {
+										"type": "string"
+									},
+									"type": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"value",
+									"type"
+								],
+								"type": "object"
+							},
+							"notification": {
+								"properties": {
+									"value": {
+										"type": "string"
+									},
+									"type": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"value",
+									"type"
+								],
+								"type": "object"
+							}
+						},
+						"required": [
+							"payload",
+							"notification"
+						],
+						"type": "object"
+					},
+					"txid": {
+						"type": "string"
+					},
+					"eventIndex": {
+						"type": "number",
+						"format": "double"
+					},
+					"contractId": {
+						"type": "string"
+					},
+					"_id": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"payloadData",
+					"bitcoinTxid",
+					"txid",
+					"eventIndex",
+					"contractId",
+					"_id"
 				],
 				"type": "object"
 			}
@@ -740,6 +819,135 @@
 				},
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/bridge-api/{network}/v1/contract/index/stacks/{txid}": {
+			"get": {
+				"operationId": "IndexSbtcEvent",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "txid",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/contract/save/{page}": {
+			"get": {
+				"operationId": "SaveSbtcEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SbtcClarityEvent"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/contract/filter/{name}/{value}": {
+			"get": {
+				"operationId": "FindSbtcEventsByFilter",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SbtcClarityEvent"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "name",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "value",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/contract/{page}": {
+			"get": {
+				"operationId": "FindSbtcEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/SbtcClarityEvent"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
 			}
 		}
 	},

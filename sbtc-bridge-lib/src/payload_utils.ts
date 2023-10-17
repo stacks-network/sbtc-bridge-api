@@ -162,7 +162,7 @@ function parseWithdrawalPayloadNoMagic(network:string, d1:Uint8Array, bitcoinAdd
 	const pubKey = getPubkeySignature(hex.decode(msgHash), signature, sigMode)
 	console.log('parseWithdrawalPayloadNoMagic:pubKey: ' + hex.encode(pubKey))
 	const stxAddresses = getStacksAddressFromPubkey(pubKey);
-	const stacksAddress = (network === 'testnet') ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
+	const stacksAddress = (network === network) ? stxAddresses.tp2pkh : stxAddresses.mp2pkh;
 	return {
 		opcode,
 		stacksAddress,
@@ -177,12 +177,12 @@ export enum PrincipalType {
 }
 
 export function buildDepositPayload(network:string, stacksAddress:string):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
 	return buildDepositPayloadInternal(net, 0, stacksAddress, false)
 }
 
 export function buildDepositPayloadOpDrop(network:string, stacksAddress:string, revealFee:number):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
 	return buildDepositPayloadInternal(net, revealFee, stacksAddress, true)
 }
 
@@ -232,7 +232,7 @@ function buildDepositPayloadInternal(net:any, amountSats:number, address:string,
  * @returns 
  */
 export function buildWithdrawPayload(network:string, amount:number, signature:string):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
 	return buildWithdrawPayloadInternal(net, amount, signature, false)
 }
 
@@ -244,7 +244,7 @@ export function buildWithdrawPayload(network:string, amount:number, signature:st
  * @returns 
  */
 export function buildWithdrawPayloadOpDrop(network:string, amount:number, signature:string):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
 	return buildWithdrawPayloadInternal(net, amount, signature, true)
 }
 
@@ -300,23 +300,30 @@ export function parsePayloadFromOutput(network:string, tx:btc.Transaction):Paylo
 		d1 = out0.script?.subarray(2) as Uint8Array // strip the op type and data length
 		witnessData = getMagicAndOpCode(d1);
 	}
-	console.log('parsePayloadFromTransaction:witnessData', witnessData)
 	witnessData.txType = btc.OutScript.decode(out0.script as Uint8Array).type;
 
 	let innerPayload:PayloadType = {} as PayloadType;
 	if (witnessData.opcode === '3C') {
 		innerPayload = parseDepositPayload(d1);
-		innerPayload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
-		//innerPayload.spendingAddress = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
+		innerPayload.sbtcWallet = getAddressFromOutScript(network, tx.getOutput(1).script as Uint8Array)
+		//const inScript = btc.RawInput.encode({
+		//	index: tx.getInput(0).index || 0,
+		//	sequence: tx.getInput(0).sequence || 0,
+		//	txid: tx.getInput(0).txid as Uint8Array,
+		//	finalScriptSig: tx.getInput(0).finalScriptSig as Uint8Array,
+		//});
+		if (tx.outputsLength > 2) innerPayload.spendingAddress = getAddressFromOutScript(network, tx.getOutput(2).script!)
+		console.log('parsePayloadFromTransaction:spendingAddress: ' +  innerPayload.spendingAddress)
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
-		const recipient = getAddressFromOutScript('testnet', tx.getOutput(1).script as Uint8Array)
+		const recipient = getAddressFromOutScript(network, tx.getOutput(1).script as Uint8Array)
 		try {
 			innerPayload = parseWithdrawPayload(network, hex.encode(d1), recipient, 'vrs')
 		} catch (err:any) {
 			innerPayload = parseWithdrawPayload(network, hex.encode(d1), recipient, 'rsv')
 		}
-		if (tx.outputsLength > 2) innerPayload.sbtcWallet = getAddressFromOutScript('testnet', tx.getOutput(2).script as Uint8Array)
+		innerPayload.spendingAddress = getAddressFromOutScript(network, tx.getOutput(1).script!);
+		if (tx.outputsLength > 2) innerPayload.sbtcWallet = getAddressFromOutScript(network, tx.getOutput(2).script as Uint8Array)
 		innerPayload.spendingAddress = recipient
 		return innerPayload;
 	} else {
@@ -332,7 +339,7 @@ export function parsePayloadFromOutput(network:string, tx:btc.Transaction):Paylo
  * @returns 
  */
 export function getDataToSign (network:string, amount:number, bitcoinAddress:string):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	tx.addOutputAddress(bitcoinAddress, BigInt(amount), net);
 	const amountBytes = P.U64BE.encode(BigInt(amount));

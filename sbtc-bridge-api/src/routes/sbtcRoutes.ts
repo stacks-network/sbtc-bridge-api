@@ -3,6 +3,7 @@ import { TransactionController, BlocksController, WalletController } from "./bit
 import { SbtcWalletController, DepositsController } from "./stacks/StacksRPCController.js";
 import type { BridgeTransactionType } from 'sbtc-bridge-lib';
 import { isUpdateAllowed } from "../lib/utils_stacks.js";
+import { EventsController } from "./events/EventsController.js";
 
 const router = express.Router();
 
@@ -101,41 +102,8 @@ router.get("/events/save", (req, res, next) => {
     next('An error occurred fetching sbtc data.') 
   }
 });
-
-router.get("/events/index/stacks/:txid", async (req, res, next) => {
-  try {
-    const controller = new SbtcWalletController();
-    const response = await controller.indexSbtcEvent(req.params.txid);
-    //const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
-    return res.send(response);
-  } catch (error) { 
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
-router.get("/events/save/:page", async (req, res, next) => {
-  try {
-    const controller = new SbtcWalletController();
-    const response = await controller.saveSbtcEvents(Number(req.params.page));
-    return res.send(response);
-  } catch (error) { 
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
-router.get("/events/:page", async (req, res, next) => {
-  try {
-    const controller = new SbtcWalletController();
-    const response = await controller.findSbtcEvents(Number(req.params.page));
-    return res.send(response);
-  } catch (error) { 
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
  */
+
 
 /**
  * fetchs a bunch of objects needed in the UI;

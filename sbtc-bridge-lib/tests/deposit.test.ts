@@ -143,6 +143,7 @@ describe('Deposit tests', () => {
     expect(payload.amountSats).equals(100)
     expect(payload.opcode).equals('3C')
     expect(payload.sbtcWallet).equals('tb1p68eyfa7nprcegz4xdj5q9msjy69xgshzckvy64cmwegfzu77v2wslah8ww')
+    expect(payload.spendingAddress).equals('tb1qp8r7ln235zx6nd8rsdzkgkrxc238p6eecys2m9')
     expect(payload.prinType).equals(0)
   })
 
