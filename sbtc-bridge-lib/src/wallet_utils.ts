@@ -184,7 +184,6 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 		const hexy = (utxo.tx.hex) ? utxo.tx.hex : utxo.tx
 		const script = btc.RawTx.decode(hex.decode(hexy))
 		if (amt < bar && utxo.status.confirmed) {
-			amt += utxo.value;
 			const txFromUtxo = btc.Transaction.fromRaw(hex.decode(hexy), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
 			const outputToSpend = txFromUtxo.getOutput(utxo.vout)
 			if (!outputToSpend || !outputToSpend.script) throw new Error('no script passed ?')
@@ -235,7 +234,12 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					  amount: BigInt(utxo.value),
 					},
 				}
-				transaction.addInput(nextI);
+				try {
+					transaction.addInput(nextI);
+				} catch(err:any) {
+					// try next input
+					console.log(err)
+				}
 			} else if (spendScr.type === 'wsh') {
 				//const p2shObj = btc.p2wsh(btc.p2wpkh(hex.decode(paymentPublicKey), net))
 				let witnessUtxo = {
@@ -254,7 +258,12 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					witnessUtxo
 				}
-				transaction.addInput(nextI);
+				try {
+					transaction.addInput(nextI);
+				} catch(err:any) {
+					// try next input
+					console.log(err)
+				}
 			} else if (spendScr.type === 'pkh') {
 				//const p2shObj = btc.p2pkh(hex.decode(paymentPublicKey), net)
 				const nextI:btc.TransactionInput = {
@@ -263,7 +272,12 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					//witnessUtxo
 				}
-				transaction.addInput(nextI);
+				try {
+					transaction.addInput(nextI);
+				} catch(err:any) {
+					// try next input
+					console.log(err)
+				}
 			} else {
 				//const p2shObj = btc.p2wpkh(hex.decode(paymentPublicKey), net)
 				const nextI:btc.TransactionInput = {
@@ -272,8 +286,14 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 					nonWitnessUtxo: hexy,
 					//witnessUtxo
 				}
-				transaction.addInput(nextI);
+				try {
+					transaction.addInput(nextI);
+				} catch(err:any) {
+					// try next input
+					console.log(err)
+				}
 			}
+			amt += utxo.value;
 		}
 	}
 }
