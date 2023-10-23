@@ -2,25 +2,25 @@ import { env } from "process";
 
 const PORT = parseInt(env.PORT || '3010');
 
-const SIMNNET_CONFIG = {
-  environment: 'simnet',
-  mongoDbUrl: '',
-  mongoDbName: '',
-  mongoUser: '',
-  mongoPwd: '',
-  btcNode: 'http://localhost:18443',
+const REGNET_CONFIG = {
+  environment: 'devnet',
+  mongoDbUrl: 'mongodb',
+  mongoDbName: 'devnet',
+  mongoUser: 'devnet',
+  mongoPwd: 'devnet',
+  btcNode: 'localhost:18443',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
   host: 'http://localhost', 
   port: PORT,
-  network: 'simnet',
-  walletPath: '/wallet/SBTC-0001',
+  network: 'devnet',
+  walletPath: '',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
   stacksApi: 'http://localhost:3999',
-  stacksExplorerUrl: 'http://localhost:3000',
+  stacksExplorerUrl: 'http://localhost:3020',
   bitcoinExplorerUrl: 'http://localhost:3002',
-  mempoolUrl: 'http://localhost:18443',
-  blockCypherUrl: 'http://localhost:18443',
+  mempoolUrl: 'http://localhost:8083/api',
+  blockCypherUrl: 'http://localhost:8083/api',
   publicAppName: 'sBTC Bridge Simnet API',
   publicAppVersion: '1.0.0',
 }
@@ -119,7 +119,7 @@ let CONFIG: {
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
   else if (isLocalTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
-	else if (isLocalRegtest()) CONFIG = SIMNNET_CONFIG;
+	else if (isLocalRegtest()) CONFIG = REGNET_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
 	else CONFIG = LINODE_TESTNET_CONFIG;
@@ -128,7 +128,16 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   console.log('================================================ >> ' + process.env.NODE_ENV)
-  if (isLocalRegtest() || isLocalTestnet()) {
+  if (isLocalRegtest()) {
+    // localhost params not provided by docker environment
+    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
+    CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
+    CONFIG.mongoUser = 'dockerdev1'
+    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
+    CONFIG.btcRpcUser = 'devnet'
+    CONFIG.btcRpcPwd = 'devnet'
+    // private keys for testing ability to sign PSBTs..
+  } else if (isLocalTestnet()) {
     // localhost params not provided by docker environment
     CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
     CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
@@ -139,7 +148,7 @@ function setOverrides() {
     CONFIG.btcRpcPwd = 'devnet'
     // private keys for testing ability to sign PSBTs..
   } else if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
-    // localhost params provided by docker environment
+    // Params provided by local machne
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
     CONFIG.mongoDbName = process.env.mongoDbName || '';
     CONFIG.mongoUser = process.env.mongoUser || ''

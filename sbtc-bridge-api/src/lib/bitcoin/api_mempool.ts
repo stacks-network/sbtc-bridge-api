@@ -3,23 +3,6 @@ import fetch from 'node-fetch';
 import type { AddressMempoolObject } from 'sbtc-bridge-lib';
 import { checkAddressForNetwork  } from 'sbtc-bridge-lib' 
 
-/**
-export async function fetchUtxoSet(address:string) {
-  const url = getConfig().mempoolUrl + '/address/' + address;
-  const response = await fetch(url);
-  if (response.status !== 200) throw new Error('Address not found - is the network correct?');
-  const result = await response.json();
-  const utxos = await fetchUTXOs(address);
-  for (let utxo of utxos) {
-    const tx = await fetchTransaction(utxo.txid);
-    const hex = await fetchTransactionHex(utxo.txid);
-    tx.hex = hex;
-    utxo.tx = tx;
-  }
-  return { addressDetails: result, utxos };
-}
- */
-
 export async function fetchBitcoinTipHeight() {
   try {
     const url = getConfig().mempoolUrl + '/api/blocks/tip/height';
