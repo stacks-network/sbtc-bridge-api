@@ -41,9 +41,9 @@ const DEVNET_CONFIG = {
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
   stacksApi: 'http://stacks-api:3999',
   stacksExplorerUrl: 'http://stacks-explorer:3020',
-  bitcoinExplorerUrl: 'http://mempool-web/testnet/api',
-  mempoolUrl: 'http://mempool-api/testnet/api',
-  blockCypherUrl: 'http://mempool-api/testnet/api',
+  bitcoinExplorerUrl: 'http://mempool-web:8083',
+  mempoolUrl: 'http://mempool-web:8083/api',
+  blockCypherUrl: 'http://mempool-web:8083/api',
   publicAppName: 'sBTC Bridge Devnet',
   publicAppVersion: '1.0.0',
 }
@@ -152,7 +152,7 @@ function setOverrides() {
     CONFIG.stacksApi = process.env.stacksApi || '';
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
-    CONFIG.mempoolUrl = process.env.mempoolUrl || 'http://mempool-api/testnet/api';
+    CONFIG.mempoolUrl = process.env.mempoolUrl || 'http://mempool-web:8083/api';
   }
   if (isLocalTestnet()) {
     CONFIG.btcNode = 'localhost:18332' // ie not via docker network

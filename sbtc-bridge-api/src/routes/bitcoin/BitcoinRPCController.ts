@@ -303,11 +303,12 @@ export class WalletController {
     //checkAddressForNetwork(getConfig().network, address);
       if (address) {
         try {
-          if (getConfig().network === 'simnet') {
-            console.log('importing address')
+          if (getConfig().network === 'simnet' || getConfig().network === 'devnet') {
+            console.log('fetchUtxoSet: importing address')
             await importAddress(address)
           }
           result = await getAddressInfo(address);
+          console.log('fetchUtxoSet: getAddressInfo')
           const addressValidation = await validateAddress(address);
           result.addressValidation = addressValidation
         } catch (err:any) {
