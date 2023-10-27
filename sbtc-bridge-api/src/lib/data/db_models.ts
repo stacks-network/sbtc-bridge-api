@@ -85,21 +85,26 @@ export async function saveNewContractEvent(newEvent:any) {
 }
 
 export async function findContractEventsByFilter(filter:any|undefined) {
-	return await sbtcContractEvents.find(filter).sort({'payloadData.burnBlockHeight': -1}).toArray();
+	return await sbtcContractEvents.find(filter).sort({'payloadData.burnBlockHeight': 1}).toArray();
 }
 
 export async function findContractEventBySbtcWalletAddress(sbtcWallet:string):Promise<any> {
-	const result = await sbtcContractEvents.find({ "payloadData.sbtcWallet": sbtcWallet }).sort({'payloadData.burnBlockHeight': -1}).toArray();
+	const result = await sbtcContractEvents.find({ "payloadData.sbtcWallet": sbtcWallet }).sort({'payloadData.burnBlockHeight': 1}).toArray();
 	return result;
 }
 
 export async function findContractEventByStacksAddress(stacksAddress:string):Promise<any> {
-	const result = await sbtcContractEvents.find({ "payloadData.stacksAddress": stacksAddress }).sort({'payloadData.burnBlockHeight': -1}).toArray();
+	const result = await sbtcContractEvents.find({ "payloadData.stacksAddress": stacksAddress }).sort({'payloadData.burnBlockHeight': 1}).toArray();
 	return result;
 }
 
 export async function findContractEventByBitcoinAddress(bitcoinAddress:string):Promise<any> {
-	const result = await sbtcContractEvents.find({ "payloadData.spendingAddress": bitcoinAddress }).sort({'payloadData.burnBlockHeight': -1}).toArray();
+	const result = await sbtcContractEvents.find({ "payloadData.spendingAddress": bitcoinAddress }).sort({'payloadData.burnBlockHeight': 1}).toArray();
+	return result;
+}
+
+export async function findContractEventByBitcoinTxId(bitcoinTxid:string):Promise<any> {
+	const result = await sbtcContractEvents.find({ "bitcoinTxid.payload.value": '0x' + bitcoinTxid }).sort({'payloadData.burnBlockHeight': 1}).toArray();
 	return result;
 }
 
@@ -123,7 +128,7 @@ export async function updateBridgeTransaction (pegger:any, changes: any) {
 }
 
 export async function findBridgeTransactionsByFilter(filter:any|undefined):Promise<any> {
-	const result = await commitments.find(filter).sort({'updated': -1}).toArray();
+	const result = await commitments.find(filter).sort({'updated': 1}).toArray();
 	return result;
 }
 

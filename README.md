@@ -44,7 +44,7 @@ docker run -d -t -i --network host --name bridge_api_production -p 3020:3020 -e 
 ```bash
 # stag
 docker rm -f bridge_api_staging
-docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${BTC_SCHNORR_KEY_ORACLE} -e btcRpcUser=${BTC_RPC_USER} -e btcRpcPwd=${BTC_RPC_PWD} -e btcNode=${BTC_NODE} -e mongoDbUrl=${MONGO_SBTC_URL} -e mongoDbName=${MONGO_SBTC_DBNAME} -e mongoUser=${MONGO_SBTC_USER} -e mongoPwd=${MONGO_SBTC_PWD} -e sbtcContractId=${CONFIG_CONTRACT_ID} -e network=${CONFIG_NETWORK} -e stacksApi=${CONFIG_STACKS_API} -e stacksExplorerUrl=${CONFIG_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${CONFIG_BITCOIN_EXPLORER_URL} mijoco/bridge_api
+docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${BTC_SCHNORR_KEY_ORACLE} -e btcRpcUser=${BTC_RPC_USER} -e btcRpcPwd=${BTC_RPC_PWD} -e btcNode=${BTC_NODE} -e mongoDbUrl=${MONGO_SBTC_URL} -e mongoDbName=${MONGO_SBTC_DBNAME} -e mongoUser=${MONGO_SBTC_USER} -e mongoPwd=${MONGO_SBTC_PWD} -e sbtcContractId=${CONFIG_CONTRACT_ID} -e network=${CONFIG_NETWORK} -e stacksApi=${CONFIG_STACKS_API} -e stacksExplorerUrl=${CONFIG_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${CONFIG_BITCOIN_EXPLORER_URL} -e mempoolUrl=${CONFIG_BITCOIN_MEMPOOL_URL} mijoco/bridge_api
 ```
 
 ## Swagger API Docs

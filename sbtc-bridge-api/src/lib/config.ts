@@ -161,7 +161,7 @@ function setOverrides() {
     CONFIG.stacksApi = process.env.stacksApi || '';
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
-    CONFIG.mempoolUrl = process.env.mempoolUrl || 'http://mempool-web:8083/api';
+    CONFIG.mempoolUrl = process.env.mempoolUrl || '';
   }
   if (isLocalTestnet()) {
     CONFIG.btcNode = 'localhost:18332' // ie not via docker network

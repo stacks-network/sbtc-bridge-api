@@ -1,6 +1,6 @@
 import express from "express";
 import { EventsController } from "./events/EventsController.js";
-import { findContractEventByBitcoinAddress, findContractEventById, findContractEventBySbtcWalletAddress, findContractEventByStacksAddress } from "../lib/data/db_models.js";
+import { findContractEventByBitcoinAddress, findContractEventByBitcoinTxId, findContractEventById, findContractEventBySbtcWalletAddress, findContractEventByStacksAddress } from "../lib/data/db_models.js";
 
 const router = express.Router();
 
@@ -52,6 +52,16 @@ router.get("/filter/:name/:value", async (req, res, next) => {
 router.get("/find-by/stacks/:stacksAddress", async (req, res, next) => {
   try {
     const response = await findContractEventByStacksAddress(req.params.stacksAddress);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
+router.get("/find-by/bitcoin-txid/:bitcoinTxid", async (req, res, next) => {
+  try {
+    const response = await findContractEventByBitcoinTxId(req.params.bitcoinTxid);
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
