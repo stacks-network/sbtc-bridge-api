@@ -10,7 +10,7 @@ import { addInputs, getPegWalletAddressFromPublicKey, inputAmt, toXOnly } from '
 const concat = P.concatBytes;
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
-export const fullfillmentFee = 500
+export const fullfillmentFee = 2000
 export const revealPayment = 10001
 export const dust = 500
 

@@ -7,8 +7,11 @@ import { readPayloadData } from '../../lib/bitcoin/rpc_transaction.js';
 import fetch from 'node-fetch';
 import { findContractEventsByFilter, countContractEvents, saveNewContractEvent } from '../../lib/data/db_models.js';
 import util from 'util'
-import type { PayloadType } from 'sbtc-bridge-lib';
+import { getAddressFromOutScript, type PayloadType } from 'sbtc-bridge-lib';
 import { SbtcClarityEvent } from "sbtc-bridge-lib/dist/types/sbtc_types.js";
+import { fetchAddressTransactions, fetchTransaction } from "../../lib/bitcoin/api_mempool.js";
+import * as btc from '@scure/btc-signer';
+import { hex } from '@scure/base';
 
 const limit = 10;
 
@@ -46,7 +49,8 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
     const url = getConfig().stacksApi + '/extended/v1/contract/' + contractId + '/events?limit=' + limit + '&offset=' + offset;
     const response = await fetch(url);
     const result:any = await response.json();
-    console.log('Sbtc Events: : offset=' + offset + ' limit=' + limit + ' results=' + result.results.length);
+    console.log('Sbtc Events: : url=' + url);
+    console.log('Sbtc Events: : results=' + (result.results) ? result.results.length : 0);
     return await indexEvents(result.results);
   } catch (err:any) {
     console.log('err - saveSbtcEvents2: ' + err);
@@ -57,20 +61,40 @@ export async function saveSbtcEvents(offset:number):Promise<Array<any>> {
 async function indexEvents(sbtcEvents:Array<any>) {
   for (const event of sbtcEvents) {
     try {
-      console.log('event ', event);
+      //console.log('event ', event);
       const edata:any = cvToJSON(deserializeCV(event.contract_log.value.hex));
       const eventType = edata.value.notification.value;
       const eventTxId = edata.value.payload.value.split('x')[1];
       //console.log('edata ', edata);
       const payloadData:PayloadType = await readPayloadData(eventTxId);
       payloadData.eventType = eventType;
-      console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
+      //console.log('indexEvents ', util.inspect(payloadData, false, null, true /* enable colors */));
+      
+      let recipient;
+      try {
+        if (eventType === 'burn') {
+          const txIn = await fetchTransaction(edata.value.payload.value.split('x')[1])
+          const tx:btc.Transaction = btc.Transaction.fromRaw(hex.decode(txIn.hex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
+          recipient = getAddressFromOutScript(getConfig().network, tx.getOutput(1).script as Uint8Array)
+        }
+      } catch (err:any) {
+        console.log('indexEvents: unable to get recipient from ', edata);
+      }
+      //const txs:Array<any> = await fetchAddressTransactions(recipient);
+      //let fulfilTx:any;
+      //for (let thisTx of txs) {
+      //  if (thisTx.vout[0].value === payloadData.amountSats) {
+      //    fulfilTx = thisTx
+      //  }
+      //}
+      //console.log(fulfilTx)
 
       let newEvent = {
         contractId: event.contract_log.contract_id,
         eventIndex: event.event_index,
         txid: event.tx_id,
         bitcoinTxid: edata.value,
+        recipient,
         payloadData,
       };
       const result = await saveNewContractEvent(newEvent);

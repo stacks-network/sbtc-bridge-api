@@ -183,6 +183,6 @@ export class SbtcWalletController {
 
 function loc_parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
   let payload:PayloadType = parsePayloadFromTransaction(network, txHex);
-  console.log('parsePayloadFromTransaction: payload: ' + payload);
+  //console.log('parsePayloadFromTransaction: payload: ' + payload);
   return payload;
 }

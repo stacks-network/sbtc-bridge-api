@@ -44,9 +44,9 @@ export async function readPayloadData(txid:string) {
   if (!txid) return
   const txHex = await fetchTransactionHex(txid);
   const tx = await fetchTransaction(txid);
-  console.log('readPayloadData:tx: ', tx);
+  //console.log('readPayloadData:tx: ', tx);
   const block = await getBlock(tx.status.block_hash, 1);
-  console.log('readPayloadData:block: ', block);
+  //console.log('readPayloadData:block: ', block);
   const txIndex = block.tx.findIndex((id) => id === txid)
   const payload:PayloadType = parsePayloadFromTransaction(getConfig().network, txHex);
   payload.txIndex = txIndex

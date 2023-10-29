@@ -419,7 +419,7 @@ function hash160(input: Uint8Array): Uint8Array {
 	return ripemd160(sha);
 }
 
-function getMagicAndOpCode(d1: Uint8Array): {magic?:string; opcode:string; txType? :string; } {
+export function getMagicAndOpCode(d1: Uint8Array): {magic?:string; opcode:string; txType? :string; } {
 	if (!d1 || d1.length < 2) throw new Error('no magic data passed');
 	const magic = hex.encode(d1.subarray(0,2));
 	if (magic === MAGIC_BYTES_TESTNET || magic === MAGIC_BYTES_MAINNET) {
