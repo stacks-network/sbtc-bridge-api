@@ -336,7 +336,7 @@ export class WalletController {
       try {
         await importAddress(address)
         console.log('fetchUtxoSet: imported address')
-      result = await getAddressInfo(address);
+        result = await getAddressInfo(address);
         console.log('fetchUtxoSet: getAddressInfo', result)
         const transactions = await fetchAddressTransactions(address);
         const utxos = []
