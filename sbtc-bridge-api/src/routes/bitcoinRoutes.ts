@@ -2,6 +2,7 @@ import express from "express";
 import { TransactionController, BlocksController, WalletController } from "./bitcoin/BitcoinRPCController.js";
 import type { WrappedPSBT } from 'sbtc-bridge-lib';
 import { updateExchangeRates } from '../lib/bitcoin/api_blockcypher.js';
+import { getConfig } from "$lib/config.js";
 
 const router = express.Router();
 
@@ -121,7 +122,12 @@ router.get("/wallet/address/:address/utxos", async (req, res, next) => {
   try {
     //checkAddressForNetwork(getConfig().network, req.params.address)
     const controller = new WalletController();
-    const response = await controller.fetchUtxoSet(req.params.address, (req.query.verbose) ? true : false);
+    let response;
+    if (getConfig().network === 'devnet') {
+      response = await controller.fetchUtxoSetDevnet(req.params.address, (req.query.verbose) ? true : false);
+    } else {
+      response = await controller.fetchUtxoSet(req.params.address, (req.query.verbose) ? true : false);
+    }
     return res.send(response);
   } catch (error:any) {
     console.log('Error in routes: ' + error.message)

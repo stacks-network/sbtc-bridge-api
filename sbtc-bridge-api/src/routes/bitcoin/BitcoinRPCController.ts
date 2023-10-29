@@ -1,7 +1,7 @@
 import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../../lib/bitcoin/rpc_transaction.js';
 import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../../lib/bitcoin/rpc_wallet.js";
-import { getBlockHeader, getBlockChainInfo, getBlockCount, getBlock, getTxOutProof, startScantxoutset } from "../../lib/bitcoin/rpc_blockchain.js";
+import { getBlockHeader, getBlockChainInfo, getBlockCount, getBlock, getTxOutProof } from "../../lib/bitcoin/rpc_blockchain.js";
 import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../../lib/bitcoin/api_mempool.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../../lib/bitcoin/api_blockcypher.js";
 import { findBridgeTransactionById } from "../../lib/data/db_models.js";
@@ -301,14 +301,42 @@ export class WalletController {
   public async fetchUtxoSet(address:string, verbose:boolean): Promise<any> {
     let result:any = {};
     //checkAddressForNetwork(getConfig().network, address);
+      if (address) {
+        try {
+          result = await getAddressInfo(address);
+          const addressValidation = await validateAddress(address);
+          result.addressValidation = addressValidation
+        } catch (err:any) {
+          console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
+          // carry on
+        }
+      }
+    try {
+      //console.log('fetchUtxoSet1:', result)
+      const utxos = await fetchUTXOs(address);
+      //console.log('fetchUtxoSet2:', utxos)
+      for (let utxo of utxos) {
+        const tx = await fetchRawTx(utxo.txid, verbose);
+        //console.log('fetchUtxoSet3:', tx)
+        utxo.tx = tx;
+      }
+      result.utxos = utxos
+    } catch (err:any) {
+      console.log('fetchUtxoSet: fetchUTXOs: ' + address + ' : ' + err.message)
+      // carry on
+    }
+    return result;
+  }
+
+  public async fetchUtxoSetDevnet(address:string, verbose:boolean): Promise<any> {
+    let result:any = {};
+    //checkAddressForNetwork(getConfig().network, address);
     console.log('fetchUtxoSet: importing addres: ' + address)
     if (address) {
       try {
-        if (getConfig().network === 'simnet' || getConfig().network === 'devnet') {
-          await importAddress(address)
-          console.log('fetchUtxoSet: imported address')
-        }
-        result = await getAddressInfo(address);
+        await importAddress(address)
+        console.log('fetchUtxoSet: imported address')
+      result = await getAddressInfo(address);
         console.log('fetchUtxoSet: getAddressInfo', result)
         const transactions = await fetchAddressTransactions(address);
         const utxos = []
@@ -323,31 +351,19 @@ export class WalletController {
                 value: vout.value,
               })
             }
-            console.log('fetchUtxoSet: startScantxoutset', utxos[count])
             count++;
           }
         }
         const addressValidation = await validateAddress(address);
         result.addressValidation = addressValidation
         result.utxos = utxos
+        for (let utxo of result.utxos) {
+          const tx = await fetchRawTx(utxo.txid, verbose);
+          utxo.tx = tx;
+        }
       } catch (err:any) {
         console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
-        // carry on
       }
-    }
-    try {
-      //console.log('fetchUtxoSet1:', result)
-      //const utxos = await fetchUTXOs(address);
-      //console.log('fetchUtxoSet2:', utxos)
-      for (let utxo of result.utxos) {
-        const tx = await fetchRawTx(utxo.txid, verbose);
-        //console.log('fetchUtxoSet3:', tx)
-        utxo.tx = tx;
-      }
-      //result.utxos = utxos
-    } catch (err:any) {
-      console.log('fetchUtxoSet: fetchUTXOs: ' + address + ' : ' + err.message)
-      // carry on
     }
     return result;
   }

@@ -157,7 +157,7 @@ function setOverrides() {
     CONFIG.btcRpcUser = process.env.btcRpcUser || '';
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
     CONFIG.sbtcContractId = process.env.sbtcContractId || '';
-    CONFIG.network = process.env.network || '';
+    if (!isDev()) CONFIG.network = process.env.network || '';
     CONFIG.stacksApi = process.env.stacksApi || '';
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
