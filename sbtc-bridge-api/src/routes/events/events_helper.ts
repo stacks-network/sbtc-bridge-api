@@ -108,9 +108,14 @@ async function indexEvents(sbtcEvents:Array<any>) {
   return sbtcEvents;
 }
 
-export async function findSbtcEvents(offset:number):Promise<any> {
+export async function findSbtcEvents():Promise<any> {
   return findContractEventsByFilter({});
 }
 export async function findSbtcEventsByFilter(filter:any):Promise<any> {
   return findContractEventsByFilter(filter);
+}
+
+export async function countSbtcEvents():Promise<number> {
+  let counter = await countContractEvents();
+  return counter;
 }

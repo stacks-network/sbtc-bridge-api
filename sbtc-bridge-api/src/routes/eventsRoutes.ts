@@ -4,17 +4,6 @@ import { findContractEventByBitcoinAddress, findContractEventByBitcoinTxId, find
 
 const router = express.Router();
 
-router.get("/read", async (req, res, next) => {
-  try {
-    const controller = new EventsController();
-    const response = await controller.readAllEvents();
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
 router.get("/index/stacks/:txid", async (req, res, next) => {
   try {
     const controller = new EventsController();
@@ -38,7 +27,7 @@ router.get("/save/:page", async (req, res, next) => {
   }
 });
 
-router.get("/filter/:name/:value", async (req, res, next) => {
+router.get("/find-by/filter/:name/:value", async (req, res, next) => {
   try {
     const controller = new EventsController();
     const response = await controller.findSbtcEventsByFilter(req.params.name, req.params.value);
@@ -99,23 +88,45 @@ router.get("/find-one/:id", async (req, res, next) => {
   }
 });
 
-router.get("/:page/:limit", async (req, res, next) => {
+router.get("/find-all", async (req, res, next) => {
   try {
     const controller = new EventsController();
-    const response = await controller.findSbtcEventsByPage({}, Number(req.params.page), Number(req.params.limit));
+    const response = await controller.findAllSbtcEvents();
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')
   }
 });
 
-router.get("/:filter/:page/:limit", async (req, res, next) => {
+router.get("/find-by/page/:page/:limit", async (req, res, next) => {
   try {
     const controller = new EventsController();
-    const response = await controller.findSbtcEventsByPage(req.params.filter, Number(req.params.page), Number(req.params.limit));
+    const response = await controller.findSbtcEventsByPage(Number(req.params.page), Number(req.params.limit));
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/find-by/filter-and-page/:filter/:page/:limit", async (req, res, next) => {
+  try {
+    const controller = new EventsController();
+    const response = await controller.findSbtcEventsByFilterAndPage(req.params.filter, Number(req.params.page), Number(req.params.limit));
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/count", async (req, res, next) => {
+  try {
+    const controller = new EventsController();
+    const response = await controller.countSbtcEvents();
+    return res.send(response);
+  } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')
   }
