@@ -102,7 +102,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
       console.log('saveSbtcEvents: saved payloadData: ', newEvent.payloadData);
       
     } catch (err:any) {
-      console.log('indexEvents: Error: ', err); //util.inspect(err, false, null, true /* enable colors */));
+      console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
     }
   }
   return sbtcEvents;

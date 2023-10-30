@@ -99,14 +99,25 @@ router.get("/find-one/:id", async (req, res, next) => {
   }
 });
 
-router.get("/:page", async (req, res, next) => {
+router.get("/:page/:limit", async (req, res, next) => {
   try {
     const controller = new EventsController();
-    const response = await controller.findSbtcEvents(Number(req.params.page));
+    const response = await controller.findSbtcEventsByPage({}, Number(req.params.page), Number(req.params.limit));
     return res.send(response);
   } catch (error) { 
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/:filter/:page/:limit", async (req, res, next) => {
+  try {
+    const controller = new EventsController();
+    const response = await controller.findSbtcEventsByPage(req.params.filter, Number(req.params.page), Number(req.params.limit));
+    return res.send(response);
+  } catch (error) { 
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
   }
 });
 

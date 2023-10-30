@@ -1,6 +1,7 @@
 import { Get, Route } from "tsoa";
 import { findSbtcEvents, findSbtcEventsByFilter, indexSbtcEvent, saveAllSbtcEvents, saveSbtcEvents } from './events_helper.js';
 import { SbtcClarityEvent } from "sbtc-bridge-lib/dist/types/sbtc_types.js";
+import { findContractEventsByPage } from "../../lib/data/db_models.js";
 
 export interface BalanceI {
   balance: number;
@@ -34,6 +35,11 @@ export class EventsController {
   @Get("/:page")
   public async findSbtcEvents(page:number): Promise<Array<SbtcClarityEvent>> {
     return await findSbtcEvents(page);
+  }
+
+  @Get("/:page/:limit")
+  public async findSbtcEventsByPage(filter:any, page:number, limit:number): Promise<Array<SbtcClarityEvent>> {
+    return await findContractEventsByPage(filter, page, limit);
   }
 
 }
