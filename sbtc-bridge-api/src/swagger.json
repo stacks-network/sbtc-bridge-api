@@ -821,7 +821,7 @@
 				"parameters": []
 			}
 		},
-		"/bridge-api/{network}/v1/contract/index/stacks/{txid}": {
+		"/bridge-api/{network}/v1/events/index/stacks/{txid}": {
 			"get": {
 				"operationId": "IndexSbtcEvent",
 				"responses": {
@@ -847,7 +847,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/contract/save/{page}": {
+		"/bridge-api/{network}/v1/events/save/{page}": {
 			"get": {
 				"operationId": "SaveSbtcEvents",
 				"responses": {
@@ -879,7 +879,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/contract/filter/{name}/{value}": {
+		"/bridge-api/{network}/v1/events/filter/{name}/{value}": {
 			"get": {
 				"operationId": "FindSbtcEventsByFilter",
 				"responses": {
@@ -918,19 +918,67 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/contract/{page}": {
+		"/bridge-api/{network}/v1/events/find-all": {
 			"get": {
-				"operationId": "FindSbtcEvents",
+				"operationId": "FindAllSbtcEvents",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/SbtcClarityEvent"
+									"properties": {
+										"events": {
+											"type": "number",
+											"format": "double"
+										},
+										"results": {
+											"items": {
+												"$ref": "#/components/schemas/SbtcClarityEvent"
+											},
+											"type": "array"
+										}
 									},
-									"type": "array"
+									"required": [
+										"events",
+										"results"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/bridge-api/{network}/v1/events/find-by/page/{page}/{limit}": {
+			"get": {
+				"operationId": "FindSbtcEventsByPage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"events": {
+											"type": "number",
+											"format": "double"
+										},
+										"results": {
+											"items": {
+												"$ref": "#/components/schemas/SbtcClarityEvent"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"events",
+										"results"
+									],
+									"type": "object"
 								}
 							}
 						}
@@ -946,8 +994,107 @@
 							"format": "double",
 							"type": "number"
 						}
+					},
+					{
+						"in": "path",
+						"name": "limit",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
 					}
 				]
+			}
+		},
+		"/bridge-api/{network}/v1/events/find-by/filter-and-page/{filter}/{page}/{limit}": {
+			"get": {
+				"operationId": "FindSbtcEventsByFilterAndPage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"events": {
+											"type": "number",
+											"format": "double"
+										},
+										"results": {
+											"items": {
+												"$ref": "#/components/schemas/SbtcClarityEvent"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"events",
+										"results"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "filter",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "page",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "path",
+						"name": "limit",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/events/count": {
+			"get": {
+				"operationId": "CountSbtcEvents",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"events": {
+											"type": "number",
+											"format": "double"
+										}
+									},
+									"required": [
+										"events"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": []
 			}
 		}
 	},

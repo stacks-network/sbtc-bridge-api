@@ -102,15 +102,20 @@ async function indexEvents(sbtcEvents:Array<any>) {
       console.log('saveSbtcEvents: saved payloadData: ', newEvent.payloadData);
       
     } catch (err:any) {
-      console.log('indexEvents: Error: ', err); //util.inspect(err, false, null, true /* enable colors */));
+      console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
     }
   }
   return sbtcEvents;
 }
 
-export async function findSbtcEvents(offset:number):Promise<any> {
+export async function findSbtcEvents():Promise<any> {
   return findContractEventsByFilter({});
 }
 export async function findSbtcEventsByFilter(filter:any):Promise<any> {
   return findContractEventsByFilter(filter);
+}
+
+export async function countSbtcEvents():Promise<number> {
+  let counter = await countContractEvents();
+  return counter;
 }

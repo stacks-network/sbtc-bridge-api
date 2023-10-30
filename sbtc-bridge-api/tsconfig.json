@@ -4,10 +4,6 @@
 		"module": "es2020",
 		"moduleResolution": "node",
 		"paths": {
-			"$lib": ["./src/lib"],
-			"$lib/*": ["./src/lib/*"],
-			"$types": ["./src/types"],
-			"$types/*": ["./src/types/*"],
 		},
 		"allowSyntheticDefaultImports": true,
 		"allowJs": true,
