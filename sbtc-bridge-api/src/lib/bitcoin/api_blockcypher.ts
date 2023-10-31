@@ -42,13 +42,20 @@ export async function updateExchangeRates() {
 
 export async function fetchCurrentFeeRates() {
   try {
-    const url = getConfig().blockCypherUrl;
-    const response = await fetch(url!);
-    const info = await response.json();
-    return { feeInfo: { low_fee_per_kb:info.low_fee_per_kb, medium_fee_per_kb:info.medium_fee_per_kb, high_fee_per_kb:info.high_fee_per_kb }};
-  } catch (err) {
-    console.log(err);
-    return { feeInfo: { low_fee_per_kb:20000, medium_fee_per_kb:30000, high_fee_per_kb:40000 }};
+    if (getConfig().network === 'devnet') {
+      const url = getConfig().mempoolUrl + '/v1/mining/blocks/fee-rates/1m';
+      const response = await fetch(url);
+      const info = await response.json();
+      return { feeInfo: { low_fee_per_kb:info[0].avgFee_100, medium_fee_per_kb:info[1].avgFee_100, high_fee_per_kb:info[2].avgFee_100 }};
+    } else {
+      const url = getConfig().blockCypherUrl;
+      const response = await fetch(url);
+      const info = await response.json();
+      return { feeInfo: { low_fee_per_kb:info.low_fee_per_kb, medium_fee_per_kb:info.medium_fee_per_kb, high_fee_per_kb:info.high_fee_per_kb }};
+    }
+  } catch (err:any) {
+    console.log('fetchCurrentFeeRates: ' + err.message);
+    return { feeInfo: { low_fee_per_kb:2000, medium_fee_per_kb:3000, high_fee_per_kb:4000 }};
   }
 }
 

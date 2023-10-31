@@ -5,7 +5,7 @@ import { checkAddressForNetwork  } from 'sbtc-bridge-lib'
 
 export async function fetchBitcoinTipHeight() {
   try {
-    const url = getConfig().mempoolUrl + '/api/blocks/tip/height';
+    const url = getConfig().mempoolUrl + '/blocks/tip/height';
     const response = await fetch(url);
     const hex = await response.text();
     return hex;
