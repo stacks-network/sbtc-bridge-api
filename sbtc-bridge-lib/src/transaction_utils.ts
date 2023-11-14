@@ -3,6 +3,7 @@ import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import * as P from 'micro-packed';
 import { buildDepositPayloadOpDrop } from './payload_utils.js'
+import { getNet } from './wallet_utils.js';
 
 const concat = P.concatBytes;
 
@@ -29,7 +30,7 @@ keySetForFeeCalculation.push({
 export function approxTxFees(network:string, utxos:any, changeAddress:string, payeeAddress:string):number {
     console.log('approxTxFees change=' + changeAddress)
     console.log('approxTxFees dest=' + payeeAddress)
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	// create a set of inputs corresponding to the utxo set
 	if (!utxos || utxos.length === 0) throw new Error('No UTXOs');

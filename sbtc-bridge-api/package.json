@@ -18,7 +18,7 @@
     "prebuild": "npm run swagger",
     "lt": "concurrently \"NODE_ENV=local-testnet nodemon \" \"NODE_ENV=local-testnet nodemon -x tsoa spec\"",
     "dev": "concurrently \"NODE_ENV=development nodemon \" \"NODE_ENV=development nodemon -x tsoa spec\"",
-    "lr": "concurrently \"NODE_ENV=local-regtest nodemon \" \"NODE_ENV=local-regtest nodemon -x tsoa spec\"",
+    "devenv": "concurrently \"NODE_ENV=devenv nodemon \" \"NODE_ENV=devenv nodemon -x tsoa spec\"",
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {
@@ -74,7 +74,7 @@
     "morgan": "^1.10.0",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.9",
-    "sbtc-bridge-lib": "^1.1.19",
+    "sbtc-bridge-lib": "^1.1.21",
     "swagger-ui-express": "^4.6.3",
     "tsoa": "^5.1.1",
     "uninstall": "^0.0.0",

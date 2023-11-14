@@ -1,4 +1,4 @@
-import { isLocalRegtest, setConfigOnStart, getConfig, isLocalTestnet, isDev } from './lib/config.js';
+import { isDevenv, setConfigOnStart, getConfig, isLocalTestnet, isDev } from './lib/config.js';
 import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
@@ -65,7 +65,7 @@ console.log(`App ${getConfig().publicAppName}`);
 console.log(`Stacks connection at ${getConfig().stacksApi}`);
 console.log(`Stacks explorer at ${getConfig().stacksExplorerUrl}`);
 console.log(`sBTC contract at ${getConfig().sbtcContractId}`);
-if (isDev() || isLocalRegtest() || isLocalTestnet()) {
+if (isDev() || isDevenv() || isLocalTestnet()) {
   console.log('linode env.. changing CONFIG.mongoDbName = ' + getConfig().mongoDbName)
   console.log('linode env.. changing CONFIG.mongoUser = ' + getConfig().mongoUser)
   console.log('linode env.. changing CONFIG.mongoPwd = ' + getConfig().mongoPwd.substring(0,2))

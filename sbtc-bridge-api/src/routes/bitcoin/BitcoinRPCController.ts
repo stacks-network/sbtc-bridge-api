@@ -241,6 +241,7 @@ export class TransactionController {
   //@Post("/sendrawtx")
   public async sendRawTransaction(hex:string, maxFeeRate:number): Promise<any> {
     try {
+      console.log('sendRawTransaction:sendRawTxRpc: ' +  hex)
       const resp =  await sendRawTxRpc(hex, maxFeeRate);
       if (resp && resp.error && resp.error.code) {
         if (resp.error.code === -27) { // Transaction already in block chain

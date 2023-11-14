@@ -2,6 +2,30 @@ import { env } from "process";
 
 const PORT = parseInt(env.PORT || '3010');
 
+const DEVENV_CONFIG = {
+  environment: 'devenv',
+  mongoDbUrl: 'cluster0.ovgne2s.mongodb.net',
+  mongoDbName: 'uasu-db-dev',
+  mongoUser: 'devuasu1',
+  mongoPwd: 'FTNM7QpjqMHph4k7',
+  btcNode: '96.126.107.204:18433',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet', 
+  host: 'http://localhost',
+  port: 3010,
+  walletPath: '',
+  network: 'devnet',
+  stacksApi: 'http://96.126.107.204:3999',
+  stacksExplorerUrl: 'http://96.126.107.204:3020',
+  bitcoinExplorerUrl: 'http://96.126.107.204:8083',
+  mempoolUrl: 'http://96.126.107.204:8083/api',
+  blockCypherUrl: 'http://96.126.107.204:8083/api',
+  publicAppName: 'UASU Devenv API',
+  publicAppVersion: '1.0.0',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
+}
+
+/**
 const REGNET_CONFIG = {
   environment: 'devnet',
   mongoDbUrl: 'mongodb',
@@ -24,6 +48,7 @@ const REGNET_CONFIG = {
   publicAppName: 'sBTC Bridge Simnet API',
   publicAppVersion: '1.0.0',
 }
+ */
 
 const DEVNET_CONFIG = {
   environment: 'devnet',
@@ -119,7 +144,7 @@ let CONFIG: {
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
   else if (isLocalTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
-	else if (isLocalRegtest()) CONFIG = REGNET_CONFIG;
+	else if (isDevenv()) CONFIG = DEVENV_CONFIG;
 	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
 	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
 	else CONFIG = LINODE_TESTNET_CONFIG;
@@ -128,7 +153,7 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   console.log('================================================ >> ' + process.env.NODE_ENV)
-  if (isLocalRegtest()) {
+  if (isDevenv()) {
     // localhost params not provided by docker environment
     CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
     CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
@@ -168,9 +193,9 @@ function setOverrides() {
   }
 }
 
-export function isLocalRegtest() {
+export function isDevenv() {
   const environ = process.env.NODE_ENV;
-  return (environ && environ === 'local-regtest')
+  return (environ && environ === 'devenv')
 }
 
 export function isLocalTestnet() {

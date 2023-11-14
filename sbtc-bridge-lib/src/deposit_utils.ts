@@ -5,7 +5,8 @@ import { hex } from '@scure/base';
 import type { Transaction } from '@scure/btc-signer' 
 import type { BridgeTransactionType, DepositPayloadUIType, UTXO } from './types/sbtc_types.js' 
 import { toStorable, buildDepositPayload, buildDepositPayloadOpDrop } from './payload_utils.js' 
-import { addInputs, getPegWalletAddressFromPublicKey, inputAmt } from './wallet_utils.js';
+import { addInputs, getNet, getPegWalletAddressFromPublicKey, inputAmt } from './wallet_utils.js';
+
 
 const concat = P.concatBytes;
 
@@ -27,7 +28,7 @@ export const dust = 500;
  * @returns Transaction from @scure/btc-signer
  */
 export function buildDepositTransaction(network:string, sbtcWalletPublicKey:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, utxos:Array<UTXO>):Transaction {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const sbtcWalletAddress = getPegWalletAddressFromPublicKey(network, sbtcWalletPublicKey)
 	const data = buildDepositPayload(network, uiPayload.principal);
 
@@ -51,7 +52,7 @@ export function buildDepositTransaction(network:string, sbtcWalletPublicKey:stri
  * @returns Transaction from @scure/btc-signer
  */
 export function buildDepositTransactionOpDrop (network:string, uiPayload:DepositPayloadUIType, btcFeeRates:any, utxos:Array<UTXO>, commitTxAddress:string) {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const txFees = calculateDepositFees(network, true, uiPayload.amountSats, btcFeeRates.feeInfo, utxos, commitTxAddress, undefined)
 	const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	addInputs(network, uiPayload.amountSats, revealPayment, tx, false, utxos, uiPayload.paymentPublicKey);
@@ -76,7 +77,7 @@ export function getBridgeDeposit(network:string, uiPayload:DepositPayloadUIType,
 }
 
 export function getBridgeDepositOpDrop(network:string, sbtcWalletPublicKey:string, uiPayload:DepositPayloadUIType, originator:string):BridgeTransactionType {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	
 	const data = buildData(network, uiPayload.principal, uiPayload.amountSats);
 	const scripts =  [
@@ -110,7 +111,7 @@ export function maxCommit(addressInfo:any) {
 
 function calculateDepositFees (network:string, opDrop:boolean, amount:number, feeInfo:any, utxos:Array<UTXO>, commitTxScriptAddress:string, data:Uint8Array|undefined) {
 	try {
-		const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+		const net = getNet(network);
 		let vsize = 0;
 		const tx = new btc.Transaction({ allowUnknowInput: true, allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 		addInputs(network, amount, revealPayment, tx, true, utxos, hex.encode(secp.getPublicKey(privKey, true)));

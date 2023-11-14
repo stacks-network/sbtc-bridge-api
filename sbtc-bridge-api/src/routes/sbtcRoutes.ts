@@ -200,7 +200,7 @@ router.put("/bridgetx/:id", async (req, res, next) => {
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
   }
 });
 

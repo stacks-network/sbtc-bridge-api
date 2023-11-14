@@ -6,11 +6,22 @@ import type { SbtcMiniContractsI, CommitKeysI, UTXO } from './types/sbtc_types.j
 
 const privKey = hex.decode('0101010101010101010101010101010101010101010101010101010101010101');
 const priv = secp.utils.randomPrivateKey()
+
+export const REGTEST_NETWORK: typeof btc.NETWORK = { bech32: 'bcrt', pubKeyHash: 0x6f, scriptHash: 0xc4, wif: 0xc4 };
+
+export function getNet(network:string) {
+	let net = btc.TEST_NETWORK;
+	if (network === 'devnet') net = REGTEST_NETWORK
+	else if (network === 'mainnet') net = btc.NETWORK
+	return net;
+}
+
 type KeySet = {
 	priv: Uint8Array,
 	ecdsaPub: Uint8Array,
 	schnorrPub: Uint8Array
 }
+
 const keySetForFeeCalculation: KeySet[] = []
 keySetForFeeCalculation.push({
   priv,
@@ -66,7 +77,7 @@ export const sbtcWallets = [
  * test wallets.
  */
 export function getTestAddresses (network:string):CommitKeysI {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	return {
 		fromBtcAddress: btc.getAddress('tr', hex.decode(testWallets[0].privateKey), net) as string,
 		sbtcWalletAddress: sbtcWallets[0].sbtcAddress,
@@ -82,7 +93,7 @@ export function getTestAddresses (network:string):CommitKeysI {
 
 // Address from a 33 byte public key (returns the pub key if schnorr pub key passed in)
 export function addressFromPubkey(network:string, pubkey:Uint8Array) {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	try {
 		return btc.Address(net).encode(btc.OutScript.decode(pubkey));
 	} catch(err) {
@@ -94,6 +105,7 @@ export function addressFromPubkey(network:string, pubkey:Uint8Array) {
 export function checkAddressForNetwork(net:string, address:string|undefined) {
 	if (!address || typeof address !== 'string') throw new Error('No address passed')
     if (address.length < 10) throw new Error('Address is undefined')
+	if (net === 'devnet') return
 	if (net === 'testnet') {
 	  if (address.startsWith('bc')) throw new Error('Mainnet address passed to testnet app: ' + address)
 	  else if (address.startsWith('3')) throw new Error('Mainnet address passed to testnet app: ' + address)
@@ -177,7 +189,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
 }
  */
 export function addInputs (network:string, amount:number, revealPayment:number, transaction:btc.Transaction, feeCalc:boolean, utxos:Array<UTXO>, paymentPublicKey:string) {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const bar = revealPayment + amount;
 	let amt = 0;
 	for (const utxo of utxos) {
@@ -305,7 +317,7 @@ export function addInputs (network:string, amount:number, revealPayment:number, 
  * @returns address as string
  */
 export function getAddressFromOutScript(network:string, script: Uint8Array):string {
-	const net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const outputScript = btc.OutScript.decode(script);
   
 	if (outputScript.type === 'pk' || outputScript.type === 'tr') {
@@ -392,7 +404,7 @@ export function toXOnly(pubkey: string): string {
  */
 export function getPegWalletAddressFromPublicKey (network:string, sbtcWalletPublicKey:string) {
 	if (!sbtcWalletPublicKey) return
-	let net = (network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+	let net = getNet(network);
 	//if (network === 'development' || network === 'simnet') {
 	//	net = { bech32: 'bcrt', pubKeyHash: 0x6f, scriptHash: 0xc4, wif: 0 }
 	//}

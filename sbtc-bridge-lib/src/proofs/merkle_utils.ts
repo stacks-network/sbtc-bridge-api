@@ -11,7 +11,7 @@ const RIGHT = 'right';
 
 /**
  * 
- * @param txIdNormal 
+ * @param txIdNormal
  * @param txHex 
  * @param block 
  * @returns 
