@@ -1,6 +1,31 @@
-import { env } from "process";
+import { ConfigI } from "../types/config";
 
-const PORT = parseInt(env.PORT || '3010');
+let CONFIG= {} as ConfigI;
+
+const LOCAL_DEVENV_CONFIG = {
+  mongoDbUrl: 'cluster0.ovgne2s.mongodb.net',
+  mongoDbName: 'uasu-db-dev',
+  mongoUser: 'devuasu1',
+  mongoPwd: 'FTNM7QpjqMHph4k7',
+  btcNode: '96.126.107.204:18433',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
+  btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
+  btcSchnorrOracle: 'f0e8dfde982fb06e26739502d92cdf433cc40036e120df45259fe590a3f043e3',
+  host: 'http://localhost',
+  port: 5010,
+  walletPath: '',
+  network: 'testnet',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
+  stacksApi: 'http://96.126.107.204:3999',
+  stacksExplorerUrl: 'http://127.0.0.1:3020',
+  bitcoinExplorerUrl: 'http://96.126.107.204:8083',
+  mempoolUrl: 'http://96.126.107.204:8083/api',
+  blockCypherUrl: 'http://96.126.107.204:8083/api',
+  publicAppName: 'UASU Devenv API',
+  publicAppVersion: '1.0.0',
+} as ConfigI
 
 const DEVENV_CONFIG = {
   environment: 'devenv',
@@ -119,28 +144,6 @@ const LINODE_MAINNET_CONFIG = {
   publicAppVersion: '1.0.0',
 }
 
-let CONFIG: {
-  mongoDbUrl: string; 
-  mongoUser: string; 
-  mongoPwd: string; 
-  mongoDbName: string; 
-  btcNode: string; 
-  btcRpcUser: string; 
-  btcRpcPwd: string; 
-  host: string; 
-  port: number; 
-  walletPath: string; 
-  network: string; 
-  sbtcContractId: string; 
-  stacksApi: string; 
-  stacksExplorerUrl: string; 
-  bitcoinExplorerUrl: string; 
-  mempoolUrl: string; 
-  blockCypherUrl: string;
-  publicAppName: string;
-  publicAppVersion: string; 
-};
-
 export function setConfigOnStart() {
 	if (isDev()) CONFIG = DEVNET_CONFIG;
   else if (isLocalTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
@@ -178,15 +181,25 @@ function setOverrides() {
     CONFIG.mongoDbName = process.env.mongoDbName || '';
     CONFIG.mongoUser = process.env.mongoUser || ''
     CONFIG.mongoPwd = process.env.mongoPwd || '';
+
     CONFIG.btcNode = process.env.btcNode || '';
     CONFIG.btcRpcUser = process.env.btcRpcUser || '';
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
+    
     CONFIG.sbtcContractId = process.env.sbtcContractId || '';
-    if (!isDev()) CONFIG.network = process.env.network || '';
+    CONFIG.network = process.env.network || '';
     CONFIG.stacksApi = process.env.stacksApi || '';
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
     CONFIG.mempoolUrl = process.env.mempoolUrl || '';
+    CONFIG.blockCypherUrl = process.env.blockCypherUrl || '';
+
+    CONFIG.publicAppName = process.env.publicAppName || '';
+    CONFIG.publicAppVersion = process.env.publicAppVersion || '';
+    CONFIG.host = process.env.host || '';
+    CONFIG.port = Number(process.env.port) || 3010;
+    CONFIG.walletPath = process.env.walletPath || '';
+
   }
   if (isLocalTestnet()) {
     CONFIG.btcNode = 'localhost:18332' // ie not via docker network
