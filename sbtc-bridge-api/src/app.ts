@@ -1,4 +1,4 @@
-import { isDevenv, setConfigOnStart, getConfig, isLocalTestnet, isDev } from './lib/config.js';
+import { isDevenv, setConfigOnStart, getConfig, isLocalTestnet, isDev, printConfig } from './lib/config.js';
 import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
@@ -31,6 +31,8 @@ app.use(express.static("public"));
 app.use(cors());
 app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 setConfigOnStart();
+printConfig()
+
 app.use(
   bodyParser.urlencoded({
     extended: true, 

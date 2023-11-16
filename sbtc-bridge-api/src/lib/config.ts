@@ -246,3 +246,22 @@ export function getConfig() {
   if (!CONFIG) setConfigOnStart();
 	return CONFIG;
 }
+
+export function printConfig() {
+  console.log('== ' + process.env.NODE_ENV + ' ==========================================================')
+  console.log('CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
+  console.log('CONFIG.mongoUser = ' + CONFIG.mongoUser)
+  console.log('CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
+  console.log('CONFIG.btcNode = ' + CONFIG.btcNode)
+  console.log('CONFIG.btcRpcUser = ' + CONFIG.btcRpcUser)
+  console.log('CONFIG.host = ' + CONFIG.host)
+  console.log('CONFIG.port = ' + CONFIG.port)
+  console.log('CONFIG.walletPath = ' + CONFIG.walletPath)
+  console.log('CONFIG.sbtcContractId = ' + CONFIG.sbtcContractId)
+  console.log('CONFIG.stacksApi = ' + CONFIG.stacksApi)
+  console.log('CONFIG.bitcoinExplorerUrl = ' + CONFIG.bitcoinExplorerUrl)
+  console.log('CONFIG.mempoolUrl = ' + CONFIG.mempoolUrl)
+  console.log('CONFIG.blockCypherUrl = ' + CONFIG.blockCypherUrl)
+  console.log('CONFIG.publicAppName = ' + CONFIG.publicAppName)
+  console.log('CONFIG.publicAppVersion = ' + CONFIG.publicAppVersion)
+}
