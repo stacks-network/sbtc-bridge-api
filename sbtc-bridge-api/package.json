@@ -16,9 +16,12 @@
     "coverage": "vitest run --coverage",
     "predev": "npm run swagger",
     "prebuild": "npm run swagger",
+
+    "devenv": "concurrently \"NODE_ENV=local-devenv      nodemon \" \"NODE_ENV=local-devenv nodemon -x tsoa spec\"",
+    "devenvr": "concurrently \"NODE_ENV=remote-devenv      nodemon \" \"NODE_ENV=remote-devenv nodemon -x tsoa spec\"",
+    "lr": "concurrently \"NODE_ENV=local-regtest nodemon \" \"NODE_ENV=local-regtest nodemon -x tsoa spec\"",
     "lt": "concurrently \"NODE_ENV=local-testnet nodemon \" \"NODE_ENV=local-testnet nodemon -x tsoa spec\"",
-    "dev": "concurrently \"NODE_ENV=development nodemon \" \"NODE_ENV=development nodemon -x tsoa spec\"",
-    "devenv": "concurrently \"NODE_ENV=devenv nodemon \" \"NODE_ENV=devenv nodemon -x tsoa spec\"",
+
     "swagger": "tsoa spec"
   },
   "nodemonConfig": {

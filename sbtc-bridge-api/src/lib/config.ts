@@ -1,56 +1,111 @@
-import { ConfigI } from "../types/config";
+import { ConfigI } from "../types/message";
 
 let CONFIG= {} as ConfigI;
 
+const LOCAL_REGTEST_CONFIG = {
+  // api running n develop mode on localhost against local regetest
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-simnet-db',
+  mongoUser: 'dockerdev1',
+  mongoPwd: 'FbKWBThNLIjqExG1',
+  btcNode: '127.0.0.1:18332',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  host: 'http://localhost',
+  port: 3010,
+  walletPath: '',
+  network: 'devnet',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset-3',
+  stacksApi: 'http://localhost:3999',
+  stacksExplorerUrl: 'http://127.0.0.1:3020',
+  bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
+  mempoolUrl: 'https://mempool.space/testnet/api',
+  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
+  btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
+  btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
+  btcSchnorrOracle: 'f0e8dfde982fb06e26739502d92cdf433cc40036e120df45259fe590a3f043e3',
+  publicAppName: 'UASU Staging API',
+  publicAppVersion: '1.0.0',
+}
+const LOCAL_TESTNET_CONFIG = {
+  // api running n develop mode on localhost against local testnet
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-simnet-db',
+  mongoUser: 'dockerdev1',
+  mongoPwd: 'FbKWBThNLIjqExG1',
+  btcNode: '127.0.0.1:18332',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  btcSchnorrReveal: '8854e0f3b4979edc55330722626ce4e12f67ef89f0ac00032d18e6da3a2dc60b',
+  btcSchnorrReclaim: '1eba17807c82b0aa676b85839ea84663ceb6fbbfb3e0a23a2bdae9cd3df096cb',
+  btcSchnorrOracle: '8181ea91f5f8e9273dc333e04abefa06ac942d85a4081684ccf3534884a66f8c',
+  host: 'http://localhost',
+  port: 5010,
+  walletPath: '/wallet/descwallet',
+  network: 'testnet',
+  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3',
+  dlcLenderCid: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.uasu-sbtc-loan-v1',
+  dlcManagerCid: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.dlc-manager-v1',
+  stacksApi: 'https://api.testnet.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.so/',
+  bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
+  mempoolUrl: 'https://mempool.space/testnet/api',
+  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
+  publicAppName: 'UASU Staging API',
+  publicAppVersion: '1.0.0',
+  mailChimpApiKey: '9f34bc871c6ea31c75810ca57da1e40e-us10',
+  mailChimpAudience: 'cf9d92c7db',
+}
+
 const LOCAL_DEVENV_CONFIG = {
-  mongoDbUrl: 'cluster0.ovgne2s.mongodb.net',
-  mongoDbName: 'uasu-db-dev',
-  mongoUser: 'devuasu1',
-  mongoPwd: 'FTNM7QpjqMHph4k7',
-  btcNode: '96.126.107.204:18433',
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-simnet-db',
+  mongoUser: 'dockerdev1',
+  mongoPwd: 'FbKWBThNLIjqExG1',
+  btcNode: '127.0.0.1:18332',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
   btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
   btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
   btcSchnorrOracle: 'f0e8dfde982fb06e26739502d92cdf433cc40036e120df45259fe590a3f043e3',
   host: 'http://localhost',
-  port: 5010,
+  port: 3010,
   walletPath: '',
   network: 'testnet',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
-  stacksApi: 'http://96.126.107.204:3999',
+  stacksApi: 'http://45.79.130.153:3999',
   stacksExplorerUrl: 'http://127.0.0.1:3020',
-  bitcoinExplorerUrl: 'http://96.126.107.204:8083',
-  mempoolUrl: 'http://96.126.107.204:8083/api',
-  blockCypherUrl: 'http://96.126.107.204:8083/api',
+  bitcoinExplorerUrl: 'http://45.79.130.153:8083',
+  mempoolUrl: 'http://45.79.130.153:8083/api',
+  blockCypherUrl: 'http://45.79.130.153:8083/api',
   publicAppName: 'UASU Devenv API',
   publicAppVersion: '1.0.0',
 } as ConfigI
 
+/**
 const DEVENV_CONFIG = {
   environment: 'devenv',
   mongoDbUrl: 'cluster0.ovgne2s.mongodb.net',
   mongoDbName: 'uasu-db-dev',
   mongoUser: 'devuasu1',
   mongoPwd: 'FTNM7QpjqMHph4k7',
-  btcNode: '96.126.107.204:18433',
+  btcNode: '45.79.130.153:18433',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet', 
   host: 'http://localhost',
   port: 3010,
   walletPath: '',
   network: 'devnet',
-  stacksApi: 'http://96.126.107.204:3999',
-  stacksExplorerUrl: 'http://96.126.107.204:3020',
-  bitcoinExplorerUrl: 'http://96.126.107.204:8083',
-  mempoolUrl: 'http://96.126.107.204:8083/api',
-  blockCypherUrl: 'http://96.126.107.204:8083/api',
+  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
+  stacksApi: 'http://45.79.130.153:3999',
+  stacksExplorerUrl: 'http://45.79.130.153:3020',
+  bitcoinExplorerUrl: 'http://45.79.130.153:8083',
+  mempoolUrl: 'http://45.79.130.153:8083/api',
+  blockCypherUrl: 'http://45.79.130.153:8083/api',
   publicAppName: 'UASU Devenv API',
   publicAppVersion: '1.0.0',
-  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset',
 }
 
-/**
 const REGNET_CONFIG = {
   environment: 'devnet',
   mongoDbUrl: 'mongodb',
@@ -73,8 +128,6 @@ const REGNET_CONFIG = {
   publicAppName: 'sBTC Bridge Simnet API',
   publicAppVersion: '1.0.0',
 }
- */
-
 const DEVNET_CONFIG = {
   environment: 'devnet',
   mongoDbUrl: '',
@@ -97,7 +150,6 @@ const DEVNET_CONFIG = {
   publicAppName: 'sBTC Bridge Devnet',
   publicAppVersion: '1.0.0',
 }
-
 const LINODE_TESTNET_CONFIG = {
   environment: 'staging',
   mongoDbUrl: '',
@@ -120,62 +172,25 @@ const LINODE_TESTNET_CONFIG = {
   publicAppName: 'sBTC Bridge Staging API',
   publicAppVersion: '1.0.0',
 }
+ */
 
-const LINODE_MAINNET_CONFIG = {
-  environment: 'production',
-  mongoDbUrl: '',
-  mongoDbName: '',
-  mongoUser: '',
-  mongoPwd: '',
-  btcNode: '',
-  btcRpcUser: '',
-  btcRpcPwd: '',
-  host: 'http://localhost',
-  port: 3020,
-  network: 'mainnet',
-  walletPath: '/wallet/SBTC-0003',
-  sbtcContractId: 'ST3ACFZ2XKFPKAFD9YY92ZP0Y4QN6MTX3H20C27NY.asset',
-  stacksApi: 'https://api.hiro.so',
-  stacksExplorerUrl: 'https://explorer.hiro.co',
-  bitcoinExplorerUrl: 'https://mempool.space/api',
-  mempoolUrl: 'https://mempool.space/api',
-  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/main',
-  publicAppName: 'sBTC Bridge Mainnet API',
-  publicAppVersion: '1.0.0',
-}
 
 export function setConfigOnStart() {
-	if (isDev()) CONFIG = DEVNET_CONFIG;
-  else if (isLocalTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
-	else if (isDevenv()) CONFIG = DEVENV_CONFIG;
-	else if (isLinodeTestnet()) CONFIG = LINODE_TESTNET_CONFIG;
-	else if (isLinodeMainnet()) CONFIG = LINODE_MAINNET_CONFIG;
-	else CONFIG = LINODE_TESTNET_CONFIG;
+	if (isLocalTestnet()) CONFIG = LOCAL_TESTNET_CONFIG;
+	else if (isLocalRegtest()) CONFIG = LOCAL_REGTEST_CONFIG;
+	else if (isLocalDevenv()) CONFIG = LOCAL_DEVENV_CONFIG;
   setOverrides();
 }
 
 function setOverrides() {
   console.log('================================================ >> ' + process.env.NODE_ENV)
-  if (isDevenv()) {
-    // localhost params not provided by docker environment
-    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
-    CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
-    CONFIG.mongoUser = 'dockerdev1'
-    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
-    CONFIG.btcRpcUser = 'devnet'
-    CONFIG.btcRpcPwd = 'devnet'
-    // private keys for testing ability to sign PSBTs..
+  if (isLocalDevenv() || isLocalRegtest()) {
+    // outside docker : config is provided by the application
+    CONFIG.publicAppVersion = '1.0.0';
   } else if (isLocalTestnet()) {
-    // localhost params not provided by docker environment
-    CONFIG.mongoDbUrl = 'cluster0.kepjbx0.mongodb.net'
-    CONFIG.mongoDbName = 'sbtc-bridge-simnet-db'
-    CONFIG.mongoUser = 'dockerdev1'
-    CONFIG.mongoPwd = 'FbKWBThNLIjqExG1'
-    CONFIG.btcNode = 'http://localhost:18443' // ie not via docker network
-    CONFIG.btcRpcUser = 'devnet'
-    CONFIG.btcRpcPwd = 'devnet'
-    // private keys for testing ability to sign PSBTs..
-  } else if (isDev() || isLinodeTestnet() || isLinodeMainnet()) {
+    //CONFIG.btcNode = 'localhost:18332'
+    CONFIG.btcNode = 'localhost:18332'
+  } else {
     // Params provided by local machne
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
     CONFIG.mongoDbName = process.env.mongoDbName || '';
@@ -199,16 +214,22 @@ function setOverrides() {
     CONFIG.host = process.env.host || '';
     CONFIG.port = Number(process.env.port) || 3010;
     CONFIG.walletPath = process.env.walletPath || '';
-
-  }
-  if (isLocalTestnet()) {
-    CONFIG.btcNode = 'localhost:18332' // ie not via docker network
   }
 }
 
 export function isDevenv() {
   const environ = process.env.NODE_ENV;
   return (environ && environ === 'devenv')
+}
+
+export function isLocalDevenv() {
+  const environ = process.env.NODE_ENV;
+  return (environ === 'local-devenv')
+}
+
+export function isLocalRegtest() {
+  const environ = process.env.NODE_ENV;
+  return (environ && environ === 'local-regtest')
 }
 
 export function isLocalTestnet() {
@@ -219,16 +240,6 @@ export function isLocalTestnet() {
 export function isDev() {
   const environ = process.env.NODE_ENV;
   return (!environ || environ === 'test' || environ === 'development' || environ === 'dev')
-}
-
-function isLinodeTestnet() {
-  const environ = process.env.NODE_ENV;
-  return (environ && environ.indexOf('linode-staging') > -1)
-}
-
-function isLinodeMainnet() {
-  const environ = process.env.NODE_ENV;
-  return (environ && environ.indexOf('linode-production') > -1)
 }
 
 export function getConfig() {
