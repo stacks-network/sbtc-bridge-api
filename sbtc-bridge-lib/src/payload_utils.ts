@@ -9,7 +9,7 @@ import { verifyMessageSignature, hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { recoverSignature } from "micro-stacks/connect";
-import { getAddressFromOutScript } from './wallet_utils.js';
+import { getAddressFromOutScript, getNet } from './wallet_utils.js';
 import { dust } from './withdraw_utils.js';
 
 const concat = P.concatBytes;
@@ -177,12 +177,12 @@ export enum PrincipalType {
 }
 
 export function buildDepositPayload(network:string, stacksAddress:string):string {
-	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	return buildDepositPayloadInternal(net, 0, stacksAddress, false)
 }
 
 export function buildDepositPayloadOpDrop(network:string, stacksAddress:string, revealFee:number):string {
-	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	return buildDepositPayloadInternal(net, revealFee, stacksAddress, true)
 }
 
@@ -232,7 +232,7 @@ function buildDepositPayloadInternal(net:any, amountSats:number, address:string,
  * @returns 
  */
 export function buildWithdrawPayload(network:string, amount:number, signature:string):string {
-	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	return buildWithdrawPayloadInternal(net, amount, signature, false)
 }
 
@@ -244,7 +244,7 @@ export function buildWithdrawPayload(network:string, amount:number, signature:st
  * @returns 
  */
 export function buildWithdrawPayloadOpDrop(network:string, amount:number, signature:string):string {
-	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	return buildWithdrawPayloadInternal(net, amount, signature, true)
 }
 
@@ -339,7 +339,7 @@ export function parsePayloadFromOutput(network:string, tx:btc.Transaction):Paylo
  * @returns 
  */
 export function getDataToSign (network:string, amount:number, bitcoinAddress:string):string {
-	const net = (network === network) ? btc.TEST_NETWORK : btc.NETWORK;
+	const net = getNet(network);
 	const tx = new btc.Transaction({ allowUnknowOutput: true, allowUnknownInputs:true, allowUnknownOutputs:true });
 	tx.addOutputAddress(bitcoinAddress, BigInt(amount), net);
 	const amountBytes = P.U64BE.encode(BigInt(amount));
