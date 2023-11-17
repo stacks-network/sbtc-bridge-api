@@ -59,6 +59,7 @@ export async function fetchAddressTransactions(address:string, lastId?:string) {
 
 export async function fetchUtxosForAddress(address:string) {
   let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
+  console.log('fetchUtxoSetDevnet: fetchUtxosForAddress' + url);
   const response = await fetch(url);
   const result = await response.json();
   return result;

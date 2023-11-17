@@ -247,7 +247,7 @@ export function isDev() {
 }
 
 export function getConfig() {
-  if (!CONFIG) setConfigOnStart();
+  if (!CONFIG || !CONFIG.btcNode) setConfigOnStart();
 	return CONFIG;
 }
 

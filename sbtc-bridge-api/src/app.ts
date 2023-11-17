@@ -31,7 +31,6 @@ app.use(express.static("public"));
 app.use(cors());
 app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 setConfigOnStart();
-printConfig()
 
 app.use(
   bodyParser.urlencoded({
@@ -67,13 +66,8 @@ console.log(`App ${getConfig().publicAppName}`);
 console.log(`Stacks connection at ${getConfig().stacksApi}`);
 console.log(`Stacks explorer at ${getConfig().stacksExplorerUrl}`);
 console.log(`sBTC contract at ${getConfig().sbtcContractId}`);
-if (isDev() || isDevenv() || isLocalTestnet()) {
-  console.log('linode env.. changing CONFIG.mongoDbName = ' + getConfig().mongoDbName)
-  console.log('linode env.. changing CONFIG.mongoUser = ' + getConfig().mongoUser)
-  console.log('linode env.. changing CONFIG.mongoPwd = ' + getConfig().mongoPwd.substring(0,2))
-  console.log('linode env.. changing CONFIG.btcNode = ' + getConfig().btcNode)
-  console.log('linode env.. changing CONFIG.btcRpcUser = ' + getConfig().btcRpcUser)
-}
+
+printConfig()
 
 async function connectToMongoCloud() {
   await connect();
