@@ -110,6 +110,7 @@ export async function getAddressInfo(address:string) {
   //checkAddressForNetwork(getConfig().network, address)
   const dataString = `{"jsonrpc":"1.0","id":"curltext","method":"getaddressinfo","params":["${address}"]}`;
   OPTIONS.body = dataString;
+  console.log('getAddressInfo: ' + BASE_URL)
   const response = await fetch(BASE_URL, OPTIONS);
   await handleError(response, 'getAddressInfo internal error: ' + address);
   const result = await response.json();

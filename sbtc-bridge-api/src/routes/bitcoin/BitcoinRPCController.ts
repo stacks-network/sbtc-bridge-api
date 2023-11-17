@@ -332,13 +332,13 @@ export class WalletController {
   public async fetchUtxoSetDevnet(address:string, verbose:boolean): Promise<any> {
     let result:any = {};
     //checkAddressForNetwork(getConfig().network, address);
-    console.log('fetchUtxoSet: importing addres: ' + address)
+    console.log('fetchUtxoSetDevnet: importing addres: ' + address)
     if (address) {
       try {
         await importAddress(address)
-        console.log('fetchUtxoSet: imported address')
+        console.log('fetchUtxoSetDevnet: imported address')
         result = await getAddressInfo(address);
-        console.log('fetchUtxoSet: getAddressInfo', result)
+        console.log('fetchUtxoSetDevnet: getAddressInfo', result)
         const transactions = await fetchAddressTransactions(address);
         const utxos = []
         for (const tx of transactions) {
@@ -363,7 +363,7 @@ export class WalletController {
           utxo.tx = tx;
         }
       } catch (err:any) {
-        console.log('fetchUtxoSet: addressValidation: ' + address + ' : ' + err.message)
+        console.log('fetchUtxoSetDevnet: addressValidation: ' + address + ' : ' + err.message)
       }
     }
     return result;
