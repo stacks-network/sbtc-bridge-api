@@ -54,9 +54,7 @@ const LOCAL_TESTNET_CONFIG = {
   electrumUrl: 'http://45.79.130.153:3002',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
   publicAppName: 'UASU Staging API',
-  publicAppVersion: '1.0.0',
-  mailChimpApiKey: '9f34bc871c6ea31c75810ca57da1e40e-us10',
-  mailChimpAudience: 'cf9d92c7db',
+  publicAppVersion: '1.0.0'
 }
 
 const LOCAL_DEVENV_CONFIG = {
