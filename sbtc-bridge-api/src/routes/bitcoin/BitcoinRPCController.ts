@@ -2,7 +2,7 @@ import { Post, Get, Route } from "tsoa";
 import { fetchRawTx, sendRawTxRpc } from '../../lib/bitcoin/rpc_transaction.js';
 import { generateNewAddress, createWallet, validateAddress, walletProcessPsbt, getAddressInfo, estimateSmartFee, loadWallet, unloadWallet, listWallets, importAddress } from "../../lib/bitcoin/rpc_wallet.js";
 import { getBlockHeader, getBlockChainInfo, getBlockCount, getBlock, getTxOutProof } from "../../lib/bitcoin/rpc_blockchain.js";
-import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions } from "../../lib/bitcoin/api_mempool.js";
+import { fetchUTXOs, sendRawTxDirectMempool, fetchAddressTransactions, fetchUtxosForAddress } from "../../lib/bitcoin/api_mempool.js";
 import { sendRawTxDirectBlockCypher, fetchCurrentFeeRates as fetchCurrentFeeRatesCypher } from "../../lib/bitcoin/api_blockcypher.js";
 import { findBridgeTransactionById } from "../../lib/data/db_models.js";
 import { getConfig } from '../../lib/config.js';
@@ -332,36 +332,21 @@ export class WalletController {
   public async fetchUtxoSetDevnet(address:string, verbose:boolean): Promise<any> {
     let result:any = {};
     //checkAddressForNetwork(getConfig().network, address);
-    console.log('fetchUtxoSetDevnet: importing addres: ' + address)
+    console.log('fetchUtxoSetDevnet: fetching utxos for: ' + address)
     if (address) {
       try {
-        await importAddress(address)
-        console.log('fetchUtxoSetDevnet: imported address')
         result = await getAddressInfo(address);
-        console.log('fetchUtxoSetDevnet: getAddressInfo', result)
-        const transactions = await fetchAddressTransactions(address);
-        const utxos = []
-        for (const tx of transactions) {
-          let count = 0
-          for (const vout of tx.vout) {
-            if (vout.scriptpubkey_address === address) {
-              utxos.push({
-                txid: tx.txid,
-                status: tx.status,
-                vout: count,
-                value: vout.value,
-              })
-            }
-            count++;
-          }
-        }
-        const addressValidation = await validateAddress(address);
-        result.addressValidation = addressValidation
-        result.utxos = utxos
-        for (let utxo of result.utxos) {
+        console.log('fetchUtxoSetDevnet: getAddressInfo', result);
+        const utxos = await fetchUtxosForAddress(address);
+        for (let utxo of utxos) {
           const tx = await fetchRawTx(utxo.txid, verbose);
           utxo.tx = tx;
         }
+        try {
+          const addressValidation = await validateAddress(address);
+          result.addressValidation = addressValidation
+        } catch (err) {}
+        result.utxos = utxos
       } catch (err:any) {
         console.log('fetchUtxoSetDevnet: addressValidation: ' + address + ' : ' + err.message)
       }

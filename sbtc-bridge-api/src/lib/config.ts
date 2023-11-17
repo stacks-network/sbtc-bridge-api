@@ -20,6 +20,7 @@ const LOCAL_REGTEST_CONFIG = {
   stacksExplorerUrl: 'http://127.0.0.1:3020',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
+  electrumUrl: 'http://45.79.130.153:3002',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
   btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
   btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
@@ -50,6 +51,7 @@ const LOCAL_TESTNET_CONFIG = {
   stacksExplorerUrl: 'https://explorer.hiro.so/',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
+  electrumUrl: 'http://45.79.130.153:3002',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
   publicAppName: 'UASU Staging API',
   publicAppVersion: '1.0.0',
@@ -77,6 +79,7 @@ const LOCAL_DEVENV_CONFIG = {
   stacksExplorerUrl: 'http://127.0.0.1:3020',
   bitcoinExplorerUrl: 'http://45.79.130.153:8083',
   mempoolUrl: 'http://45.79.130.153:8083/api',
+  electrumUrl: 'http://45.79.130.153:3002',
   blockCypherUrl: 'http://45.79.130.153:8083/api',
   publicAppName: 'UASU Devenv API',
   publicAppVersion: '1.0.0',
@@ -207,6 +210,7 @@ function setOverrides() {
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
     CONFIG.bitcoinExplorerUrl = process.env.bitcoinExplorerUrl|| '';
     CONFIG.mempoolUrl = process.env.mempoolUrl || '';
+    CONFIG.electrumUrl = process.env.electrumUrl || '';
     CONFIG.blockCypherUrl = process.env.blockCypherUrl || '';
 
     CONFIG.publicAppName = process.env.publicAppName || '';

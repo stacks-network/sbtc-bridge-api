@@ -13,7 +13,8 @@ export type ConfigI = {
 	stacksApi: string; 
     stacksExplorerUrl: string;
 	bitcoinExplorerUrl: string; 
-	mempoolUrl: string; 
+	mempoolUrl: string;
+	electrumUrl: string,
 	blockCypherUrl: string;
 	publicAppName: string;
 	publicAppVersion: string; 

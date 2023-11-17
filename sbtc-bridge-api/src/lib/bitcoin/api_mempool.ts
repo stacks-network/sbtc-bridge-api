@@ -57,9 +57,16 @@ export async function fetchAddressTransactions(address:string, lastId?:string) {
   return result;
 }
 
+export async function fetchUtxosForAddress(address:string) {
+  let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
+  const response = await fetch(url);
+  const result = await response.json();
+  return result;
+}
+
 export async function fetchUTXOs(address:string) {
   try {
-    //checkAddressForNetwork(getConfig().network, address)
+    // this will work on test/main net but not devnet
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';
     const response = await fetch(url);
     //if (response.status !== 200) throw new Error('Unable to retrieve utxo set from mempool?');
