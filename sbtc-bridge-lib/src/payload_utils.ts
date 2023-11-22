@@ -199,9 +199,14 @@ function buildDepositPayloadInternal(net:any, amountSats:number, address:string,
 	let buf1 = concat(opCodeBuf, principalType, addr0Buf, addr1Buf);
 	if (address.indexOf('.') > -1) {
 		const cnameBuf = new TextEncoder().encode(address.split('.')[1]);
-		cnameLength.fill(cnameBuf.length);
-		//const cnameLen = hex.decode(cnameBuf.length.toString(8));
-		buf1 = concat(buf1, cnameLength, cnameBuf);
+		const cnameBufHex = hex.encode(cnameBuf)
+		let cnameLen:any;
+		try {
+			cnameLen = cnameLength.fill(cnameBufHex.length);
+		} catch (err) {
+			cnameLen = hex.decode(cnameBuf.length.toString(8))
+		}
+		buf1 = concat(buf1, cnameLen, cnameBuf);
 	} else {
 		cnameLength.fill(0);
 		buf1 = concat(buf1, cnameLength);
