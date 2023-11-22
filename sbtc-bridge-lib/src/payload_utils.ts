@@ -5,12 +5,11 @@ import { c32address, c32addressDecode } from 'c32check';
 import * as P from 'micro-packed';
 import { bitcoinToSats } from './formatting.js'
 import type { PayloadType } from './types/sbtc_types.js'
-import { verifyMessageSignature, hashMessage } from '@stacks/encryption';
+import { hashMessage } from '@stacks/encryption';
 import { sha256 } from '@noble/hashes/sha256';
 import { ripemd160 } from '@noble/hashes/ripemd160';
 import { recoverSignature } from "micro-stacks/connect";
 import { getAddressFromOutScript, getNet } from './wallet_utils.js';
-import { dust } from './withdraw_utils.js';
 
 const concat = P.concatBytes;
 
@@ -187,7 +186,7 @@ export function buildDepositPayloadOpDrop(network:string, stacksAddress:string, 
 }
 
 function buildDepositPayloadInternal(net:any, amountSats:number, address:string, opDrop:boolean):string {
-	const magicBuf = (typeof net === 'object' && net.bech32 === 'tb') ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
+	const magicBuf = (typeof net === 'object' && (net.bech32 === 'tb' || net.bech32 === 'bcrt')) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGIN_OPCODE);
 	const addr = c32addressDecode(address.split('.')[0])
 	//const addr0Buf = hex.encode(amountToUint8(addr[0], 1));
@@ -249,7 +248,7 @@ export function buildWithdrawPayloadOpDrop(network:string, amount:number, signat
 }
 
 function buildWithdrawPayloadInternal(net:any, amount:number, signature:string, opDrop:boolean):string {
-	const magicBuf = (net === btc.TEST_NETWORK) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
+	const magicBuf = (typeof net === 'object' && (net.bech32 === 'tb' || net.bech32 === 'bcrt')) ? hex.decode(MAGIC_BYTES_TESTNET) : hex.decode(MAGIC_BYTES_MAINNET);
 	const opCodeBuf = hex.decode(PEGOUT_OPCODE);
 	///const amountBuf = amountToBigUint64(amount, 8);
 	const amountBytes = P.U64BE.encode(BigInt(amount));

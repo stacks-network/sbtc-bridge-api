@@ -67,30 +67,7 @@ mijoco/bridge_api
 ```bash
 # stag
 docker rm -f bridge_api_staging
-docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' 
--e mongoDbUrl=${SBTC_STAG_MONGO_URL} 
--e mongoDbName=${SBTC_STAG_MONGO_DBNAME} 
--e mongoUser=${SBTC_STAG_MONGO_USER} 
--e mongoPwd=${SBTC_STAG_MONGO_PWD}
--e btcRpcUser=${SBTC_STAG_BTC_RPC_USER} 
--e btcRpcPwd=${SBTC_STAG_BTC_RPC_PWD} 
--e btcNode=${SBTC_STAG_BTC_NODE}
--e btcSchnorrReveal=${SBTC_STAG_BTC_SCHNORR_KEY_REVEAL} 
--e btcSchnorrReclaim=${SBTC_STAG_BTC_SCHNORR_KEY_RECLAIM} 
--e btcSchnorrOracle=${SBTC_STAG_BTC_SCHNORR_KEY_ORACLE}   
--e sbtcContractId=${SBTC_STAG_CONTRACT_ID} 
--e network=${SBTC_STAG_NETWORK} 
--e stacksApi=${SBTC_STAG_STACKS_API} 
--e stacksExplorerUrl=${SBTC_STAG_STACKS_EXPLORER_URL} 
--e bitcoinExplorerUrl=${SBTC_STAG_BITCOIN_EXPLORER_URL} 
--e mempoolUrl=${SBTC_STAG_BITCOIN_MEMPOOL_URL} 
--e blockCypherUrl=${SBTC_STAG_BITCOIN_BLOCKCYPHER_URL} 
--e publicAppName=${SBTC_STAG_PUBLIC_APP_NAME} 
--e publicAppVersion=${SBTC_STAG_PUBLIC_APP_VERSION} 
--e host=${SBTC_STAG_HOST} 
--e port=${SBTC_STAG_PORT} 
--e walletPath=${SBTC_STAG_WALLET_PATH} 
-mijoco/bridge_api
+docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' -e mongoDbUrl=${SBTC_STAG_MONGO_URL} -e mongoDbName=${SBTC_STAG_MONGO_DBNAME} -e mongoUser=${SBTC_STAG_MONGO_USER} -e mongoPwd=${SBTC_STAG_MONGO_PWD} -e btcRpcUser=${SBTC_STAG_BTC_RPC_USER} -e btcRpcPwd=${SBTC_STAG_BTC_RPC_PWD}  -e btcNode=${SBTC_STAG_BTC_NODE} -e btcSchnorrReveal=${SBTC_STAG_BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${SBTC_STAG_BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${SBTC_STAG_BTC_SCHNORR_KEY_ORACLE} -e sbtcContractId=${SBTC_STAG_CONTRACT_ID} -e network=${SBTC_STAG_NETWORK} -e stacksApi=${SBTC_STAG_STACKS_API} -e stacksExplorerUrl=${SBTC_STAG_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${SBTC_STAG_BITCOIN_EXPLORER_URL} -e mempoolUrl=${SBTC_STAG_BITCOIN_MEMPOOL_URL} -e blockCypherUrl=${SBTC_STAG_BITCOIN_BLOCKCYPHER_URL} -e publicAppName=${SBTC_STAG_APP_NAME} -e publicAppVersion=${SBTC_STAG_PUBLIC_APP_VERSION} -e host=${SBTC_STAG_HOST} -e port=${SBTC_STAG_PORT} -e walletPath=${SBTC_STAG_WALLET_PATH} mijoco/bridge_api
 ```
 
 ## Swagger API Docs
