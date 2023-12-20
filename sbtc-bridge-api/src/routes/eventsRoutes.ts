@@ -10,9 +10,9 @@ router.get("/index/stacks/:txid", async (req, res, next) => {
     const response = await controller.indexSbtcEvent(req.params.txid);
     //const response = 'reading sbtc event data from stacks and bitcoin blockchains.';
     return res.send(response);
-  } catch (error) { 
+  } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
   }
 });
 

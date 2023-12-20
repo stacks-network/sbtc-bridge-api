@@ -78,7 +78,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
           recipient = getAddressFromOutScript(getConfig().network, tx.getOutput(1).script as Uint8Array)
         }
       } catch (err:any) {
-        console.log('indexEvents: unable to get recipient from ', edata);
+        console.log('indexEvents: unable to get recipient from ');
       }
       //const txs:Array<any> = await fetchAddressTransactions(recipient);
       //let fulfilTx:any;
@@ -102,7 +102,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
       console.log('saveSbtcEvents: saved payloadData: ', newEvent.payloadData);
       
     } catch (err:any) {
-      console.log('indexEvents: Error: ' + err.message); //util.inspect(err, false, null, true /* enable colors */));
+      console.log('indexEvents: Error: duplicate '); //util.inspect(err, false, null, true /* enable colors */));
     }
   }
   return sbtcEvents;

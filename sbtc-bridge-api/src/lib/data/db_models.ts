@@ -1,10 +1,16 @@
 import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
 import { getConfig, isDev } from '../config.js';
+import { ProposalEvent, VoteEvent } from '../../types/stxeco_type.js';
+import { RewardSlot } from '../../types/stxeco_stacker_type.js';
 
 let exchangeRates:Collection;
 let sbtcContractEvents:Collection;
 let commitments:Collection;
+let proposals:Collection;
+let proposalVotes:Collection;
+export let rewardSlotHolders:Collection;
+export let poxAddressInfo:Collection;
   
 export async function connect() {
 	let uriPrefix:string = 'mongodb+srv'
@@ -42,6 +48,14 @@ export async function connect() {
 	await commitments.createIndex({btcTxid: 1}, { unique: true })
 	exchangeRates = database.collection('exchangeRates');
 	await exchangeRates.createIndex({currency: 1}, { unique: true })
+	proposals = database.collection('proposals');
+	await proposals.createIndex({contractId: 1}, { unique: true })
+	proposalVotes = database.collection('proposalVotes');
+	await proposalVotes.createIndex({submitTxId: 1}, { unique: true })
+	rewardSlotHolders = database.collection('rewardSlotHolders');
+	await rewardSlotHolders.createIndex({address: 1, slot_index: 1, burn_block_height: 1}, { unique: true })
+	poxAddressInfo = database.collection('poxAddressInfo');
+	await poxAddressInfo.createIndex({hashBytes: 1, version: 1, totalUstx: 1, cycle: 1}, { unique: true })
 }
 
 // Exchange Rates 
@@ -140,5 +154,97 @@ export async function findBridgeTransactionById(_id:string):Promise<any> {
 	let o_id = new ObjectId(_id);   // id as a string is passed
 	const result = await commitments.findOne({"_id":o_id});
 	return result;
+}
+
+export async function saveProposal(proposal:any) {
+	const result = await proposals.insertOne(proposal);
+	return result;
+}
+
+export async function updateProposal(proposal:any, changes: any) {
+	const result = await proposals.updateOne({
+		_id: proposal._id
+	},
+    { $set: changes});
+	return result;
+}
+
+export async function getProposals():Promise<any> {
+	const result = await proposals.find({}).toArray();
+	return result;
+}
+
+export async function findProposalByContractId(contractId:string):Promise<any> {
+	const result = await proposals.findOne({"contractId":contractId});
+	return result;
+}
+
+export async function findProposalByContractIdConcluded(contractId:string):Promise<any> {
+	const result = await proposals.findOne({"contractId":contractId});
+	return result;
+}
+
+export async function saveOrUpdateProposal(p:ProposalEvent) {
+	try {
+		const pdb = await findProposalByContractId(p.contractId)
+		if (pdb) {
+			console.log('saveOrUpdateProposal: updating: ' + p.contractId);
+			await updateProposal(pdb, p)
+		} else {
+			console.log('saveOrUpdateProposal: saving: ' + p.contractId);
+			await saveProposal(p)
+		}
+	} catch (err:any) {
+		console.log('saveOrUpdateProposal: error')
+	}
+}
+
+
+async function saveVote(vote:any) {
+	const result = await proposalVotes.insertOne(vote);
+	return result;
+}
+
+async function updateVote(vote:any, changes: any) {
+	const result = await proposalVotes.updateOne({
+		_id: vote._id
+	},
+    { $set: changes});
+	return result;
+}
+
+export async function findProposalVotesByProposal(proposalContractId:string):Promise<any> {
+	const result = await proposalVotes.find({"proposalContractId":proposalContractId}).toArray();
+	return result;
+}
+
+export async function findVotesByProposalAndVoter(proposalContractId:string, voter:string):Promise<any> {
+	const result = await proposalVotes.find({"proposalContractId":proposalContractId, "voter":voter}).toArray();
+	return result;
+}
+
+export async function findVotesByVoter(voter:string):Promise<any> {
+	const result = await proposalVotes.find({"voter":voter}).toArray();
+	return result;
+}
+
+export async function findVoteBySubmitTxId(submitTxId:string):Promise<any> {
+	const result = await proposalVotes.findOne({"submitTxId":submitTxId});
+	return result;
+}
+
+export async function saveOrUpdateVote(v:VoteEvent) {
+	try {
+		const pdb = await findVoteBySubmitTxId(v.votingContractId)
+		if (pdb) {
+			console.log('saveOrUpdateVote: updating: ' + v.proposalContractId + ' voter: ' + v.voter + ' amount: ' + v.amount + ' for: ' + v.for);
+			await updateVote(pdb, v)
+		} else {
+			console.log('saveOrUpdateVote: saving: ', v);
+			await saveVote(v)
+		}
+	} catch (err:any) {
+		console.log('saveOrUpdateVote: unable to save or update')
+	}
 }
 

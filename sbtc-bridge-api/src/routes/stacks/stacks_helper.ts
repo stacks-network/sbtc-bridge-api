@@ -218,6 +218,11 @@ export async function callContractReadOnly(data:any) {
   } catch (err) {
     console.log('callContractReadOnly4: ', err);
   }
-  const result = cvToJSON(deserializeCV(val.result));
-  return result;
+  try {
+    const result = cvToJSON(deserializeCV(val.result));
+    return result;
+  } catch (err:any) {
+    console.log('Error: callContractReadOnly: ', val)
+    return val
+  } 
 }
