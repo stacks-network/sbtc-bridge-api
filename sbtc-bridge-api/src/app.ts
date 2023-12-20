@@ -10,9 +10,11 @@ import { WebSocketServer } from 'ws'
 import { configRoutes } from './routes/configRoutes.js'
 import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
 import { sbtcRoutes } from './routes/sbtcRoutes.js'
+import { daoRoutes } from './routes/daoRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
+import { setDaoConfig } from './lib/config_dao.js';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
 const swaggerDocument = r('./swagger.json');
@@ -31,6 +33,7 @@ app.use(express.static("public"));
 app.use(cors());
 app.get('/api-docs', swaggerUi.setup(swaggerDocument));
 setConfigOnStart();
+setDaoConfig(getConfig().network);
 
 app.use(
   bodyParser.urlencoded({
@@ -55,6 +58,7 @@ app.use((req, res, next) => {
 app.use('/bridge-api/:network/v1/config', configRoutes);
 app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
 app.use('/bridge-api/:network/v1/sbtc', sbtcRoutes);
+app.use('/bridge-api/:network/v1/dao', daoRoutes);
 app.use('/bridge-api/:network/v1/events', eventsRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);

@@ -132,6 +132,17 @@ router.get("/data", async (req, res, next) => {
   }
 });
 
+router.get("/info", async (req, res, next) => {
+  try {
+    const controller = new SbtcWalletController();
+    const sbtcContractData = await controller.fetchSbtcContractData();
+    return res.send(sbtcContractData);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
 router.get("/wallet-address", async (req, res, next) => {
   try {
     const controller = new SbtcWalletController();

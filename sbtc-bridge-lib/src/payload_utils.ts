@@ -293,7 +293,7 @@ export function parsePayloadFromTransaction(network:string, txHex:string):Payloa
 		if (payload.opcode === '3C') payload.amountSats = Number(tx.getOutput(1).amount)
 		//payload.dust = Number(tx.getOutput(1).amount)
 	}
-	console.log('parsePayloadFromTransaction: payload: ' + payload);
+	//console.log('parsePayloadFromTransaction: payload: ' + payload);
 	return payload;
 }
 
@@ -318,7 +318,7 @@ export function parsePayloadFromOutput(network:string, tx:btc.Transaction):Paylo
 		//	finalScriptSig: tx.getInput(0).finalScriptSig as Uint8Array,
 		//});
 		if (tx.outputsLength > 2) innerPayload.spendingAddress = getAddressFromOutScript(network, tx.getOutput(2).script!)
-		console.log('parsePayloadFromTransaction:spendingAddress: ' +  innerPayload.spendingAddress)
+		//console.log('parsePayloadFromTransaction:spendingAddress: ' +  innerPayload.spendingAddress)
 		return innerPayload;
 	} else if (witnessData.opcode.toUpperCase() === '3E') {
 		const recipient = getAddressFromOutScript(network, tx.getOutput(1).script as Uint8Array)
@@ -409,7 +409,7 @@ export function getStacksAddressFromPubkey(pubkey:Uint8Array) {
 		mp2pkh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2PKH),
 		mp2sh: publicKeyToStxAddress(pubkey, StacksNetworkVersion.mainnetP2SH),
 	}
-	console.log('getStacksAddressFromPubkey: addresses: ', addresses)
+	//console.log('getStacksAddressFromPubkey: addresses: ', addresses)
 	return addresses;
 }
 
