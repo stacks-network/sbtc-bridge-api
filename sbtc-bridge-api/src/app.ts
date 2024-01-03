@@ -14,7 +14,7 @@ import { daoRoutes } from './routes/daoRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
-import { setDaoConfig } from './lib/config_dao.js';
+import { printDaoConfig, setDaoConfig } from './lib/config_dao.js';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
 const swaggerDocument = r('./swagger.json');
@@ -72,6 +72,7 @@ console.log(`Stacks explorer at ${getConfig().stacksExplorerUrl}`);
 console.log(`sBTC contract at ${getConfig().sbtcContractId}`);
 
 printConfig()
+printDaoConfig()
 
 async function connectToMongoCloud() {
   await connect();

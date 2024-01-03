@@ -14,8 +14,8 @@ const DAO_CONFIG_DEVNET = {
 const DAO_CONFIG_TESTNET = {
     VITE_DOA: 'executor-dao',
     VITE_DOA_DEPLOYER: 'ST167Z6WFHMV0FZKFCRNWZ33WTB0DFBCW9M1FW3AY',
-    VITE_DOA_PROPOSAL: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.edp017-testnet-stacks-update',
-    VITE_DOA_PROPOSALS: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.edp017-testnet-stacks-update',
+    VITE_DOA_PROPOSAL: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.edp017-testnet-stacks-update-x',
+    VITE_DOA_PROPOSALS: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.edp017-testnet-stacks-update-x',
     VITE_DOA_ACTIVE_VOTING_EXTENSIONS: 'ede007-snapshot-proposal-voting-v2,ede007-snapshot-proposal-voting-v5',
     VITE_DOA_SNAPSHOT_VOTING_EXTENSION: 'ede007-snapshot-proposal-voting-v5',
     VITE_DOA_PROPOSAL_VOTING_EXTENSION: 'ede001-proposal-voting',
@@ -50,6 +50,9 @@ export function setDaoConfig(network:string) {
         network = 'testnet'
         DAO_CONFIG = DAO_CONFIG_TESTNET;
     } 
+    if (process.env.daoProposal) {
+        DAO_CONFIG.VITE_DOA_PROPOSAL = process.env.daoProposal
+    }
     if (process.env.daoProposals) {
         DAO_CONFIG.VITE_DOA_PROPOSALS = process.env.daoProposals
     }
@@ -63,4 +66,15 @@ export function getDaoConfig() {
     return DAO_CONFIG;
 }
   
+export function printDaoConfig() {
+    console.log('== ' + process.env.NODE_ENV + ' ==========================================================')
+    console.log('VITE_DOA_PROPOSAL = ' + DAO_CONFIG.VITE_DOA_PROPOSAL);
+    console.log('VITE_DOA_PROPOSALS = ' + DAO_CONFIG.VITE_DOA_PROPOSALS);
+    console.log('VITE_DOA_DEPLOYER = ' + DAO_CONFIG.VITE_DOA_DEPLOYER);
+    console.log('VITE_DOA_ACTIVE_VOTING_EXTENSIONS = ' + DAO_CONFIG.VITE_DOA_ACTIVE_VOTING_EXTENSIONS);
+    console.log('VITE_DOA_SNAPSHOT_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
+    console.log('VITE_DOA_PROPOSAL_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_PROPOSAL_VOTING_EXTENSION);
+    console.log('VITE_DOA_FUNDED_SUBMISSION_EXTENSION = ' + DAO_CONFIG.VITE_DOA_FUNDED_SUBMISSION_EXTENSION);
+    console.log('VITE_DOA_POX = ' + DAO_CONFIG.VITE_DOA_POX);
+  }
   
