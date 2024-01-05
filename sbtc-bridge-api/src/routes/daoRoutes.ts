@@ -158,7 +158,7 @@ router.get("/nft/assets-classes/:stxAddress", async (req, res, next) => {
 
 router.get("/nft/assets/:stxAddress/:limit/:offset", async (req, res, next) => {
   try {
-    const response = await getNftHoldings(req.params.stxAddress, Number(req.params.limit), Number(req.params.offset));
+    const response = await getNftHoldings(req.params.stxAddress, undefined, Number(req.params.limit), Number(req.params.offset));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -166,9 +166,9 @@ router.get("/nft/assets/:stxAddress/:limit/:offset", async (req, res, next) => {
   }
 });
 
-router.get("/nft/assets/:stxAddress", async (req, res, next) => {
+router.get("/nft/assets/:stxAddress/:assetId/:limit/:offset", async (req, res, next) => {
   try {
-    const response = await getNftHoldings(req.params.stxAddress, -1, 0);
+    const response = await getNftHoldings(req.params.stxAddress, req.params.assetId, Number(req.params.limit), Number(req.params.offset));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)

@@ -66,6 +66,17 @@ async function getNftHoldingsByPage(stxAddress:string, limit:number, offset:numb
   return val;
 }
 
+async function getNftHoldingsByAssetAndPage(stxAddress:string, assetId:string|undefined, limit:number, offset:number):Promise<any> {
+  let url = getConfig().stacksApi + '/extended/v1/tokens/nft/holdings?principal=' + stxAddress + '&limit=' + limit + '&offset=' + offset;
+  if (assetId) {
+    url += '&asset_identifiers=' + assetId
+  }
+  console.log('url: ', url)
+  const response = await fetch(url)
+  const val = await response.json();
+  return val;
+}
+
 export async function getAssetClasses(stxAddress:string):Promise<any> {
   let events:any;
   const assetClasses = [];
@@ -84,14 +95,14 @@ export async function getAssetClasses(stxAddress:string):Promise<any> {
   return assetClasses;
 }
 
-export async function getNftHoldings(stxAddress:string, limit:number, offset:number):Promise<NFTHoldings> {
+export async function getNftHoldings(stxAddress:string, assetId:string|undefined, limit:number, offset:number):Promise<NFTHoldings> {
   let events:any;
   const holdings = {
     total: 0,
     results: []
   } as NFTHoldings;
   do {
-    events = await getNftHoldingsByPage(stxAddress, limit, offset);
+    events = await getNftHoldingsByAssetAndPage(stxAddress, assetId, limit, offset);
     console.log('events.total: ', events.total)
     console.log('events.results.length: ', events.results.length)
     holdings.total = events.total
