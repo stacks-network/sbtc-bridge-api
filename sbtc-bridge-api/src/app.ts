@@ -14,7 +14,7 @@ import { daoRoutes } from './routes/daoRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
-import { setDaoConfig } from './lib/config_dao.js';
+import { printDaoConfig, setDaoConfig } from './lib/config_dao.js';
 const r = createRequire(import.meta.url);
 // - assertions are experimental.. import swaggerDocument from '../public/swagger.json' assert { type: "json" };;
 const swaggerDocument = r('./swagger.json');
@@ -55,11 +55,11 @@ app.use((req, res, next) => {
   }
 })
 
-app.use('/bridge-api/:network/v1/config', configRoutes);
-app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
-app.use('/bridge-api/:network/v1/sbtc', sbtcRoutes);
-app.use('/bridge-api/:network/v1/dao', daoRoutes);
-app.use('/bridge-api/:network/v1/events', eventsRoutes);
+app.use('/bridge-api/v1/config', configRoutes);
+app.use('/bridge-api/v1/btc', bitcoinRoutes);
+app.use('/bridge-api/v1/sbtc', sbtcRoutes);
+app.use('/bridge-api/v1/dao', daoRoutes);
+app.use('/bridge-api/v1/events', eventsRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
 console.log('Startup Environment: ', process.env.NODE_ENV);
@@ -72,6 +72,7 @@ console.log(`Stacks explorer at ${getConfig().stacksExplorerUrl}`);
 console.log(`sBTC contract at ${getConfig().sbtcContractId}`);
 
 printConfig()
+printDaoConfig()
 
 async function connectToMongoCloud() {
   await connect();

@@ -1,6 +1,6 @@
 import express from "express";
-import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVoter, getProposals } from "../lib/data/db_models.js";
-import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getPoxInfo, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember } from "./dao/dao_helper.js";
+import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVoter, getDaoMongoConfig, getProposals, saveOrUpdateDaoMongoConfig } from "../lib/data/db_models.js";
+import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getPoxInfo, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
 import { findRewardSlotByAddress, findRewardSlotByAddressMaxHeight, findRewardSlotByAddressMinHeight, readRewardSlots } from "./dao/reward_slot_helper.js";
@@ -27,9 +27,9 @@ router.get("/is-executive-team-member/:stacksAddress", async (req, res, next) =>
   try {
     const result = isExecutiveTeamMember(req.params.stacksAddress);
     return res.send(result);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.')
+  } catch (error:any) {
+    console.log('Error in routes: ', error.message)
+    next('An error occurred fetching executive-team-member.')
   }
 });
 
@@ -46,6 +46,17 @@ router.get("/get-governance-data/:stacksAddress", async (req, res, next) => {
 router.get("/get-proposal-from-contract-id/:submissionContractId/:proposalContractId", async (req, res, next) => {
   try {
     const result = getProposalFromContractId(req.params.submissionContractId, req.params.proposalContractId);
+    return res.send(result);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/is-extension/:extensionCid", async (req, res, next) => {
+  try {
+    const result = await isExtension(req.params.extensionCid);
+    console.log('isExtension:', result)
     return res.send(result);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -88,8 +99,9 @@ router.get("/get-signals/:principle", async (req, res, next) => {
  */
 router.get("/votes", async (req, res, next) => {
   try {
-    const soloVotes = await getSoloVotesByProposal(getDaoConfig().VITE_DOA_PROPOSAL, 'solo-voting');
-    const poolVotes = await getPoolVotesByProposal(getDaoConfig().VITE_DOA_PROPOSAL, 'pool-voting');
+    const currentProposal = await getDaoMongoConfig()
+    const soloVotes = await getSoloVotesByProposal(currentProposal.contractId, 'solo-voting');
+    const poolVotes = await getPoolVotesByProposal(currentProposal.contractId, 'pool-voting');
     const soloAddresses = soloStackerAddresses(getConfig().network);
     const poolAddresses = poolStackerAddresses(getConfig().network);
     return res.send({soloVotes, poolVotes, soloAddresses, poolAddresses});
@@ -157,7 +169,7 @@ router.get("/nft/assets-classes/:stxAddress", async (req, res, next) => {
 
 router.get("/nft/assets/:stxAddress/:limit/:offset", async (req, res, next) => {
   try {
-    const response = await getNftHoldings(req.params.stxAddress, Number(req.params.limit), Number(req.params.offset));
+    const response = await getNftHoldings(req.params.stxAddress, undefined, Number(req.params.limit), Number(req.params.offset));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -165,9 +177,9 @@ router.get("/nft/assets/:stxAddress/:limit/:offset", async (req, res, next) => {
   }
 });
 
-router.get("/nft/assets/:stxAddress", async (req, res, next) => {
+router.get("/nft/assets/:stxAddress/:assetId/:limit/:offset", async (req, res, next) => {
   try {
-    const response = await getNftHoldings(req.params.stxAddress, -1, 0);
+    const response = await getNftHoldings(req.params.stxAddress, req.params.assetId, Number(req.params.limit), Number(req.params.offset));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -214,6 +226,46 @@ router.get("/proposals", async (req, res, next) => {
     next('An error occurred fetching sbtc data.') 
   }
 });
+router.get("/dao-config", async (req, res, next) => {
+  try {
+    const response = await getDaoConfig();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/get-current-proposal", async (req, res, next) => {
+  try {
+    const response = await getDaoMongoConfig();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/set-current-proposal/:contractId", async (req, res, next) => {
+  try {
+    let config = await getDaoMongoConfig();
+    console.log('config in routes: ', config)
+    if (!config) {
+      config = {
+        configId: 1,
+        contractId: req.params.contractId
+      }
+    } else {
+      config.contractId = req.params.contractId
+    }
+    config = await saveOrUpdateDaoMongoConfig(config)
+    return res.send(config);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
 
 /**
  * Mongo collection: rewardSlotHolders(burn_block_height, address, slot_index)
@@ -285,6 +337,18 @@ router.get("/sync/read-dao-votes", async (req, res, next) => {
     console.log('Running: sync: submissionContractId: ' + submissionContractId);
     console.log('Running: sync: proposals: ' + getDaoConfig().VITE_DOA_PROPOSALS);
     await getProposalsFromContractIds(submissionContractId, getDaoConfig().VITE_DOA_PROPOSALS);
+    const response = await getProposals();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+router.get("/sync/proposal/:contractIds", async (req, res, next) => {
+  try {
+    const submissionContractId = getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION
+    console.log('Running: sync: proposals: ' + req.params.contractIds);
+    await getProposalsFromContractIds(submissionContractId, req.params.contractIds);
     const response = await getProposals();
     return res.send(response);
   } catch (error) {

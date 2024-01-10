@@ -9,11 +9,11 @@ export PORT=7019
 export SERVER=chomsky.brightblock.org
 export DOCKER_NAME=bridge_api_staging
 export TARGET_ENV=linode-staging
-if [ "$DEPLOYMENT" == "prod" ]; then
-  #SERVER=chomsky.brightblock.org;
+if [ "$DEPLOYMENT" == "mainnet" ]; then
+  SERVER=spinoza.brightblock.org;
   DOCKER_NAME=bridge_api_production
   TARGET_ENV=linode-production
-  PORT=7019
+  PORT=22
 fi
 export DOCKER_ID_USER='mijoco'
 export DOCKER_CMD='docker'
@@ -25,53 +25,36 @@ $DOCKER_CMD push mijoco/bridge_api:latest
 printf "\nConnecting to: $SERVER.\n\n"
 printf "\nDeploying docker container: $DOCKER_NAME.\n\n"
 
-if [ "$DEPLOYMENT" == "prod" ]; then
   ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
     cd /home/bob/hubgit/sbtc-bridge-api
     pwd
-    cat .env;
-    docker login;
-    docker pull mijoco/bridge_api;
-
-    docker rm -f ${DOCKER_NAME}
-    source /home/bob/.profile;
-    docker run -d -t -i --network host --name ${DOCKER_NAME} -p 3020:3020 \
-      -e TARGET_ENV=linode-production \
-      -e btcSchnorrReveal=${BTC_PROD_SCHNORR_KEY_REVEAL} \
-      -e btcSchnorrReclaim=${BTC_PROD_SCHNORR_KEY_RECLAIM} \
-      -e btcRpcUser=${BTC_PROD_RPC_USER} \
-      -e btcRpcPwd=${BTC_PROD_RPC_PWD} \
-      -e btcNode=${BTC_PROD_NODE} \
-      -e mongoDbUrl=${MONGO_PROD_SBTC_URL} \
-      -e mongoDbName=${MONGO_PROD_SBTC_DBNAME} \
-      -e mongoUser=${MONGO_PROD_SBTC_USER} \
-      -e mongoPwd=${MONGO_PROD_SBTC_PWD} \
-      mijoco/bridge_api
-  ";
-else 
-  ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER "
-    cd /home/bob/hubgit/sbtc-bridge-api
-    pwd
-    cat .env;
+    source ~/.profile;
     docker login;
     docker pull mijoco/bridge_api;
 
     docker rm -f ${DOCKER_NAME}
     source /home/bob/.profile;
     docker run -d -t -i --network host --name ${DOCKER_NAME} -p 3010:3010 \
-      -e TARGET_ENV=linode-staging \
-      -e btcSchnorrReveal=${BTC_SCHNORR_KEY_REVEAL} \
-      -e btcSchnorrReclaim=${BTC_SCHNORR_KEY_RECLAIM} \
-      -e btcRpcUser=${BTC_RPC_USER} \
-      -e btcRpcPwd=${BTC_RPC_PWD} \
-      -e btcNode=${BTC_NODE} \
-      -e mongoDbUrl=${MONGO_SBTC_URL} \
-      -e mongoDbName=${MONGO_SBTC_DBNAME} \
-      -e mongoUser=${MONGO_SBTC_USER} \
-      -e mongoPwd=${MONGO_SBTC_PWD} \
+      -e TARGET_ENV=${TARGET_ENV} \
+      -e NODE_ENV='linode-production' -e mongoDbUrl=${SBTC_MONGO_URL} \
+      -e mongoDbName=${SBTC_MONGO_DBNAME} -e mongoUser=${SBTC_MONGO_USER} \
+      -e mongoPwd=${SBTC_MONGO_PWD} -e btcRpcUser=${SBTC_BTC_RPC_USER} \
+      -e btcRpcPwd=${SBTC_BTC_RPC_PWD}  -e btcNode=${SBTC_BTC_NODE} \
+      -e btcSchnorrReveal=${SBTC_BTC_SCHNORR_KEY_REVEAL} \
+      -e btcSchnorrReclaim=${SBTC_BTC_SCHNORR_KEY_RECLAIM} \
+      -e btcSchnorrOracle=${SBTC_BTC_SCHNORR_KEY_ORACLE} \
+      -e sbtcContractId=${SBTC_CONTRACT_ID} -e network=${SBTC_NETWORK} \
+      -e stacksApi=${SBTC_STACKS_API} -e stacksExplorerUrl=${SBTC_STACKS_EXPLORER_URL} \
+      -e bitcoinExplorerUrl=${SBTC_BITCOIN_EXPLORER_URL} \
+      -e mempoolUrl=${SBTC_BITCOIN_MEMPOOL_URL} \
+      -e blockCypherUrl=${SBTC_BITCOIN_BLOCKCYPHER_URL} \
+      -e publicAppVersion=${SBTC_PUBLIC_APP_VERSION} \
+      -e host=${SBTC_HOST} -e port=${SBTC_PORT} \
+      -e walletPath=${SBTC_WALLET_PATH} -e daoProposals=${SBTC_DOA_PROPOSALS} \
+      -e daoProposal=${SBTC_DOA_PROPOSAL} \
+      -e daoVotings=${SBTC_DOA_ACTIVE_VOTING_EXTENSIONS} \
       mijoco/bridge_api
   ";
-fi
 
 printf "Finished....\n"
 printf "\n-----------------------------------------------------------------------------------------------------\n";

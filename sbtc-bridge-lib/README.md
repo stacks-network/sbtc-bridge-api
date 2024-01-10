@@ -7,7 +7,7 @@ This library is intended to be used by app developers to build sBTC applications
 For more information on the sBTC project see;
 
 - [sBTC.tech](https://sbtc.tech)
-- [sBTC bridge web app](https://bridge.sbtc.tech?net=testnet)
+- [sBTC bridge web app](https://bridge.sbtc.tech?chain=testnet)
 - [npm registry](https://www.npmjs.com/package/sbtc-bridge-lib)
 
 ## The sBTC Library Install

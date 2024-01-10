@@ -66,6 +66,17 @@ async function getNftHoldingsByPage(stxAddress:string, limit:number, offset:numb
   return val;
 }
 
+async function getNftHoldingsByAssetAndPage(stxAddress:string, assetId:string|undefined, limit:number, offset:number):Promise<any> {
+  let url = getConfig().stacksApi + '/extended/v1/tokens/nft/holdings?principal=' + stxAddress + '&limit=' + limit + '&offset=' + offset;
+  if (assetId) {
+    url += '&asset_identifiers=' + assetId
+  }
+  console.log('url: ', url)
+  const response = await fetch(url)
+  const val = await response.json();
+  return val;
+}
+
 export async function getAssetClasses(stxAddress:string):Promise<any> {
   let events:any;
   const assetClasses = [];
@@ -84,14 +95,14 @@ export async function getAssetClasses(stxAddress:string):Promise<any> {
   return assetClasses;
 }
 
-export async function getNftHoldings(stxAddress:string, limit:number, offset:number):Promise<NFTHoldings> {
+export async function getNftHoldings(stxAddress:string, assetId:string|undefined, limit:number, offset:number):Promise<NFTHoldings> {
   let events:any;
   const holdings = {
     total: 0,
     results: []
   } as NFTHoldings;
   do {
-    events = await getNftHoldingsByPage(stxAddress, limit, offset);
+    events = await getNftHoldingsByAssetAndPage(stxAddress, assetId, limit, offset);
     console.log('events.total: ', events.total)
     console.log('events.results.length: ', events.results.length)
     holdings.total = events.total
@@ -279,16 +290,22 @@ export async function getProposalFromContractId(submissionContractId:string, pro
   let proposal:ProposalEvent|undefined = undefined;
   try {
     const contract = await getProposalContract(proposalContractId)
-    const funding = await getFunding(submissionContractId, proposalContractId);
+    let funding;
+    let signals;
     let stage = ProposalStage.PARTIAL_FUNDING;
-    if (funding.funding === 0) stage = ProposalStage.UNFUNDED
-    const signals = await getSignals(proposalContractId)
+    try {
+      funding = await getFunding(submissionContractId, proposalContractId);
+      if (funding.funding === 0) stage = ProposalStage.UNFUNDED
+      signals = await getSignals(proposalContractId)
+    } catch (err:any) {
+      console.log(err.message)
+    }
     const proposalMeta = DaoUtils.getMetaData(contract.source)
     const p = {
       contract,
       proposalMeta,
       contractId: proposalContractId,
-      submissionData: { contractId: submissionContractId, transaction: undefined},
+      submissionData: { contractId: submissionContractId, transaction: undefined },
       signals,
       stage,
       funding
@@ -339,6 +356,23 @@ export async function getGovernanceData(principle:string):Promise<GovernanceData
       userBalance: 0,
       userLocked: 0,
     }
+  }
+}
+
+export async function isExtension(extensionCid:string):Promise<{result: boolean}> {
+  const functionArgs = [`0x${hex.encode(serializeCV(contractPrincipalCV(extensionCid.split('.')[0], extensionCid.split('.')[1] )))}`];
+  const data = {
+    contractAddress: getDaoConfig().VITE_DOA_DEPLOYER,
+    contractName: getDaoConfig().VITE_DOA,
+    functionName: 'is-extension',
+    functionArgs,
+  }
+  let res:{value:boolean, type:string};
+  try {
+    res = (await callContractReadOnly(data));
+    return { result: res.value }
+  } catch (e) { 
+    return { result: false } 
   }
 }
 
@@ -410,11 +444,13 @@ export async function getFundingParams(extensionCid:string):Promise<any> {
     functionName: 'get-parameter',
     functionArgs
   }
+  const param1 = (extensionCid.split('.')[1] === 'ede008-flexible-funded-submission') ? 'minimum-proposal-start-delay' : 'proposal-start-delay'
+  const param2 = (extensionCid.split('.')[1] === 'ede008-flexible-funded-submission') ? 'minimum-proposal-duration' : 'proposal-duration'
   //console.log('Running: getFundingParams: ', data);
   const fundingCost = (await callContractReadOnly(data)).value.value;
-  data.functionArgs = [`0x${hex.encode(serializeCV(stringAsciiCV('proposal-start-delay')))}`];
+  data.functionArgs = [`0x${hex.encode(serializeCV(stringAsciiCV(param1)))}`];
   const proposalStartDelay = (await callContractReadOnly(data)).value.value;
-  data.functionArgs = [`0x${hex.encode(serializeCV(stringAsciiCV('proposal-duration')))}`];
+  data.functionArgs = [`0x${hex.encode(serializeCV(stringAsciiCV(param2)))}`];
   const proposalDuration = (await callContractReadOnly(data)).value.value;
   return {
     fundingCost: Number(fundingCost),
@@ -434,12 +470,15 @@ async function getSubmissionData(txId:string):Promise<SubmissionData> {
 
 async function getProposalContract(principle:string):Promise<ProposalContract> {
   const url = getConfig().stacksApi + '/v2/contracts/source/' + principle.split('.')[0] + '/' + principle.split('.')[1] + '?proof=0';
+  console.log('getProposalContract: url: ' + url);
   const response = await fetch(url)
   const val = await response.json();
+  console.log('getProposalContract: url: ' + url);
   return val;
 }
 
 export async function isExecutiveTeamMember(stxAddress:string):Promise<{executiveTeamMember:boolean}> {
+  if (!stxAddress || stxAddress === 'undefined') return {executiveTeamMember:false}
   const functionArgs = [`0x${hex.encode(serializeCV(principalCV(stxAddress)))}`];
   const data = {
     contractAddress: getDaoConfig().VITE_DOA_DEPLOYER,
@@ -447,9 +486,13 @@ export async function isExecutiveTeamMember(stxAddress:string):Promise<{executiv
     functionName: 'is-executive-team-member',
     functionArgs,
   }
-  const result = (await callContractReadOnly(data)).value;
-  return {
-    executiveTeamMember: Boolean(result),
+  try {
+    const result = (await callContractReadOnly(data)).value;
+    return {
+      executiveTeamMember: Boolean(result),
+    }
+  } catch(err) {
+    return {executiveTeamMember:false}
   }
 }
 

@@ -3,7 +3,7 @@
 Indexes and caches contract data to make the api client application faster
 and more flexible.
 
-API [documentation](https://bridge.sbtc.tech/bridge-api/docs/).
+API [documentation](https://mainnet.bridge.sbtc.tech/bridge-api/docs/).
 
 ## Development
 
@@ -36,43 +36,20 @@ Alternatively, no docker hub, use docker compose directly..
 ### Bridge API
 
 ```bash
-# prod
+# stag
 docker rm -f bridge_api_production
-docker run -d -t -i --network host --name bridge_api_production -p 3020:3020 -e NODE_ENV='linode-production' 
--e mongoDbUrl=${SBTC_PROD_MONGO_URL} 
--e mongoDbName=${SBTC_PROD_MONGO_DBNAME} 
--e mongoUser=${SBTC_PROD_MONGO_USER} 
--e mongoPwd=${SBTC_PROD_MONGO_PWD}
--e btcRpcUser=${SBTC_PROD_BTC_RPC_USER} 
--e btcRpcPwd=${SBTC_PROD_BTC_RPC_PWD} 
--e btcNode=${SBTC_PROD_BTC_NODE}
--e btcSchnorrReveal=${SBTC_PROD_BTC_SCHNORR_KEY_REVEAL} 
--e btcSchnorrReclaim=${SBTC_PROD_BTC_SCHNORR_KEY_RECLAIM} 
--e btcSchnorrOracle=${SBTC_PROD_BTC_SCHNORR_KEY_ORACLE}   
--e sbtcContractId=${SBTC_PROD_CONTRACT_ID} 
--e network=${SBTC_PROD_NETWORK} 
--e stacksApi=${SBTC_PROD_STACKS_API} 
--e stacksExplorerUrl=${SBTC_PROD_STACKS_EXPLORER_URL} 
--e bitcoinExplorerUrl=${SBTC_PROD_BITCOIN_EXPLORER_URL} 
--e mempoolUrl=${SBTC_PROD_BITCOIN_MEMPOOL_URL} 
--e blockCypherUrl=${SBTC_PROD_BITCOIN_BLOCKCYPHER_URL} 
--e publicAppName=${SBTC_PROD_PUBLIC_APP_NAME} 
--e publicAppVersion=${SBTC_PROD_PUBLIC_APP_VERSION} 
--e host=${SBTC_PROD_HOST} 
--e port=${SBTC_PROD_PORT} 
--e walletPath=${SBTC_PROD_WALLET_PATH} 
-mijoco/bridge_api
+docker run -d -t -i --network host --name bridge_api_production -p 3010:3010 -e NODE_ENV='linode-production' -e mongoDbUrl=${SBTC_MONGO_URL} -e mongoDbName=${SBTC_MONGO_DBNAME} -e mongoUser=${SBTC_MONGO_USER} -e mongoPwd=${SBTC_MONGO_PWD} -e btcRpcUser=${SBTC_BTC_RPC_USER} -e btcRpcPwd=${SBTC_BTC_RPC_PWD}  -e btcNode=${SBTC_BTC_NODE} -e btcSchnorrReveal=${SBTC_BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${SBTC_BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${SBTC_BTC_SCHNORR_KEY_ORACLE} -e sbtcContractId=${SBTC_CONTRACT_ID} -e network=${SBTC_NETWORK} -e stacksApi=${SBTC_STACKS_API} -e stacksExplorerUrl=${SBTC_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${SBTC_BITCOIN_EXPLORER_URL} -e mempoolUrl=${SBTC_BITCOIN_MEMPOOL_URL} -e blockCypherUrl=${SBTC_BITCOIN_BLOCKCYPHER_URL} -e publicAppVersion=${SBTC_PUBLIC_APP_VERSION} -e host=${SBTC_HOST} -e port=${SBTC_PORT} -e walletPath=${SBTC_WALLET_PATH} -e daoProposals=${SBTC_DOA_PROPOSALS} -e daoProposal=${SBTC_DOA_PROPOSAL} -e daoVotings=${SBTC_DOA_ACTIVE_VOTING_EXTENSIONS} mijoco/bridge_api
 ```
 
 ```bash
 # stag
 docker rm -f bridge_api_staging
-docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' -e mongoDbUrl=${SBTC_STAG_MONGO_URL} -e mongoDbName=${SBTC_STAG_MONGO_DBNAME} -e mongoUser=${SBTC_STAG_MONGO_USER} -e mongoPwd=${SBTC_STAG_MONGO_PWD} -e btcRpcUser=${SBTC_STAG_BTC_RPC_USER} -e btcRpcPwd=${SBTC_STAG_BTC_RPC_PWD}  -e btcNode=${SBTC_STAG_BTC_NODE} -e btcSchnorrReveal=${SBTC_STAG_BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${SBTC_STAG_BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${SBTC_STAG_BTC_SCHNORR_KEY_ORACLE} -e sbtcContractId=${SBTC_STAG_CONTRACT_ID} -e network=${SBTC_STAG_NETWORK} -e stacksApi=${SBTC_STAG_STACKS_API} -e stacksExplorerUrl=${SBTC_STAG_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${SBTC_STAG_BITCOIN_EXPLORER_URL} -e mempoolUrl=${SBTC_STAG_BITCOIN_MEMPOOL_URL} -e blockCypherUrl=${SBTC_STAG_BITCOIN_BLOCKCYPHER_URL} -e publicAppVersion=${SBTC_STAG_PUBLIC_APP_VERSION} -e host=${SBTC_STAG_HOST} -e port=${SBTC_STAG_PORT} -e walletPath=${SBTC_STAG_WALLET_PATH} -e daoProposals=${VITE_DOA_PROPOSALS} -e daoVotings=${VITE_DOA_ACTIVE_VOTING_EXTENSIONS} mijoco/bridge_api
+docker run -d -t -i --network host --name bridge_api_staging -p 3010:3010 -e NODE_ENV='linode-staging' -e mongoDbUrl=${SBTC_MONGO_URL} -e mongoDbName=${SBTC_MONGO_DBNAME} -e mongoUser=${SBTC_MONGO_USER} -e mongoPwd=${SBTC_MONGO_PWD} -e btcRpcUser=${SBTC_BTC_RPC_USER} -e btcRpcPwd=${SBTC_BTC_RPC_PWD}  -e btcNode=${SBTC_BTC_NODE} -e btcSchnorrReveal=${SBTC_BTC_SCHNORR_KEY_REVEAL} -e btcSchnorrReclaim=${SBTC_BTC_SCHNORR_KEY_RECLAIM} -e btcSchnorrOracle=${SBTC_BTC_SCHNORR_KEY_ORACLE} -e sbtcContractId=${SBTC_CONTRACT_ID} -e network=${SBTC_NETWORK} -e stacksApi=${SBTC_STACKS_API} -e stacksExplorerUrl=${SBTC_STACKS_EXPLORER_URL} -e bitcoinExplorerUrl=${SBTC_BITCOIN_EXPLORER_URL} -e mempoolUrl=${SBTC_BITCOIN_MEMPOOL_URL} -e blockCypherUrl=${SBTC_BITCOIN_BLOCKCYPHER_URL} -e publicAppVersion=${SBTC_PUBLIC_APP_VERSION} -e host=${SBTC_HOST} -e port=${SBTC_PORT} -e walletPath=${SBTC_WALLET_PATH} -e daoProposals=${SBTC_DOA_PROPOSALS} -e daoProposal=${SBTC_DOA_PROPOSAL} -e daoVotings=${SBTC_DOA_ACTIVE_VOTING_EXTENSIONS} mijoco/bridge_api
 ```
 
 ## Swagger API Docs
 
-See https://bridge.sbtc.tech/bridge-api/docs/#/
+See https://mainnet.bridge.sbtc.tech/bridge-api/docs/#/
 
 ## Deployment
 

@@ -11,6 +11,7 @@ let proposals:Collection;
 let proposalVotes:Collection;
 export let rewardSlotHolders:Collection;
 export let poxAddressInfo:Collection;
+export let daoMongoConfig:Collection;
   
 export async function connect() {
 	let uriPrefix:string = 'mongodb+srv'
@@ -52,6 +53,8 @@ export async function connect() {
 	await proposals.createIndex({contractId: 1}, { unique: true })
 	proposalVotes = database.collection('proposalVotes');
 	await proposalVotes.createIndex({submitTxId: 1}, { unique: true })
+	daoMongoConfig = database.collection('daoMongoConfig');
+	await daoMongoConfig.createIndex({configId: 1}, { unique: true })
 	rewardSlotHolders = database.collection('rewardSlotHolders');
 	await rewardSlotHolders.createIndex({address: 1, slot_index: 1, burn_block_height: 1}, { unique: true })
 	poxAddressInfo = database.collection('poxAddressInfo');
@@ -183,6 +186,42 @@ export async function findProposalByContractIdConcluded(contractId:string):Promi
 	const result = await proposals.findOne({"contractId":contractId});
 	return result;
 }
+
+export async function getDaoMongoConfig():Promise<any> {
+	const result = await daoMongoConfig.find({}).toArray()
+	if (result && result.length > 0) return result[0];
+	return
+}
+
+export async function saveOrUpdateDaoMongoConfig(config:any) {
+	try {
+		const pdb = await getDaoMongoConfig()
+		if (pdb) {
+			console.log('updateDaoMongoConfig: updating: ' + config.contractId);
+			await updateDaoMongoConfig(pdb, config)
+		} else {
+			console.log('saveDaoMongoConfig: saving: ' + config.contractId);
+			await saveDaoMongoConfig(config)
+		}
+		return await getDaoMongoConfig()
+	} catch (err:any) {
+		console.log('saveOrUpdateProposal: error')
+	}
+}
+async function saveDaoMongoConfig(config:any) {
+	const result = await daoMongoConfig.insertOne(config);
+	return result;
+}
+async function updateDaoMongoConfig(config:any, changes: any) {
+	const result = await daoMongoConfig.updateOne({
+		_id: config._id
+	},
+    { $set: changes});
+	return result;
+}
+
+
+
 
 export async function saveOrUpdateProposal(p:ProposalEvent) {
 	try {
