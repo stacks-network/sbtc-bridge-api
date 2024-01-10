@@ -359,6 +359,23 @@ export async function getGovernanceData(principle:string):Promise<GovernanceData
   }
 }
 
+export async function isExtension(extensionCid:string):Promise<{result: boolean}> {
+  const functionArgs = [`0x${hex.encode(serializeCV(contractPrincipalCV(extensionCid.split('.')[0], extensionCid.split('.')[1] )))}`];
+  const data = {
+    contractAddress: getDaoConfig().VITE_DOA_DEPLOYER,
+    contractName: getDaoConfig().VITE_DOA,
+    functionName: 'is-extension',
+    functionArgs,
+  }
+  let res:{value:boolean, type:string};
+  try {
+    res = (await callContractReadOnly(data));
+    return { result: res.value }
+  } catch (e) { 
+    return { result: false } 
+  }
+}
+
 export async function getFunding(extensionCid:string, proposalCid:string):Promise<FundingData> {
   const functionArgs = [`0x${hex.encode(serializeCV(contractPrincipalCV(proposalCid.split('.')[0], proposalCid.split('.')[1] )))}`];
   const data = {

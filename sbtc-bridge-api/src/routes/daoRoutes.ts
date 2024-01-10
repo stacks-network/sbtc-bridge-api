@@ -1,6 +1,6 @@
 import express from "express";
 import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVoter, getDaoMongoConfig, getProposals, saveOrUpdateDaoMongoConfig } from "../lib/data/db_models.js";
-import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getPoxInfo, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember } from "./dao/dao_helper.js";
+import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getPoxInfo, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
 import { findRewardSlotByAddress, findRewardSlotByAddressMaxHeight, findRewardSlotByAddressMinHeight, readRewardSlots } from "./dao/reward_slot_helper.js";
@@ -46,6 +46,17 @@ router.get("/get-governance-data/:stacksAddress", async (req, res, next) => {
 router.get("/get-proposal-from-contract-id/:submissionContractId/:proposalContractId", async (req, res, next) => {
   try {
     const result = getProposalFromContractId(req.params.submissionContractId, req.params.proposalContractId);
+    return res.send(result);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/is-extension/:extensionCid", async (req, res, next) => {
+  try {
+    const result = await isExtension(req.params.extensionCid);
+    console.log('isExtension:', result)
     return res.send(result);
   } catch (error) {
     console.log('Error in routes: ', error)

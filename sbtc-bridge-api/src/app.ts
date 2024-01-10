@@ -55,11 +55,11 @@ app.use((req, res, next) => {
   }
 })
 
-app.use('/bridge-api/:network/v1/config', configRoutes);
-app.use('/bridge-api/:network/v1/btc', bitcoinRoutes);
-app.use('/bridge-api/:network/v1/sbtc', sbtcRoutes);
-app.use('/bridge-api/:network/v1/dao', daoRoutes);
-app.use('/bridge-api/:network/v1/events', eventsRoutes);
+app.use('/bridge-api/v1/config', configRoutes);
+app.use('/bridge-api/v1/btc', bitcoinRoutes);
+app.use('/bridge-api/v1/sbtc', sbtcRoutes);
+app.use('/bridge-api/v1/dao', daoRoutes);
+app.use('/bridge-api/v1/events', eventsRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
 console.log('Startup Environment: ', process.env.NODE_ENV);
