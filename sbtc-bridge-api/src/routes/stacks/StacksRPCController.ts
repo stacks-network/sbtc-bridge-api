@@ -3,7 +3,7 @@ import { fetchDataVar, fetchNoArgsReadOnly, fetchUserSbtcBalance, fetchUserBalan
 import { scanCommitments, savePeginCommit, scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitcoin/rpc_commit.js';
 import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
 import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
-import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayloadOpDrop, PayloadType, parseDepositPayload, parseWithdrawPayload, parsePayloadFromTransaction, buildWithdrawPayloadOpDrop } from 'sbtc-bridge-lib';
+import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayloadOpDrop, PayloadType, parseDepositPayload, parseWithdrawPayload, parsePayloadFromTransaction, buildWithdrawPayloadOpDrop, buildDepositPayload, buildWithdrawPayload } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
 import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { BlocksController, TransactionController, WalletController } from "../bitcoin/BitcoinRPCController.js";
@@ -19,25 +19,76 @@ let cachedUIObject:any;
 @Route("/bridge-api/:network/v1/sbtc")
 export class DepositsController {
   
-  @Get("/build/deposit/:stxAddress/:revealFee")
-  public commitDepositData(stxAddress:string, revealFee:number): string {
-    const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK;
+  /**
+   * Builds the sBTC deposit data for the op_return variant of the protocol.
+   * Returns the hex encoded data as a string.
+   * @stxAddress: address or contract principal that is the destination of the deposit 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/deposit.rs
+   */
+  @Get("/build/deposit/:stxAddress")
+  public commitDepositData(stxAddress:string): string {
+    const data = buildDepositPayload(getConfig().network, stxAddress);
+		return data;
+  }
+  
+  /**
+   * Builds the sBTC deposit data for the op_drop variant of the protocol.
+   * Returns the hex encoded data as a string.
+   * @stxAddress: address or contract principal that is the destination of the deposit 
+   * @revealFee: the fee needed to cover the reveal transaction that the stackers need to spend this deposit 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/deposit.rs
+   */
+  @Get("/build/deposit/op_drop/:stxAddress/:revealFee")
+  public commitDepositDataOpDrop(stxAddress:string, revealFee:number): string {
     const data = buildDepositPayloadOpDrop(getConfig().network, stxAddress, revealFee);
 		return data;
   }
   
+  /**
+   * Parses the sBTC withdraw request data.
+   * Returns the hex encoded data as a string.
+   * @data: the encoded deposit data 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/deposit.rs
+   */
   @Get("/parse/deposit/:data")
   public commitDeposit(data:string): PayloadType {
     const payload = parseDepositPayload(hex.decode(data));
 		return payload;
   }
   
+  /**
+   * Builds the sBTC withdraw request data for the op_return variant of the protocol.
+   * Returns the hex encoded data as a string.
+   * @signature: the users signature that proves they control the owning address  
+   * @amount: the amount of sBTC to withdraw 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/withdrawal_request.rs
+   */
   @Get("/build/withdrawal/:signature/:amount")
   public commitWithdrawalData(signature:string, amount:number): string {
+    const data = buildWithdrawPayload(getConfig().network, amount, signature);
+		return data
+  }
+  
+  /**
+   * Builds the sBTC withdraw request data for the op_drop variant of the protocol.
+   * Returns the hex encoded data as a string.
+   * @signature: the users signature that proves they control the owning address  
+   * @amount: the amount of sBTC to withdraw 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/withdrawal_request.rs
+   */
+  @Get("/build/withdrawal/op_drop/:signature/:amount")
+  public commitWithdrawalDataOpDrop(signature:string, amount:number): string {
     const data = buildWithdrawPayloadOpDrop(getConfig().network, amount, signature);
 		return data
   }
   
+  /**
+   * Parses the sBTC withdraw request data.
+   * Returns the hex encoded data as a string.
+   * @data: the encoded deposit data 
+   * @sbtcWallet: the current sbtc wallets taproot address 
+   * For complete definition @see https://github.com/stacks-network/sbtc/blob/main/sbtc-core/src/operations/op_return/withdrawal_request.rs
+   */
   @Get("/parse/withdrawal/:data/:sbtcWallet")
   public commitWithdrawal(data:string, sbtcWallet:string): PayloadType {
     const payload = parseWithdrawPayload(getConfig().network, data, sbtcWallet, 'vrs');

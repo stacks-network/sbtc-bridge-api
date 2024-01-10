@@ -3,7 +3,7 @@ import { rewardSlotHolders } from '../../lib/data/db_models.js';
 import { RewardSlot } from '../../types/stxeco_stacker_type.js';
 
 const limit = 250;
-const depth = 5000;
+let depth = 5000;
 export async function readAllRewardSlots() {
   let val;
   let runningTotal = 0;
@@ -11,9 +11,13 @@ export async function readAllRewardSlots() {
   try {
     do {
       val = await readRewardSlots((count * limit), limit)
-      runningTotal += val.results.length
-      count++;
-      console.log('readRewardSlots: runningTotal: ' + runningTotal);
+      if (!val || !val.results || val.results.length === 0) {
+        depth = 0
+      } else {
+        runningTotal += val.results.length
+        count++;
+        console.log('readRewardSlots: runningTotal: ' + runningTotal);
+      }
     }
     while (runningTotal < depth)
   }

@@ -530,7 +530,7 @@
 				]
 			}
 		},
-		"/bridge-api/{network}/v1/sbtc/build/deposit/{stxAddress}/{revealFee}": {
+		"/bridge-api/{network}/v1/sbtc/build/deposit/{stxAddress}": {
 			"get": {
 				"operationId": "CommitDepositData",
 				"responses": {
@@ -545,6 +545,36 @@
 						}
 					}
 				},
+				"description": "Builds the sBTC deposit data for the op_return variant of the protocol.\nReturns the hex encoded data as a string.",
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "stxAddress",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/sbtc/build/deposit/op_drop/{stxAddress}/{revealFee}": {
+			"get": {
+				"operationId": "CommitDepositDataOpDrop",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"description": "Builds the sBTC deposit data for the op_drop variant of the protocol.\nReturns the hex encoded data as a string.",
 				"security": [],
 				"parameters": [
 					{
@@ -582,6 +612,7 @@
 						}
 					}
 				},
+				"description": "Parses the sBTC withdraw request data.\nReturns the hex encoded data as a string.",
 				"security": [],
 				"parameters": [
 					{
@@ -610,6 +641,45 @@
 						}
 					}
 				},
+				"description": "Builds the sBTC withdraw request data for the op_return variant of the protocol.\nReturns the hex encoded data as a string.",
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "signature",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "amount",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/bridge-api/{network}/v1/sbtc/build/withdrawal/op_drop/{signature}/{amount}": {
+			"get": {
+				"operationId": "CommitWithdrawalDataOpDrop",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"description": "Builds the sBTC withdraw request data for the op_drop variant of the protocol.\nReturns the hex encoded data as a string.",
 				"security": [],
 				"parameters": [
 					{
@@ -647,6 +717,7 @@
 						}
 					}
 				},
+				"description": "Parses the sBTC withdraw request data.\nReturns the hex encoded data as a string.",
 				"security": [],
 				"parameters": [
 					{

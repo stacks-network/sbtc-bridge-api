@@ -7,10 +7,21 @@ import { EventsController } from "./events/EventsController.js";
 
 const router = express.Router();
 
-router.get("/build/deposit/:stxAddress/:revealFee", async (req, res, next) => {
+router.get("/build/deposit/:stxAddress", async (req, res, next) => {
   try {
     const controller = new DepositsController();
-    const response = await controller.commitDepositData(req.params.stxAddress, Number(req.params.revealFee));
+    const response = await controller.commitDepositData(req.params.stxAddress);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
+router.get("/build/deposit/op_drop/:stxAddress/:revealFee", async (req, res, next) => {
+  try {
+    const controller = new DepositsController();
+    const response = await controller.commitDepositDataOpDrop(req.params.stxAddress, Number(req.params.revealFee));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -33,6 +44,17 @@ router.get("/build/withdrawal/:signature/:amount", async (req, res, next) => {
   try {
     const controller = new DepositsController();
     const response = await controller.commitWithdrawalData(req.params.signature, Number(req.params.amount));
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/build/withdrawal/op_drop/:signature/:amount", async (req, res, next) => {
+  try {
+    const controller = new DepositsController();
+    const response = await controller.commitWithdrawalDataOpDrop(req.params.signature, Number(req.params.amount));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
