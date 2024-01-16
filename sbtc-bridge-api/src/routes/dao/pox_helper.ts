@@ -83,8 +83,8 @@ async function saveRewardCyclePoxList(cycle:number):Promise<any> {
             poxEntry.delegations = result?.total || 0
             //console.log('saveRewardCyclePoxList: delegations: ', result)
           }
-          await saveOrUpdateRewardSlot(poxEntry)
-          console.log('saveRewardCyclePoxList: entry saved ')
+          await saveOrUpdatePoxEntry(poxEntry)
+          //console.log('saveRewardCyclePoxList: entry saved ')
           entries.push(poxEntry)
         }
       } catch (err:any) {
@@ -136,15 +136,15 @@ export async function findPoxAddress(address:string):Promise<any> {
 	return result;
 }
 
-export async function saveOrUpdateRewardSlot(v:PoxEntry) {
+export async function saveOrUpdatePoxEntry(v:PoxEntry) {
 	try {
 		const pdb = await findPoxAddress(v.poxAddr)
 		if (!pdb || !pdb._id) {
-			console.log('saveOrUpdateVote: saving: ' + v.poxAddr);
+			//console.log('saveOrUpdateVote: saving: ' + v.poxAddr);
 			await savePoxAddressInfo(v)
 		}
 	} catch (err:any) {
-		console.log('saveOrUpdateVote: unable to save or update', err)
+		//console.log('saveOrUpdateVote: unable to save or update', err)
 	}
 }
 

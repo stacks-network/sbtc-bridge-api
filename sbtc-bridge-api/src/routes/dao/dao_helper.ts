@@ -134,10 +134,18 @@ export async function getNftHoldings(stxAddress:string, assetId:string|undefined
   } while (events.total > offset && limit === -1);
   for (const h of holdings.results) {
     let res = await getTokenUri(h.asset_identifier, h.token.id)
-    h.token_uri = res.uri
+    h.token_uri = stripDupIpfs(res.uri)
     h.metaData = res.meta
   }
   return holdings;
+}
+
+function stripDupIpfs(uri:string) {
+  let token_uri = uri
+  if (token_uri.indexOf('ipfs/ipfs') > -1) {
+    token_uri = token_uri.replace('ipfs/ipfs', 'ipfs')
+  }
+  return token_uri
 }
 
 async function getTokenUri(asset_identifier:string, tokenId:number) {
@@ -177,6 +185,7 @@ async function returnUri(rawTokenUri:string, tokenId:number) {
   } else if (rawTokenUri.endsWith('/')) {
     uri = uri + tokenId + '.json'
   }
+  uri = stripDupIpfs(uri)
   let meta:any;
   try {
     const response = await fetch(uri);

@@ -69,11 +69,11 @@ export async function saveOrUpdateRewardSlot(v:RewardSlot) {
 	try {
 		const pdb = await findRewardSlot(v.address, v.slot_index, v.burn_block_height)
 		if (!pdb || !pdb._id) {
-			console.log('saveOrUpdateVote: saving: ' + v.address);
+			//console.log('saveOrUpdateVote: saving: ' + v.address);
 			await saveRewardSlot(v)
 		}
 	} catch (err:any) {
-		console.log('saveOrUpdateVote: unable to save or update')
+		//console.log('saveOrUpdateVote: unable to save or update')
 	}
 }
 

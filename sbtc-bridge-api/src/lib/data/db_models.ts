@@ -276,14 +276,14 @@ export async function saveOrUpdateVote(v:VoteEvent) {
 	try {
 		const pdb = await findVoteBySubmitTxId(v.votingContractId)
 		if (pdb) {
-			console.log('saveOrUpdateVote: updating: ' + v.proposalContractId + ' voter: ' + v.voter + ' amount: ' + v.amount + ' for: ' + v.for);
+			//console.log('saveOrUpdateVote: updating: ' + v.proposalContractId + ' voter: ' + v.voter + ' amount: ' + v.amount + ' for: ' + v.for);
 			await updateVote(pdb, v)
 		} else {
-			console.log('saveOrUpdateVote: saving: ', v);
+			//console.log('saveOrUpdateVote: saving: ', v);
 			await saveVote(v)
 		}
 	} catch (err:any) {
-		console.log('saveOrUpdateVote: unable to save or update')
+		//console.log('saveOrUpdateVote: unable to save or update')
 	}
 }
 

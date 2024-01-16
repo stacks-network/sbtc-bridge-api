@@ -56,7 +56,7 @@ export const initUiCacheJob = cron.schedule('*/3 * * * *', (fireDate) => {
   }
 });
 
-export const initDaoProposalsJob = cron.schedule('*/20 * * * *', (fireDate) => {
+export const initDaoProposalsJob = cron.schedule('* */2 * * *', (fireDate) => {
   console.log('Running: initDaoProposalsJob at: ' + fireDate);
   try {
     getProposalsForActiveVotingExt(getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_SNAPSHOT_VOTING_EXTENSION);

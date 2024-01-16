@@ -153,7 +153,7 @@ router.get("/balance/:stxAddress/:height", async (req, res, next) => {
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
   }
 });
 
@@ -203,7 +203,7 @@ router.get("/voter/events-proposal/:proposalContractId", async (req, res, next) 
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
+    next('An error occurred fetching sbtc data.')
   }
 });
 
