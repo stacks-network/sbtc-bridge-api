@@ -27,19 +27,6 @@ export async function getPoxInfo() {
   return await response.json();
 }
 
-export enum EXTENSIONS {
-  'ede000-governance-token', 
-  'ede001-proposal-voting', 
-  'ede002-threshold-proposal-submission', 
-  'ede003-emergency-proposals', 
-  'ede004-emergency-execute', 
-  'ede005-dev-fund', 
-  'ede006-treasury',
-  'ede007-snapshot-proposal-voting-v5', 
-  'ede008-funded-proposal-submission-v5',
-  'ede009-governance-token-sale'
-};
-
 export const coordinators = [
   { stxAddress: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5', btcAddress: 'bc1qkj5yxgm3uf78qp2fdmgx2k76ccdvj7rx0qwhv0' }, // devnet + electrum bob
   { stxAddress: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM', btcAddress: 'tb1q6ue638m4t5knwxl4kwhwyuffttlp0ffee3zn3e' }, // devnet + electrum bob
