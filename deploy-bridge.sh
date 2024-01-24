@@ -52,7 +52,6 @@ printf "\nDeploying docker container: $DOCKER_NAME.\n\n"
       -e host=${SBTC_HOST} -e port=${SBTC_PORT} \
       -e walletPath=${SBTC_WALLET_PATH} -e daoProposals=${SBTC_DOA_PROPOSALS} \
       -e daoProposal=${SBTC_DOA_PROPOSAL} \
-      -e daoVotings=${SBTC_DOA_ACTIVE_VOTING_EXTENSIONS} \
       mijoco/bridge_api
   ";
 
