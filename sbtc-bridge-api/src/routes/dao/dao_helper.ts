@@ -10,6 +10,7 @@ import { saveOrUpdateProposal, saveOrUpdateVote } from '../../lib/data/db_models
 import { getDaoConfig } from '../../lib/config_dao.js';
 import { callContractReadOnly, fetchDataVar } from '../stacks/stacks_helper.js';
 import { NFTHolding, NFTHoldings } from '../../types/stxeco_nft_type.js';
+import { BlockchainInfo } from 'sbtc-bridge-lib';
 
 let uris:any = {};
 const gateway = "https://hashone.mypinata.cloud/";
@@ -17,12 +18,6 @@ const gatewayAr = "https://arweave.net/";
 
 export async function getStacksInfo() {
   const url = getConfig().stacksApi + '/v2/info';
-  const response = await fetch(url)
-  return await response.json();
-}
-
-export async function getPoxInfo() {
-  const url = getConfig().stacksApi + '/v2/pox';
   const response = await fetch(url)
   return await response.json();
 }
@@ -234,7 +229,7 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
           const contract = await getProposalContract(result.value.proposal.value)
           const submissionData = await getSubmissionData(event.tx_id)
           const funding = await getFunding(submissionData.contractId, result.value.proposal.value)
-          const signals = await getSignals(result.value.proposal.value)
+          //const signals = await getSignals(result.value.proposal.value)
           const executedAt = await getExecutedAt(result.value.proposal.value)
           const proposal = {
             event: 'propose',
@@ -247,7 +242,7 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
             votingContract: event.contract_log.contract_id,
             submissionData,
             funding,
-            signals,
+            //signals,
             executedAt,
             stage: ProposalStage.PROPOSED
           } as ProposalEvent
@@ -277,9 +272,12 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
 
 export async function getProposalsFromContractIds(submissionContractId:string, proposalContractIds:string):Promise<any> {
   const proposalCids = proposalContractIds.split(',')
+  const props = []
   for (const proposalCid of proposalCids) {
-    getProposalFromContractId(submissionContractId, proposalCid.trim())
+    const p = await getProposalFromContractId(submissionContractId, proposalCid.trim())
+    props.push(p)
   }
+  return props
 }
 
 export async function getProposalFromContractId(submissionContractId:string, proposalContractId:string):Promise<ProposalEvent|undefined> {
@@ -292,11 +290,15 @@ export async function getProposalFromContractId(submissionContractId:string, pro
     try {
       funding = await getFunding(submissionContractId, proposalContractId);
       if (funding.funding === 0) stage = ProposalStage.UNFUNDED
-      signals = await getSignals(proposalContractId)
+      //signals = await getSignals(proposalContractId)
     } catch (err:any) {
       console.log(err.message)
     }
     const proposalMeta = DaoUtils.getMetaData(contract.source)
+    let proposalData:ProposalData;
+    try {
+      proposalData = await getProposalData(proposalContractId)
+    } catch (e) { }
     const p = {
       contract,
       proposalMeta,
@@ -306,6 +308,7 @@ export async function getProposalFromContractId(submissionContractId:string, pro
       stage,
       funding
     } as ProposalEvent
+    if (proposalData) p.proposalData = proposalData
     saveOrUpdateProposal(p)
     proposal = p
   } catch(err:any) {
@@ -314,7 +317,7 @@ export async function getProposalFromContractId(submissionContractId:string, pro
   return proposal
 }
 
-async function getProposalData(principle:string):Promise<ProposalData> {
+export async function getProposalData(principle:string):Promise<ProposalData> {
   const functionArgs = [`0x${hex.encode(serializeCV(contractPrincipalCV(principle.split('.')[0], principle.split('.')[1] )))}`];
   const data = {
     contractAddress: getDaoConfig().VITE_DOA_DEPLOYER,
@@ -323,15 +326,20 @@ async function getProposalData(principle:string):Promise<ProposalData> {
     functionArgs,
   }
   const result = await callContractReadOnly(data);
+  const start = Number(result.value.value['start-block-height'].value)
+  const end = Number(result.value.value['end-block-height'].value)
+  //console.log('result.value.value[custom-majority].value: ' + result.value.value['custom-majority'].value.value)
   const pd = {
     concluded:Boolean(result.value.value.concluded.value),
     passed:Boolean(result.value.value.passed.value), 
     proposer:result.value.value.proposer.value,
-    customMajority:Number(result.value.value['custom-majority'].value),
-    endBlockHeight:Number(result.value.value['end-block-height'].value),
-    startBlockHeight:Number(result.value.value['start-block-height'].value),
+    customMajority:Number(result.value.value['custom-majority'].value.value),
+    endBlockHeight:end,
+    startBlockHeight:start,
     votesAgainst:Number(result.value.value['votes-against'].value),
     votesFor:Number(result.value.value['votes-for'].value),
+    burnStartHeight: await getBurnBlockHeight(start),
+    burnEndHeight: await getBurnBlockHeight(end)
   }
   return pd;
 }
@@ -466,11 +474,21 @@ async function getSubmissionData(txId:string):Promise<SubmissionData> {
 
 async function getProposalContract(principle:string):Promise<ProposalContract> {
   const url = getConfig().stacksApi + '/v2/contracts/source/' + principle.split('.')[0] + '/' + principle.split('.')[1] + '?proof=0';
-  console.log('getProposalContract: url: ' + url);
   const response = await fetch(url)
   const val = await response.json();
-  console.log('getProposalContract: url: ' + url);
   return val;
+}
+
+export async function getBurnBlockHeight(height:number):Promise<number> {
+  let url = getConfig().stacksApi + '/extended/v1/block/by_height/' + height;
+  let response = await fetch(url)
+  let val = await response.json();
+  if (response.status !== 200) {
+    url = getConfig().stacksApi + '/extended/v2/burn-blocks/' + height;
+    response = await fetch(url)
+    val = await response.json();
+  }
+  return val.burn_block_height;
 }
 
 export async function isExecutiveTeamMember(stxAddress:string):Promise<{executiveTeamMember:boolean}> {

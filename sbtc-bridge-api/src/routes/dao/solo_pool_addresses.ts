@@ -16,30 +16,28 @@ export function getNet(network:string) {
  */
 export function soloStackerAddresses (network:string):{ yAddress:string, nAddress:string} {
 	const net = getNet(network);
-    //const voteYes = new TextEncoder().encode('yes-nakamoto');
-    //const voteNo = new TextEncoder().encode('no-nakamoto');
-    //00000000000000007965732D6E616B616D6F746F - yes-nakamoto
-    //0000000000000000006E6F2D6E616B616D6F746F - no-nakamoto
-    const p2shObjY = btc.p2sh({type:'unknown', script: btc.Script.encode(['DUP', 'HASH160', hex.decode('00000000000000007965732D6E616B616D6F746F'), 'EQUALVERIFY', 'CHECKSIG'])}, net)
-    const p2shObjN = btc.p2sh({type:'unknown', script: btc.Script.encode(['DUP', 'HASH160', hex.decode('0000000000000000006E6F2D6E616B616D6F746F'), 'EQUALVERIFY', 'CHECKSIG'])}, net)
-
-    const yAddress = p2shObjY.address as string
-    const nAddress = p2shObjN.address as string
+    let yAddress = '11111111111111X6zHB1bPW6NJxw6'
+    let nAddress = '1111111111111117Crbcbt8W5dSU7'
+    if (network !== 'mainnet') {
+        const p2shObjY = btc.p2sh({type:'unknown', script: btc.Script.encode(['DUP', 'HASH160', hex.decode('00000000000000007965732D6E616B616D6F746F'), 'EQUALVERIFY', 'CHECKSIG'])}, net)
+        const p2shObjN = btc.p2sh({type:'unknown', script: btc.Script.encode(['DUP', 'HASH160', hex.decode('0000000000000000006E6F2D6E616B616D6F746F'), 'EQUALVERIFY', 'CHECKSIG'])}, net)
+    
+        yAddress = p2shObjY.address as string
+        nAddress = p2shObjN.address as string
+    }
 
     return { nAddress, yAddress }
 }
 
 export function poolStackerAddresses (network:string):{ yAddress:string, nAddress:string} {
-	//ST000000003SCNSJTVK1DDGPTVVMDZW4Y8Y2
-	//ST000000000DSQJTVK1DDGPTVVMDWPDT7M9
-
-	//SP000000003SCNSJTVK1DDGPTVVMDW837741
-	//SP000000000DSQJTVK1DDGPTVVMDYAQ9C2M
-
-    const addr0 = (network === 'testnet') ? 26 : 22;
-    let addr1 = '00000000000000007965732D6E616B616D6F746F'
-    const yAddress = c32address(addr0, addr1);
-    addr1 = '0000000000000000006E6F2D6E616B616D6F746F'
-    const nAddress = c32address(addr0, addr1);
+    let yAddress = 'SP00000000000003SCNSJTCSE62ZF4MSE'
+    let nAddress = 'SP00000000000000DSQJTCSE63RMXHDP'
+    if (network !== 'mainnet') {
+        const addr0 = (network === 'testnet') ? 26 : 22;
+        let addr1 = '00000000000000007965732D6E616B616D6F746F'
+        yAddress = c32address(addr0, addr1);
+        addr1 = '0000000000000000006E6F2D6E616B616D6F746F'
+        nAddress = c32address(addr0, addr1);
+    }
     return { nAddress, yAddress }
 }

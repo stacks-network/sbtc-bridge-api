@@ -42,6 +42,8 @@ export type VoteEvent = {
   votingContractId:string;
   proposalContractId: string;
   submitTxId: string;
+  blockHeight: number;
+  burnBlockHeight: number;
 }
 export enum ProposalStage {
   UNFUNDED,
@@ -82,6 +84,8 @@ export type ProposalData = {
   startBlockHeight:number;
   votesAgainst:number;
   votesFor:number;
+  burnStartHeight:number;
+  burnEndHeight:number;
 }
 export type SubmissionData = {
   contractId:string;

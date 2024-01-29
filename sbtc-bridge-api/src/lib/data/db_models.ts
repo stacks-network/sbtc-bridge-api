@@ -173,7 +173,7 @@ export async function updateProposal(proposal:any, changes: any) {
 }
 
 export async function getProposals():Promise<any> {
-	const result = await proposals.find({}).toArray();
+	const result = await proposals.find({}).sort({"proposalData.startBlockHeight": -1}).toArray();
 	return result;
 }
 
@@ -227,10 +227,10 @@ export async function saveOrUpdateProposal(p:ProposalEvent) {
 	try {
 		const pdb = await findProposalByContractId(p.contractId)
 		if (pdb) {
-			console.log('saveOrUpdateProposal: updating: ' + p.contractId);
+			//console.log('saveOrUpdateProposal: updating: ', p.proposalData);
 			await updateProposal(pdb, p)
 		} else {
-			console.log('saveOrUpdateProposal: saving: ' + p.contractId);
+			console.log('saveOrUpdateProposal: saving: ', p.proposalData);
 			await saveProposal(p)
 		}
 	} catch (err:any) {

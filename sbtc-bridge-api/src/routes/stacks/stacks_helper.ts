@@ -1,15 +1,13 @@
 /**
  * sbtc - interact with Stacks Blockchain to read sbtc contract info
  */
-import { deserializeCV, cvToJSON, serializeCV } from "micro-stacks/clarity";
-import { principalCV } from 'micro-stacks/clarity';
-import { bytesToHex } from "micro-stacks/common";
 import { getConfig } from '../../lib/config.js';
 import { fetchAddress } from '../../lib/bitcoin/api_mempool.js';
 import fetch from 'node-fetch';
 import type { BalanceI } from './StacksRPCController.js';
-import { type PayloadType, type SbtcContractDataType, type AddressObject, type AddressMempoolObject, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib';
-import * as btc from '@scure/btc-signer';
+import { type SbtcContractDataType, type AddressObject, type AddressMempoolObject, getPegWalletAddressFromPublicKey } from 'sbtc-bridge-lib';
+import { cvToJSON, deserializeCV, principalCV, serializeCV } from '@stacks/transactions';
+import { hex } from '@scure/base';
 
 const limit = 10;
 
@@ -141,7 +139,7 @@ export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> 
   try {
     const contractId = getConfig().sbtcContractId;
     //const functionArgs = [`0x${bytesToHex(serializeCV(uintCV(1)))}`, `0x${bytesToHex(serializeCV(standardPrincipalCV(address)))}`];
-    const functionArgs = [`0x${bytesToHex(serializeCV(principalCV(stxAddress)))}`];
+    const functionArgs = [`0x${hex.encode(serializeCV(principalCV(stxAddress)))}`];
     const data = {
       contractAddress: contractId!.split('.')[0],
       contractName: contractId!.split('.')[1],
