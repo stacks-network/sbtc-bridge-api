@@ -1,7 +1,6 @@
 /**
  * sbtc - interact with Stacks Blockchain to read sbtc contract info
  */
-import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { getConfig } from '../../lib/config.js';
 import { readPayloadData } from '../../lib/bitcoin/rpc_transaction.js';
 import fetch from 'node-fetch';
@@ -12,6 +11,7 @@ import { SbtcClarityEvent } from "sbtc-bridge-lib/dist/types/sbtc_types.js";
 import { fetchAddressTransactions, fetchTransaction } from "../../lib/bitcoin/api_mempool.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
+import { cvToJSON, deserializeCV } from '@stacks/transactions';
 
 const limit = 10;
 
@@ -102,7 +102,7 @@ async function indexEvents(sbtcEvents:Array<any>) {
       console.log('saveSbtcEvents: saved payloadData: ', newEvent.payloadData);
       
     } catch (err:any) {
-      console.log('indexEvents: Error: duplicate '); //util.inspect(err, false, null, true /* enable colors */));
+      //console.log('indexEvents: Error: duplicate '); //util.inspect(err, false, null, true /* enable colors */));
     }
   }
   return sbtcEvents;

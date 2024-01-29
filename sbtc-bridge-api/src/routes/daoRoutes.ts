@@ -1,29 +1,17 @@
 import express from "express";
 import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVoter, getDaoMongoConfig, getProposals, saveOrUpdateDaoMongoConfig } from "../lib/data/db_models.js";
-import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getPoxInfo, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
+import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
-import { findRewardSlotByAddress, findRewardSlotByAddressMaxHeight, findRewardSlotByAddressMinHeight, readRewardSlots } from "./dao/reward_slot_helper.js";
+import { findRewardSlotByAddress, findRewardSlotByAddressMaxHeight, findRewardSlotByAddressMinHeight, readRewardSlots } from "./pox/reward_slot_helper.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
 import { getPoolVotesByProposal, getSoloVotesByProposal } from "./dao/vote_count_helper.js";
 import { readPoxAddressInfo } from "./dao/pox_helper.js";
 
 const router = express.Router();
 
-/**
- * addresses for solo and pool stackers to send txs to express their votes.
- */
-router.get("/addresses", async (req, res, next) => {
-  try {
-    const solo = soloStackerAddresses(getConfig().network);
-    const pool = poolStackerAddresses(getConfig().network);
-    return res.send({solo, pool});
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.')
-  }
-});
 router.get("/is-executive-team-member/:stacksAddress", async (req, res, next) => {
+  return false
   try {
     const result = isExecutiveTeamMember(req.params.stacksAddress);
     return res.send(result);
@@ -110,6 +98,46 @@ router.get("/votes", async (req, res, next) => {
     next('An error occurred fetching pox-info.')
   }
 });
+/**
+ * addresses for solo and pool stackers to send txs to express their votes.
+ */
+router.get("/addresses", async (req, res, next) => {
+  try {
+    const soloAddresses = soloStackerAddresses(getConfig().network);
+    const poolAddresses = poolStackerAddresses(getConfig().network);
+    return res.send({soloAddresses, poolAddresses, soloVotes:[], poolVotes: []});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+/**
+ * votes for solo and pool stackers and addresses - for the configured proposal.
+ */
+router.get("/votes/pool", async (req, res, next) => {
+  try {
+    const currentProposal = await getDaoMongoConfig()
+    const poolVotes = await getPoolVotesByProposal(currentProposal.contractId, 'pool-voting');
+    const poolAddresses = poolStackerAddresses(getConfig().network);
+    return res.send({poolVotes, poolAddresses});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/votes/solo", async (req, res, next) => {
+  try {
+    const currentProposal = await getDaoMongoConfig()
+    const soloVotes = await getSoloVotesByProposal(currentProposal.contractId, 'solo-voting');
+    const soloAddresses = soloStackerAddresses(getConfig().network);
+    return res.send({soloVotes, soloAddresses});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
 
 /**
  * votes for solo and pool stackers and addresses - for the given proposal.
@@ -124,16 +152,6 @@ router.get("/votes/:proposalCid", async (req, res, next) => {
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching pox-info.')
-  }
-});
-
-router.get("/pox-info", async (req, res, next) => {
-  try {
-    const response = await getPoxInfo();
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
   }
 });
 
@@ -266,64 +284,6 @@ router.get("/set-current-proposal/:contractId", async (req, res, next) => {
   }
 });
 
-
-/**
- * Mongo collection: rewardSlotHolders(burn_block_height, address, slot_index)
- * Sync methods: readAllRewardSlots, readRewardSlots
- * note there are 37k of these and the data contains
- * 
- * extended/v1/burnchain/reward_slot_holders
- */
-router.get("/reward-slot/:address/most-recent", async (req, res, next) => {
-  try {
-    const response = await findRewardSlotByAddressMaxHeight(req.params.address);
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
-  }
-});
-
-router.get("/reward-slot/:address/least-recent", async (req, res, next) => {
-  try {
-    const response = await findRewardSlotByAddressMinHeight(req.params.address);
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
-  }
-});
-
-router.get("/reward-slot/:address", async (req, res, next) => {
-  try {
-    const response = await findRewardSlotByAddress(req.params.address);
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
-  }
-});
-
-router.get("/reward-slot/sync/read-reward-slots/:offset/:limit", async (req, res, next) => {
-  try {
-    const response = await readRewardSlots(Number(req.params.offset), Number(req.params.limit));
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.') 
-  }
-});
-
-router.get("/sync/read-reward-set-pox-address/:cycle", async (req, res, next) => {
-  try {
-    const response = await readPoxAddressInfo(Number(req.params.cycle));
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching sbtc data.')
-  }
-});
-
 router.get("/sync/read-dao-votes", async (req, res, next) => {
   try {
     console.log('Running: sync: ' + getConfig().network);
@@ -336,7 +296,7 @@ router.get("/sync/read-dao-votes", async (req, res, next) => {
     const submissionContractId = getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION
     console.log('Running: sync: submissionContractId: ' + submissionContractId);
     console.log('Running: sync: proposals: ' + getDaoConfig().VITE_DOA_PROPOSALS);
-    await getProposalsFromContractIds(submissionContractId, getDaoConfig().VITE_DOA_PROPOSALS);
+    const props = await getProposalsFromContractIds(submissionContractId, getDaoConfig().VITE_DOA_PROPOSALS);
     const response = await getProposals();
     return res.send(response);
   } catch (error) {
@@ -348,9 +308,8 @@ router.get("/sync/proposal/:contractIds", async (req, res, next) => {
   try {
     const submissionContractId = getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION
     console.log('Running: sync: proposals: ' + req.params.contractIds);
-    await getProposalsFromContractIds(submissionContractId, req.params.contractIds);
-    const response = await getProposals();
-    return res.send(response);
+    const props = await getProposalsFromContractIds(submissionContractId, req.params.contractIds);
+    return res.send(props);
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')

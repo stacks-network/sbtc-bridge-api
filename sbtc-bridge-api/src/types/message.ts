@@ -19,5 +19,6 @@ export type ConfigI = {
 	publicAppName: string;
 	publicAppVersion: string; 
 	sbtcContractId: string;
+	poxContractId: string;
 };
 

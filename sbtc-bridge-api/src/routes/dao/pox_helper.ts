@@ -8,6 +8,7 @@ import { poxAddressInfo } from "../../lib/data/db_models.js";
 import * as btc from '@scure/btc-signer';
 import { getConfig } from "../../lib/config.js";
 import { base58 } from "@scure/base";
+import { getNumbEntriesRewardCyclePoxList, getRewardSetPoxAddress } from "../pox/pox_contract_helper.js";
 import * as P from 'micro-packed';
 
 const concat = P.concatBytes;
@@ -35,7 +36,7 @@ export async function getRewardCycleFromBurnHeight(burnHeight:number):Promise<an
   return result
 }
 
-function getAddressFromHasbytes(hashBytes:string, version:string) {
+export function getAddressFromHasbytes(hashBytes:string, version:string) {
   const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK
   let btcAddr:string;
   try {
@@ -56,13 +57,43 @@ function getAddressFromHasbytes(hashBytes:string, version:string) {
   //let addr = base58.encode(hex.decode(version + hashBytes));
 }
 
+export function getHasbytesFromAddress(address:string):{version:Uint8Array, hashBytes:Uint8Array }|undefined {
+  const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK
+  let outScript:any;
+  try {
+    const addr:any = btc.Address(net);
+    console.debug('getHasbytesFromAddress: ', net)
+    console.debug('getHasbytesFromAddress: ', btc.Address(btc.NETWORK).decode(address))
+    //outScript = btc.OutScript.encode(address);
+    const s = btc.OutScript.encode(btc.Address(net).decode(address))
+    outScript = btc.OutScript.decode(s);
+    if (outScript.type === "ms") {
+      return
+    } else if (outScript.type === "pkh") {
+      return { version: (new Uint8Array(0)), hashBytes: (outScript.hash) }
+    } else if (outScript.type === "sh") {
+      return { version: (new Uint8Array(1)), hashBytes: (outScript.hash) }
+    } else if (outScript.type === "wpkh") {
+      return { version: (new Uint8Array(4)), hashBytes: (outScript.hash) }
+    } else if (outScript.type === "wsh") {
+      return { version: (new Uint8Array(5)), hashBytes: (outScript.hash) }
+    } else if (outScript.type === "tr") {
+      return { version: (new Uint8Array(6)), hashBytes: (outScript.pubkey) }
+    }
+    return
+  } catch (err:any) {
+    console.error('getPartialStackedByCycle: ' + outScript)
+  }
+  return
+}
+
 async function saveRewardCyclePoxList(cycle:number):Promise<any> {
     const len = await getNumbEntriesRewardCyclePoxList(cycle)
     console.log('saveRewardCyclePoxList: len: ' + len)
     const entries = []
     for (let i = 0; i < len; i++) {
       try {
-        const entry = await getNextEntryRewardCyclePoxList(cycle, i)
+        const entry = await getRewardSetPoxAddress(cycle, i)
         if (entry) {
           //console.log('saveRewardCyclePoxList: entry: ', entry)
           const hashBytes = entry.value['pox-addr'].value.hashbytes.value.split('x')[1]
@@ -104,31 +135,6 @@ async function saveRewardCyclePoxList(cycle:number):Promise<any> {
        console.log('callContractReadOnly4: ', err);
     }
   }
-  
-  export async function getNextEntryRewardCyclePoxList(cycle:number, index:number):Promise<any> {
-    const functionArgs = [`0x${hex.encode(serializeCV(uintCV(cycle)))}`, `0x${hex.encode(serializeCV(uintCV(index)))}`];
-      const data = {
-      contractAddress: getDaoConfig().VITE_DOA_POX.split('.')[0],
-      contractName: getDaoConfig().VITE_DOA_POX.split('.')[1],
-      functionName: 'get-reward-set-pox-address',
-      functionArgs,
-    }
-    const result = (await callContractReadOnly(data)).value;
-    return result
-  }
-  
-  export async function getNumbEntriesRewardCyclePoxList(cycle:number):Promise<any> {
-    const functionArgs = [`0x${hex.encode(serializeCV(uintCV(cycle)))}`];
-      const data = {
-      contractAddress: getDaoConfig().VITE_DOA_POX.split('.')[0],
-      contractName: getDaoConfig().VITE_DOA_POX.split('.')[1],
-      functionName: 'get-num-reward-set-pox-addresses',
-      functionArgs,
-    }
-    const result = (await callContractReadOnly(data)).value;
-    return result
-  }
-  
   
   // -- mongo: reward slots -------------
 export async function findPoxAddress(address:string):Promise<any> {

@@ -11,6 +11,7 @@ import { configRoutes } from './routes/configRoutes.js'
 import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
 import { sbtcRoutes } from './routes/sbtcRoutes.js'
 import { daoRoutes } from './routes/daoRoutes.js'
+import { poxRoutes } from './routes/pox/poxRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
@@ -59,6 +60,7 @@ app.use('/bridge-api/v1/config', configRoutes);
 app.use('/bridge-api/v1/btc', bitcoinRoutes);
 app.use('/bridge-api/v1/sbtc', sbtcRoutes);
 app.use('/bridge-api/v1/dao', daoRoutes);
+app.use('/bridge-api/v1/pox', poxRoutes);
 app.use('/bridge-api/v1/events', eventsRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);

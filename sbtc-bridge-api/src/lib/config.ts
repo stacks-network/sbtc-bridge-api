@@ -15,6 +15,7 @@ const LOCAL_REGTEST_CONFIG = {
   port: 3010,
   walletPath: '',
   network: 'devnet',
+  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset-3',
   stacksApi: 'http://localhost:3999',
   stacksExplorerUrl: 'http://127.0.0.1:3020',
@@ -44,6 +45,7 @@ const LOCAL_TESTNET_CONFIG = {
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
+  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
   sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3',
   //stacksApi: 'http://45.79.131.55:3999',
   stacksApi: 'https://api.testnet.hiro.so',
@@ -71,6 +73,7 @@ const LOCAL_DEVENV_CONFIG = {
   port: 3010,
   walletPath: '',
   network: 'testnet',
+  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
   sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset-3',
   //stacksApi: 'http://45.79.130.153:3999',
   stacksApi: 'https://api.testnet.hiro.so',
@@ -97,7 +100,8 @@ function setOverrides() {
     CONFIG.publicAppVersion = '1.0.0';
   } else if (isLocalTestnet()) {
     //CONFIG.btcNode = 'localhost:18332'
-    CONFIG.btcNode = 'localhost:18332'
+    //CONFIG.poxContractId = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3'
+    //CONFIG.stacksApi = 'https://api.hiro.so'
   } else {
     // Params provided by local machne
     CONFIG.mongoDbUrl = process.env.mongoDbUrl || '';
@@ -109,6 +113,7 @@ function setOverrides() {
     CONFIG.btcRpcUser = process.env.btcRpcUser || '';
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
     
+    CONFIG.poxContractId = process.env.poxContractId || '';
     CONFIG.sbtcContractId = process.env.sbtcContractId || '';
     CONFIG.network = process.env.network || '';
     CONFIG.stacksApi = process.env.stacksApi || '';

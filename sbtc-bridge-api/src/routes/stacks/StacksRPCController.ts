@@ -5,11 +5,11 @@ import { getBlockCount } from "../../lib/bitcoin/rpc_blockchain.js";
 import { updateBridgeTransaction, findBridgeTransactionById, findBridgeTransactionsByFilter } from '../../lib/data/db_models.js';
 import { type BridgeTransactionType, type SbtcContractDataType, type AddressObject, buildDepositPayloadOpDrop, PayloadType, parseDepositPayload, parseWithdrawPayload, parsePayloadFromTransaction, buildWithdrawPayloadOpDrop, buildDepositPayload, buildWithdrawPayload } from 'sbtc-bridge-lib';
 import { getConfig } from '../../lib/config.js';
-import { deserializeCV, cvToJSON } from "micro-stacks/clarity";
 import { BlocksController, TransactionController, WalletController } from "../bitcoin/BitcoinRPCController.js";
 import * as btc from '@scure/btc-signer';
 import { hex } from '@scure/base';
 import { fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js";
+import { cvToJSON, deserializeCV } from "@stacks/transactions";
 
 export interface BalanceI {
   balance: number;
@@ -229,8 +229,6 @@ export class SbtcWalletController {
     return await fetchSbtcWalletAddress();
   }
 }
-
-
 
 function loc_parsePayloadFromTransaction(network:string, txHex:string):PayloadType {
   let payload:PayloadType = parsePayloadFromTransaction(network, txHex);

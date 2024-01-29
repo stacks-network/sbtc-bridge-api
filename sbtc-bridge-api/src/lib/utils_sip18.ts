@@ -1,11 +1,12 @@
-import { serializeCV, type ClarityValue } from "micro-stacks/clarity";
 import { sha256 } from "@noble/hashes/sha256";
-import { bytesToHex, concatByteArrays } from "micro-stacks/common";
-import { tupleCV, bufferCV, uintCV, stringAsciiCV } from "micro-stacks/clarity";
 import { getConfig } from './config.js';
-import { verifyMessageSignature } from "micro-stacks/connect";
-import { hexToBytes } from "micro-stacks/common";
 import type { Message } from 'sbtc-bridge-lib' 
+import { verifyMessageSignature } from "@stacks/encryption";
+import { hex } from '@scure/base';
+import { ClarityValue, bufferCV, serializeCV, stringAsciiCV, tupleCV, uintCV } from "@stacks/transactions";
+import * as P from 'micro-packed';
+
+const concat = P.concatBytes;
 
 const prefix = Uint8Array.from([0x53, 0x49, 0x50, 0x30, 0x31, 0x38]); // SIP018
 
@@ -34,8 +35,8 @@ export const domainCV = tupleCV({
 export function verifySignedMessage(message:Message, pubKey:string) {
 	if (!message.signature)
 		return false;
-	const signature = typeof message.signature === "string" ? hexToBytes(message.signature): message.signature;
-	return verifyStructuredDataSignature(message, hexToBytes(pubKey), signature);
+	const signature = typeof message.signature === "string" ? hex.decode(message.signature): message.signature;
+	return verifyStructuredDataSignature(message, hex.decode(pubKey), signature);
 }
 
 function messageToTuple(message: Message) {
@@ -49,15 +50,15 @@ export function hash_cv(clarityValue: ClarityValue) {
 }
 
 export function structuredDataHash(message: Message) {
-	return sha256(concatByteArrays([prefix, hash_cv(domainCV), hash_cv(messageToTuple(message))]));
+	return sha256(concat(prefix, hash_cv(domainCV), hash_cv(messageToTuple(message))));
 }
 
 export function verifyStructuredDataSignature(message: Message, public_key: Uint8Array, signature: Uint8Array) {
-	const sig = bytesToHex(signature);
+	const sig = hex.encode(signature);
 	return verifyMessageSignature({
 		message: structuredDataHash(message),
 		signature: sig,
-		publicKey: bytesToHex(public_key)
+		publicKey: hex.encode(public_key)
 	});
 }
 
