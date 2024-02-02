@@ -37,6 +37,14 @@ const DAO_CONFIG_MAINNET = {
 export let DAO_CONFIG = DAO_CONFIG_TESTNET;
 
 export function setDaoConfig(network:string) {
+	if (isLocalTestnet()) {
+        DAO_CONFIG = DAO_CONFIG_TESTNET;
+        return
+    } else if (isLocalMainnet()) {
+        DAO_CONFIG = DAO_CONFIG_MAINNET;
+        return
+    }
+  
     if (network.indexOf('mainnet') > -1) {
         network = 'mainnet'
         DAO_CONFIG = DAO_CONFIG_MAINNET;
@@ -69,4 +77,14 @@ export function printDaoConfig() {
     console.log('VITE_DOA_FUNDED_SUBMISSION_EXTENSION = ' + DAO_CONFIG.VITE_DOA_FUNDED_SUBMISSION_EXTENSION);
     console.log('VITE_DOA_POX = ' + DAO_CONFIG.VITE_DOA_POX);
   }
+  
+  export function isLocalMainnet() {
+    const environ = process.env.NODE_ENV;
+    return (environ && environ === 'local-mainnet')
+  }
+  export function isLocalTestnet() {
+    const environ = process.env.NODE_ENV;
+    return (environ && environ === 'local-testnet')
+  }
+  
   

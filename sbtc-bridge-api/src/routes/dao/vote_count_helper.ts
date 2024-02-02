@@ -146,7 +146,6 @@ export async function getSoloVotesByProposal(proposalCid:string, votingCid:strin
       }
       const poxAddress = await findRewardSlotByAddressMaxHeight(potVote.voter)
       if (poxAddress) {
-        //const rewardCycle = await getRewardCycleFromBurnHeight(poxAddress.burn_block_height)
         votes.push(potVote)
       }
     }

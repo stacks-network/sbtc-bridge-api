@@ -577,18 +577,3 @@ export async function getBalanceAtHeight(stxAddress:string, height: number):Prom
   }
   return val;
 }
-
-/**
-export async function fetchDataVar(contractAddress:string, contractName:string, dataVarName:string) {
-  try {
-    //checkAddressForNetwork(getConfig().network, contractAddress)
-    const url = getConfig().stacksApi + '/v2/data_var/' + contractAddress + '/' + contractName + '/' + dataVarName;
-    const response = await fetch(url);
-    const result:any = await response.json();
-    const val = cvToJSON(deserializeCV(result.data));
-    return val.value
-  } catch(err:any) {
-    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message + ' contractAddress: ' + contractAddress);
-  }
-}
- */

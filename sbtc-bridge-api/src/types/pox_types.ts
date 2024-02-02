@@ -1,4 +1,29 @@
 
+
+export type StackerInfo = {
+    stacksAddress: string;
+    stacker?: Stacker,
+    delegation?: Delegation,
+    poxRejection: PoxRejection,
+}
+export type Stacker = {
+    poxAddr?: PoxAddress;
+    lockPeriod: Array<{value:number}>;
+    firstRewardCycle: number;
+    rewardSetIndexes: Array<number>;
+    delegatedTo?: string;
+    bitcoinAddr?: string;
+  }
+  export type PoxRejection = {
+    poxRejectionPerStackerPerCycle: number;
+  }
+  export type Delegation = {
+        amountUstx: number;
+        delegatedTo?: string;
+        untilBurnHt: number;
+        poxAddr?: PoxAddress;
+        bitcoinAddr?: string;
+    }
 export type PoxInfo = {
     contract_id: string;
     pox_activation_threshold_ustx: number;
@@ -51,3 +76,24 @@ export type PoxInfo = {
     ]
 
 }
+
+export type RewardSlot = {
+    _id?:string;
+    canonical:boolean;
+    address:string;
+    burn_block_hash:string;
+    cycle:number;
+    burn_block_height:number;
+    slot_index:number;
+  }
+  export type PoxEntry = {
+    index: number;
+    cycle: number;
+    bitcoinAddr: string;
+    poxAddr: PoxAddress,
+    stacker: string;
+    totalUstx: number;
+    delegations: number;
+  }
+  export type PoxAddress = { version: string; hashBytes: string; }
+  

@@ -2,17 +2,17 @@ import { MongoClient, ServerApiVersion, ObjectId } from 'mongodb';
 import type { Collection } from 'mongodb';
 import { getConfig, isDev } from '../config.js';
 import { ProposalEvent, VoteEvent } from '../../types/stxeco_type.js';
-import { RewardSlot } from '../../types/stxeco_stacker_type.js';
 
 let exchangeRates:Collection;
 let sbtcContractEvents:Collection;
 let commitments:Collection;
 let proposals:Collection;
 let proposalVotes:Collection;
+export let delegationEvents:Collection; 
 export let rewardSlotHolders:Collection;
 export let poxAddressInfo:Collection;
 export let daoMongoConfig:Collection;
-  
+
 export async function connect() {
 	let uriPrefix:string = 'mongodb+srv'
 	if (isDev()) {
@@ -59,6 +59,7 @@ export async function connect() {
 	await rewardSlotHolders.createIndex({address: 1, slot_index: 1, burn_block_height: 1}, { unique: true })
 	poxAddressInfo = database.collection('poxAddressInfo');
 	await poxAddressInfo.createIndex({hashBytes: 1, version: 1, totalUstx: 1, cycle: 1}, { unique: true })
+	delegationEvents = database.collection('delegationEvents');
 }
 
 // Exchange Rates 
