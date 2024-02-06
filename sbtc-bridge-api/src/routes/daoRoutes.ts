@@ -3,10 +3,8 @@ import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVo
 import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
-import { findRewardSlotByAddress, findRewardSlotByAddressMaxHeight, findRewardSlotByAddressMinHeight, readRewardSlots } from "./pox/reward_slot_helper.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
 import { getPoolVotesByProposal, getSoloVotesByProposal } from "./dao/vote_count_helper.js";
-import { readPoxAddressInfo } from "./dao/pox_helper.js";
 
 const router = express.Router();
 

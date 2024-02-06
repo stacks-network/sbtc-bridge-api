@@ -108,7 +108,7 @@ export async function fetchDataVar(contractAddress:string, contractName:string, 
     const result:any = await response.json();
     return result;
   } catch(err:any) {
-    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message + ' contractAddress: ' + contractAddress);
+    console.log('fetchDataVar: ' + err.message + ' contractAddress: ' + contractAddress);
   }
 }
 
@@ -173,7 +173,7 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
       userBalances.stacksTokenInfo = result;
     }
   } catch(err:any) {
-    console.log('fetchUserBalances: stacksTokenInfo: ' + err.message)
+    //console.error('fetchUserBalances: stacksTokenInfo: ' + err.message)
   }
   try {
     if (userBalances.stxAddress) {
@@ -204,9 +204,15 @@ export async function callContractReadOnly(data:any) {
   const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
   let val;
   try {
+
+    //console.log('callContractReadOnly: url: ', url)
+    const hiroApi1 = 'ae4ecb7b39e8fbc0326091ddac461bc6'
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-hiro-api-key': hiroApi1
+      },
       body: JSON.stringify({
         arguments: data.functionArgs,
         sender: data.contractAddress,
@@ -214,13 +220,13 @@ export async function callContractReadOnly(data:any) {
     });
     val = await response.json();
   } catch (err) {
-    console.log('callContractReadOnly4: ', err);
+    console.error('callContractReadOnly4: ', err);
   }
   try {
     const result = cvToJSON(deserializeCV(val.result));
     return result;
   } catch (err:any) {
-    console.log('Error: callContractReadOnly: ', val)
+    console.error('Error: callContractReadOnly: ', val)
     return val
   } 
 }

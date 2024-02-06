@@ -58,6 +58,35 @@ const LOCAL_TESTNET_CONFIG = {
   publicAppVersion: '1.0.0'
 }
 
+const LOCAL_MAINNET_CONFIG = {
+  // api running n develop mode on localhost against local testnet
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-simnet-db',
+  mongoUser: 'dockerdev1',
+  mongoPwd: 'FbKWBThNLIjqExG1',
+  btcNode: '127.0.0.1:18332',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  btcSchnorrReveal: '8854e0f3b4979edc55330722626ce4e12f67ef89f0ac00032d18e6da3a2dc60b',
+  btcSchnorrReclaim: '1eba17807c82b0aa676b85839ea84663ceb6fbbfb3e0a23a2bdae9cd3df096cb',
+  btcSchnorrOracle: '8181ea91f5f8e9273dc333e04abefa06ac942d85a4081684ccf3534884a66f8c',
+  host: 'http://localhost',
+  port: 3010,
+  walletPath: '/wallet/descwallet',
+  network: 'mainnet',
+  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
+  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3',
+  //stacksApi: 'http://45.79.131.55:3999',
+  stacksApi: 'https://api.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.so/',
+  bitcoinExplorerUrl: 'https://mempool.space/==/api',
+  mempoolUrl: 'https://mempool.space/==/api',
+  electrumUrl: '',
+  blockCypherUrl: 'https://api.blockcypher.com/v1/btc',
+  publicAppName: 'UASU Staging API',
+  publicAppVersion: '1.0.0'
+}
+
 const LOCAL_DEVENV_CONFIG = {
   mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
   mongoDbName: 'sbtc-bridge-simnet-db',
@@ -88,6 +117,7 @@ const LOCAL_DEVENV_CONFIG = {
 
 export function setConfigOnStart() {
 	if (isLocalTestnet()) CONFIG = LOCAL_TESTNET_CONFIG;
+	else if (isLocalMainnet()) CONFIG = LOCAL_MAINNET_CONFIG;
 	else if (isLocalRegtest()) CONFIG = LOCAL_REGTEST_CONFIG;
 	else if (isLocalDevenv()) CONFIG = LOCAL_DEVENV_CONFIG;
   setOverrides();
@@ -98,7 +128,7 @@ function setOverrides() {
   if (isLocalDevenv() || isLocalRegtest()) {
     // outside docker : config is provided by the application
     CONFIG.publicAppVersion = '1.0.0';
-  } else if (isLocalTestnet()) {
+  } else if (isLocalTestnet() || isLocalMainnet()) {
     //CONFIG.btcNode = 'localhost:18332'
     //CONFIG.poxContractId = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3'
     //CONFIG.stacksApi = 'https://api.hiro.so'
@@ -149,6 +179,11 @@ export function isLocalRegtest() {
 export function isLocalTestnet() {
   const environ = process.env.NODE_ENV;
   return (environ && environ === 'local-testnet')
+}
+
+export function isLocalMainnet() {
+  const environ = process.env.NODE_ENV;
+  return (environ && environ === 'local-mainnet')
 }
 
 export function isDev() {

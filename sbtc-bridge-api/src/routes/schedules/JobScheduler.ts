@@ -6,7 +6,6 @@ import { checkReveal } from '../../lib/bitcoin/rpc_reveal.js';
 import { SbtcWalletController } from '../stacks/StacksRPCController.js';
 import { getProposalsForActiveVotingExt, getProposalsFromContractIds } from '../dao/dao_helper.js';
 import { getDaoConfig } from '../../lib/config_dao.js';
-import { readAllRewardSlots } from '../pox/reward_slot_helper.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
   console.log('Running: sbtcEventJob at: ' + fireDate);
@@ -66,9 +65,9 @@ export const initDaoProposalsJob = cron.schedule('* */2 * * *', (fireDate) => {
   }
 });
 
-export const initRewardSlotsJob = cron.schedule('*/30 * * * *', (fireDate) => {
+export const initRewardSlotsJob = cron.schedule('0 */6 * * *', (fireDate) => {
   try {
-    console.log('Running: initRewardSlotsJob at: ' + fireDate);
+    console.log('NOT Running: initRewardSlotsJob at: ' + fireDate);
     //readAllRewardSlots()
   } catch (err) {
     console.log('Error running: initRewardSlotsJob: ', err);
