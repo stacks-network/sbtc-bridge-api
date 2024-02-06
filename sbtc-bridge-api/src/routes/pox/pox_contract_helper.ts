@@ -39,7 +39,7 @@ export async function getPoxCycleInfo(cycle:number):Promise<any> {
     numRewardSetPoxAddresses: (numRewardSetPoxAddresses) ? Number(numRewardSetPoxAddresses) : 0,
     numbEntriesRewardCyclePoxList: (numbEntriesRewardCyclePoxList) ? Number(numbEntriesRewardCyclePoxList) : 0,
     totalPoxRejection: (totalPoxRejection) ? Number(totalPoxRejection) : 0,
-    totalUstxStacked: (totalStacked && totalStacked.value) ? Number(totalStacked.value) : 0
+    totalUstxStacked: totalStacked
   };
 }
 
@@ -130,7 +130,7 @@ export async function getTotalUstxStacked(cycle:number):Promise<any> {
     functionArgs,
   }
   const val = (await callContractReadOnly(data));
-  return (val.value) ? val.value: 0
+  return (val.value) ? val.value : 0;
 }
 
 export async function getRewardSetPoxAddress(cycle:number, index:number):Promise<any> {
@@ -157,18 +157,6 @@ export async function getNumbEntriesRewardCyclePoxList(cycle:number):Promise<any
   return (val.value) ? val.value: 0
 }
 
-export async function getBurnHeightToRewardCycle(burnHeight:number):Promise<any> {
-  const functionArgs = [`0x${hex.encode(serializeCV(uintCV(burnHeight)))}`];
-    const data = {
-    contractAddress: getDaoConfig().VITE_DOA_POX.split('.')[0],
-    contractName: getDaoConfig().VITE_DOA_POX.split('.')[1],
-    functionName: 'burn-height-to-reward-cycle',
-    functionArgs,
-  }
-  const val = (await callContractReadOnly(data));
-  return (val.value) ? val.value.value: 0
-}
-
 async function getTotalPoxRejection(cycle:number):Promise<any> {
   const functionArgs = [`0x${hex.encode(serializeCV(uintCV(cycle)))}`];
     const data = {
@@ -178,9 +166,8 @@ async function getTotalPoxRejection(cycle:number):Promise<any> {
     functionArgs,
   }
   const val = (await callContractReadOnly(data));
-  return (val.value) ? val.value.value: 0
+  return (val.value) ? Number(val.value) : 0
 }
-
 
 async function getPoxRejection(address:string, cycle:number):Promise<any> {
   const functionArgs = [`0x${hex.encode(serializeCV(principalCV(address)))}`,`0x${hex.encode(serializeCV(uintCV(cycle)))}`];

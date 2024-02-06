@@ -204,10 +204,15 @@ export async function callContractReadOnly(data:any) {
   const url = getConfig().stacksApi + '/v2/contracts/call-read/' + data.contractAddress + '/' + data.contractName + '/' + data.functionName
   let val;
   try {
+
     //console.log('callContractReadOnly: url: ', url)
+    const hiroApi1 = 'ae4ecb7b39e8fbc0326091ddac461bc6'
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-hiro-api-key': hiroApi1
+      },
       body: JSON.stringify({
         arguments: data.functionArgs,
         sender: data.contractAddress,

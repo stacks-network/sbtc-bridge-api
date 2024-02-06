@@ -1,6 +1,6 @@
 import express from "express";
 import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, readRewardSlots } from "./reward_slot_helper.js";
-import { findPoxEntriesByCycle, readPoxEntriesFromContract } from "./pox_helper.js";
+import { findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
 import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getPoxStacksAddressInfo, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
 
@@ -10,6 +10,16 @@ router.get("/info", async (req, res, next) => {
   try {
     const response = await getPoxInfo();
     return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/info/cycle/:cycle", async (req, res, next) => {
+  try {
+    const cycleInfo = await getPoxCycleInfo(Number(req.params.cycle));
+    return res.send(cycleInfo);
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching pox-info.')
@@ -66,7 +76,9 @@ router.get("/stacker/:stxAddress/:cycle", async (req, res, next) => {
 
 router.get("/get-reward-set-pox-address/:cycle/:index", async (req, res, next) => {
   try {
-    const response = await getRewardSetPoxAddress(Number(req.params.cycle), Number(req.params.index));
+    const cycle = Number(req.params.cycle)
+    const index = Number(req.params.index)
+    const response = await readSavePoxEntries(cycle, index + 1, index);
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -80,7 +92,7 @@ router.get("/reward-slot/:address/least-recent", async (req, res, next) => {
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
+    next('An error occurred fetching pox-info.')
   }
 });
 

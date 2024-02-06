@@ -51,9 +51,18 @@ export function getAddressFromHashBytes(hashBytes:string, version:string) {
   const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK
   let btcAddr:string|undefined;
   try {
-    let outType = {
-      type: getVersionAsType(version),
-      hash: hex.decode(hashBytes.split('x')[1])
+    let txType = getVersionAsType(version)
+    let outType:any;
+    if (txType === 'tr') {
+      outType = {
+        type: getVersionAsType(version),
+        pubkey: hex.decode(hashBytes.split('x')[1])
+      }
+    } else {
+      outType = {
+        type: getVersionAsType(version),
+        hash: hex.decode(hashBytes.split('x')[1])
+      }
     }
     const addr:any = btc.Address(net);
     btcAddr = addr.encode(outType)
@@ -93,7 +102,7 @@ export function getHashBytesFromAddress(address:string):{version:Uint8Array, has
   return
 }
 
-async function readSavePoxEntries(cycle:number, len:number, offset:number):Promise<any> {
+export async function readSavePoxEntries(cycle:number, len:number, offset:number):Promise<any> {
     const entries = []
     let poxEntry:PoxEntry;
     for (let i = offset; i < len; i++) {
@@ -115,7 +124,7 @@ async function readSavePoxEntries(cycle:number, len:number, offset:number):Promi
             cycle,
             poxAddr,
             bitcoinAddr: getAddressFromHashBytes(poxAddr.hashBytes, poxAddr.version),
-            stacker: entry.stacker.value.value,
+            stacker: (entry.stacker.value) ? entry.stacker.value.value : undefined,
             totalUstx: Number(entry['total-ustx'].value),
             delegations: 0
           } as PoxEntry
@@ -186,7 +195,7 @@ async function readSavePoxEntries(cycle:number, len:number, offset:number):Promi
 		const pdb = await findPoxEntry(poxEntry.poxAddr, poxEntry.totalUstx, poxEntry.cycle)
     // hashBytes: 1, version: 1, totalUstx: 1, cycle: 1
 		if (!pdb || !pdb._id) {
-      console.log('readSavePoxEntries: saving: ' + poxEntry.bitcoinAddr + '/' + poxEntry.stacker + '/' + poxEntry.cycle + '/' + poxEntry.index)
+      console.log('saveOrUpdatePoxEntry: saving: ' + poxEntry.bitcoinAddr + '/' + poxEntry.stacker + '/' + poxEntry.cycle + '/' + poxEntry.index)
 			await savePoxEntryInfo(poxEntry)
 		}
 	} catch (err:any) {
