@@ -130,6 +130,7 @@ export async function readSavePoxEntries(cycle:number, len:number, offset:number
           } as PoxEntry
           if (poxEntry.stacker) {
             const result = await readDelegates(poxEntry.stacker)
+            //console.log('readDelegates: ', result)
             poxEntry.delegations = result?.total || 0
           }
           await saveOrUpdatePoxEntry(poxEntry)
@@ -171,7 +172,7 @@ export async function readSavePoxEntries(cycle:number, len:number, offset:number
   }
   
   export async function findPoxEntriesByAddress(address:string):Promise<any> {
-    const result = await poxAddressInfo.find({"bitcoinAddr":address});
+    const result = await poxAddressInfo.find({"bitcoinAddr":address}).toArray();
     return result;
   }
   
@@ -192,14 +193,10 @@ export async function readSavePoxEntries(cycle:number, len:number, offset:number
   
   export async function saveOrUpdatePoxEntry(poxEntry:PoxEntry) {
 	try {
-		const pdb = await findPoxEntry(poxEntry.poxAddr, poxEntry.totalUstx, poxEntry.cycle)
-    // hashBytes: 1, version: 1, totalUstx: 1, cycle: 1
-		if (!pdb || !pdb._id) {
-      console.log('saveOrUpdatePoxEntry: saving: ' + poxEntry.bitcoinAddr + '/' + poxEntry.stacker + '/' + poxEntry.cycle + '/' + poxEntry.index)
-			await savePoxEntryInfo(poxEntry)
-		}
-	} catch (err:any) {
-		//console.log('saveOrUpdateVote: unable to save or update', err)
+    console.log('saveOrUpdatePoxEntry: saving: ' + poxEntry.bitcoinAddr + '/' + poxEntry.stacker + '/' + poxEntry.cycle + '/' + poxEntry.index)
+    await savePoxEntryInfo(poxEntry)
+  } catch (err:any) {
+		console.log('saveOrUpdateVote: unable to save or update' + poxEntry.bitcoinAddr)
 	}
 }
 

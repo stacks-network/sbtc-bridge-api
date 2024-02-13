@@ -74,18 +74,6 @@ router.get("/stacker/:stxAddress/:cycle", async (req, res, next) => {
   }
 });
 
-router.get("/get-reward-set-pox-address/:cycle/:index", async (req, res, next) => {
-  try {
-    const cycle = Number(req.params.cycle)
-    const index = Number(req.params.index)
-    const response = await readSavePoxEntries(cycle, index + 1, index);
-    return res.send(response);
-  } catch (error) {
-    console.log('Error in routes: ', error)
-    next('An error occurred fetching pox-info.') 
-  }
-});
-
 router.get("/reward-slot/:address/least-recent", async (req, res, next) => {
   try {
     const response = await findRewardSlotByAddressMinHeight(req.params.address);
@@ -126,6 +114,18 @@ router.get("/sync/pox-entries/:cycle", async (req, res, next) => {
     next('An error occurred fetching sbtc data.')
   }
 });
+router.get("/sync/pox-entries/:cycle/:index", async (req, res, next) => {
+  try {
+    const cycle = Number(req.params.cycle)
+    const index = Number(req.params.index)
+    const response = await readSavePoxEntries(cycle, index + 1, index);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.') 
+  }
+});
+
 
 router.get("/reward-slots/:cycle", async (req, res, next) => {
   try {

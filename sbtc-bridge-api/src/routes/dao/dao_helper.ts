@@ -6,11 +6,12 @@ import { hex } from '@scure/base';
 import { type FundingData, type GovernanceData, type ProposalContract, type ProposalData, type ProposalEvent, type SignalData, type SubmissionData, ProposalStage, VoteEvent } from '../../types/stxeco_type.js';
 import { getConfig } from '../../lib/config.js';
 import DaoUtils from './DaoUtils.js';
-import { saveOrUpdateProposal, saveOrUpdateVote } from '../../lib/data/db_models.js';
+import { saveOrUpdateProposal } from '../../lib/data/db_models.js';
 import { getDaoConfig } from '../../lib/config_dao.js';
 import { callContractReadOnly, fetchDataVar } from '../stacks/stacks_helper.js';
 import { NFTHolding, NFTHoldings } from '../../types/stxeco_nft_type.js';
 import { BlockchainInfo } from 'sbtc-bridge-lib';
+import { countsVotesByMethod, countsVotesByProposalAndMethod, saveOrUpdateVote } from './vote_count_helper.js';
 
 let uris:any = {};
 const gateway = "https://hashone.mypinata.cloud/";
@@ -198,11 +199,16 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
   const proposals: Array<ProposalEvent> = [];
   let val;
   let response;
+  let currentOffset = await countsVotesByMethod('vote')
+  if (!currentOffset) currentOffset = 0
   let count = 0;
   try {
     do {
-      response = await fetch(url + '&offset=' + (count * 20));
+      let urlOffset = url + '&offset=' + (currentOffset + (count * 20))
+      response = await fetch(urlOffset);
+      console.log('getProposalsForActiveVotingExt: ' + urlOffset)
       val = await response.json();
+      console.log('getProposalsForActiveVotingExt: ' + val.results.length)
       for (const event of val.results) {
         const result = cvToJSON(deserializeCV(event.contract_log.value.hex));
         const concProp = result.value.proposal.value
@@ -236,7 +242,7 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
             proposalContractId: result.value.proposal.value,
             voter: result.value.voter.value,
             for: result.value.for.value,
-            amount: result.value.amount.value,
+            amount: Number(result.value.amount.value),
             submitTxId: event.tx_id,
           } as VoteEvent
           await saveOrUpdateVote(vote)

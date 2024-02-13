@@ -22,6 +22,8 @@ const noArgMethods = [
 export async function fetchNoArgsReadOnly():Promise<SbtcContractDataType> {
   const result = {} as SbtcContractDataType
   const contractId = getConfig().sbtcContractId;
+  if (!contractId || contractId.length === 0) return {} as SbtcContractDataType
+
   //checkAddressForNetwork(getConfig().network, contractId)
   const data = {
     contractAddress: contractId!.split('.')[0],
@@ -115,6 +117,7 @@ export async function fetchDataVar(contractAddress:string, contractName:string, 
 export async function fetchSbtcWalletAddress() {
   try {
     const contractId = getConfig().sbtcContractId;
+    if (!contractId || contractId.length === 0) return
     const data = {
       contractAddress: contractId!.split('.')[0],
       contractName: contractId!.split('.')[1],
@@ -138,7 +141,7 @@ export async function fetchSbtcWalletAddress() {
 export async function fetchUserSbtcBalance(stxAddress:string):Promise<BalanceI> {
   try {
     const contractId = getConfig().sbtcContractId;
-    //const functionArgs = [`0x${bytesToHex(serializeCV(uintCV(1)))}`, `0x${bytesToHex(serializeCV(standardPrincipalCV(address)))}`];
+    if (!contractId || contractId.length === 0) return { balance: 0 }
     const functionArgs = [`0x${hex.encode(serializeCV(principalCV(stxAddress)))}`];
     const data = {
       contractAddress: contractId!.split('.')[0],
