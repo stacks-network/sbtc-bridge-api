@@ -1,10 +1,10 @@
 import express from "express";
-import { findProposalVotesByProposal, findVotesByProposalAndVoter, findVotesByVoter, getDaoMongoConfig, getProposals, saveOrUpdateDaoMongoConfig } from "../lib/data/db_models.js";
+import { getDaoMongoConfig, getProposals, saveOrUpdateDaoMongoConfig } from "../lib/data/db_models.js";
 import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, getNftHoldings, getProposalFromContractId, getProposalsForActiveVotingExt, getProposalsFromContractIds, getStacksInfo, isExecutiveTeamMember, isExtension } from "./dao/dao_helper.js";
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
-import { getPoolVotesByProposal, getSoloVotesByProposal } from "./dao/vote_count_helper.js";
+import { findProposalVotesByProposal, findVotesByProposalAndMethod, findVotesByProposalAndVoter, findVotesByVoter, getSummary, syncPoolVotesByProposal, syncSoloVotesByProposal  } from "./dao/vote_count_helper.js";
 
 const router = express.Router();
 
@@ -86,8 +86,8 @@ router.get("/get-signals/:principle", async (req, res, next) => {
 router.get("/votes", async (req, res, next) => {
   try {
     const currentProposal = await getDaoMongoConfig()
-    const soloVotes = await getSoloVotesByProposal(currentProposal.contractId, 'solo-voting');
-    const poolVotes = await getPoolVotesByProposal(currentProposal.contractId, 'pool-voting');
+    const soloVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'solo-vote');
+    const poolVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'pool-vote');
     const soloAddresses = soloStackerAddresses(getConfig().network);
     const poolAddresses = poolStackerAddresses(getConfig().network);
     return res.send({soloVotes, poolVotes, soloAddresses, poolAddresses});
@@ -110,13 +110,20 @@ router.get("/addresses", async (req, res, next) => {
   }
 });
 
-/**
- * votes for solo and pool stackers and addresses - for the configured proposal.
- */
-router.get("/votes/pool", async (req, res, next) => {
+router.get("/results/summary", async (req, res, next) => {
+  try {
+    const summary = await getSummary();
+    return res.send(summary);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/results/pool-stackers", async (req, res, next) => {
   try {
     const currentProposal = await getDaoMongoConfig()
-    const poolVotes = await getPoolVotesByProposal(currentProposal.contractId, 'pool-voting');
+    const poolVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'pool-vote');
     const poolAddresses = poolStackerAddresses(getConfig().network);
     return res.send({poolVotes, poolAddresses});
   } catch (error) {
@@ -125,12 +132,23 @@ router.get("/votes/pool", async (req, res, next) => {
   }
 });
 
-router.get("/votes/solo", async (req, res, next) => {
+router.get("/results/solo-stackers", async (req, res, next) => {
   try {
     const currentProposal = await getDaoMongoConfig()
-    const soloVotes = await getSoloVotesByProposal(currentProposal.contractId, 'solo-voting');
+    const soloVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'solo-vote');
     const soloAddresses = soloStackerAddresses(getConfig().network);
     return res.send({soloVotes, soloAddresses});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/results/non-stackers", async (req, res, next) => {
+  try {
+    const currentProposal = await getDaoMongoConfig()
+    const daoVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'vote');
+    return res.send({daoVotes});
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching pox-info.')
@@ -142,8 +160,8 @@ router.get("/votes/solo", async (req, res, next) => {
  */
 router.get("/votes/:proposalCid", async (req, res, next) => {
   try {
-    const soloVotes = await getSoloVotesByProposal(req.params.proposalCid, 'solo-voting');
-    const poolVotes = await getPoolVotesByProposal(req.params.proposalCid, 'pool-voting');
+    const soloVotes = await findVotesByProposalAndMethod(req.params.proposalCid, 'solo-vote');
+    const poolVotes = await findVotesByProposalAndMethod(req.params.proposalCid, 'pool-vote');
     const soloAddresses = soloStackerAddresses(getConfig().network);
     const poolAddresses = poolStackerAddresses(getConfig().network);
     return res.send({soloVotes, poolVotes, soloAddresses, poolAddresses});
@@ -282,7 +300,27 @@ router.get("/set-current-proposal/:contractId", async (req, res, next) => {
   }
 });
 
-router.get("/sync/read-dao-votes", async (req, res, next) => {
+router.get("/sync/results/solo-stackers", async (req, res, next) => {
+  try {
+    syncSoloVotesByProposal();
+    return res.send({result: 'syncing data'});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/pool-stackers", async (req, res, next) => {
+  try {
+    syncPoolVotesByProposal();
+    return res.send({result: 'syncing data'});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/non-stackers", async (req, res, next) => {
   try {
     console.log('Running: sync: ' + getConfig().network);
     console.log('Running: sync: ' + getDaoConfig().VITE_DOA_DEPLOYER);
@@ -302,6 +340,7 @@ router.get("/sync/read-dao-votes", async (req, res, next) => {
     next('An error occurred fetching sbtc data.')
   }
 });
+
 router.get("/sync/proposal/:contractIds", async (req, res, next) => {
   try {
     const submissionContractId = getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION

@@ -44,6 +44,8 @@ export type VoteEvent = {
   submitTxId: string;
   blockHeight: number;
   burnBlockHeight: number;
+  delegations?: number;
+  poxStacker?: string;
 }
 export enum ProposalStage {
   UNFUNDED,

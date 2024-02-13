@@ -52,6 +52,7 @@ export async function fetchAddress(address:string):Promise<AddressMempoolObject>
 export async function fetchAddressTransactions(address:string, lastId?:string) {
   let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
   if (lastId) url += '/' + lastId
+  console.log('fetchAddressTransactions: url: ' + url)
   const response = await fetch(url);
   const result = await response.json();
   return result;
