@@ -4,9 +4,6 @@ import { scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitco
 import { updateExchangeRates } from '../../lib/bitcoin/api_blockcypher.js';
 import { checkReveal } from '../../lib/bitcoin/rpc_reveal.js';
 import { SbtcWalletController } from '../stacks/StacksRPCController.js';
-import { getProposalsForActiveVotingExt, getProposalsFromContractIds } from '../dao/dao_helper.js';
-import { getDaoConfig } from '../../lib/config_dao.js';
-import { syncPoolVotesByProposal, syncSoloVotesByProposal } from '../dao/vote_count_helper.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
   console.log('Running: sbtcEventJob at: ' + fireDate);
@@ -54,8 +51,8 @@ export const initUiCacheJob = cron.schedule('*/3 * * * *', (fireDate) => {
     console.log('Error running: initUiCacheJob: ', err);
   }
 });
-
-export const initDaoProposalsJob = cron.schedule('* */2 * * *', (fireDate) => {
+/**
+export const initDaoProposalsJob = cron.schedule('* * * * *', (fireDate) => {
   console.log('Running: initDaoProposalsJob at: ' + fireDate);
   try {
     getProposalsForActiveVotingExt(getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
@@ -66,7 +63,7 @@ export const initDaoProposalsJob = cron.schedule('* */2 * * *', (fireDate) => {
   }
 });
 
-export const initRewardSlotsJob = cron.schedule('0 */2 * * *', (fireDate) => {
+export const initRewardSlotsJob = cron.schedule('0 * * * *', (fireDate) => {
   try {
     console.log('NOT Running: initRewardSlotsJob at: ' + fireDate);
     //readAllRewardSlots()
@@ -74,13 +71,14 @@ export const initRewardSlotsJob = cron.schedule('0 */2 * * *', (fireDate) => {
     console.log('Error running: initRewardSlotsJob: ', err);
   }
 });
-export const readDaoVotesJob = cron.schedule('0 */6 * * *', (fireDate) => {
+export const readDaoVotesJob = cron.schedule('* * * * *', (fireDate) => {
   try {
     console.log('NOT Running: readDaoVotesJob at: ' + fireDate);
-    syncPoolVotesByProposal();
-    syncSoloVotesByProposal();
+    reconcilePoolTxs();
+    reconcileSoloTxs();
   } catch (err) {
     console.log('Error running: readDaoVotesJob: ', err);
   }
 });
 
+*/

@@ -49,6 +49,8 @@ function getVersionAsType(version:string) {
 
 export function getAddressFromHashBytes(hashBytes:string, version:string) {
   const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK
+  if (!version.startsWith('0x')) version = '0x' + version
+  if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
   let btcAddr:string|undefined;
   try {
     let txType = getVersionAsType(version)
@@ -74,7 +76,7 @@ export function getAddressFromHashBytes(hashBytes:string, version:string) {
   return btcAddr
 }
 
-export function getHashBytesFromAddress(address:string):{version:Uint8Array, hashBytes:Uint8Array }|undefined {
+export function getHashBytesFromAddress(address:string):{version:string, hashBytes:string }|undefined {
   const net = (getConfig().network === 'testnet') ? btc.TEST_NETWORK : btc.NETWORK
   let outScript:any;
   try {
@@ -85,15 +87,15 @@ export function getHashBytesFromAddress(address:string):{version:Uint8Array, has
     if (outScript.type === "ms") {
       return
     } else if (outScript.type === "pkh") {
-      return { version: ADDRESS_VERSION_P2PKH, hashBytes: (outScript.hash) }
+      return { version: hex.encode(ADDRESS_VERSION_P2PKH), hashBytes: hex.encode(outScript.hash) }
     } else if (outScript.type === "sh") {
-      return { version: ADDRESS_VERSION_P2SH, hashBytes: (outScript.hash) }
+      return { version: hex.encode(ADDRESS_VERSION_P2SH), hashBytes: hex.encode(outScript.hash) }
     } else if (outScript.type === "wpkh") {
-      return { version: ADDRESS_VERSION_NATIVE_P2WPKH, hashBytes: (outScript.hash) }
+      return { version: hex.encode(ADDRESS_VERSION_NATIVE_P2WPKH), hashBytes: hex.encode(outScript.hash) }
     } else if (outScript.type === "wsh") {
-      return { version: ADDRESS_VERSION_NATIVE_P2WSH, hashBytes: (outScript.hash) }
+      return { version: hex.encode(ADDRESS_VERSION_NATIVE_P2WSH), hashBytes: hex.encode(outScript.hash) }
     } else if (outScript.type === "tr") {
-      return { version: ADDRESS_VERSION_NATIVE_P2TR, hashBytes: (outScript.pubkey) }
+      return { version: hex.encode(ADDRESS_VERSION_NATIVE_P2TR), hashBytes: hex.encode(outScript.pubkey) }
     }
     return
   } catch (err:any) {
@@ -166,8 +168,8 @@ export async function readSavePoxEntries(cycle:number, len:number, offset:number
     return result;
   }
   
-  export async function findPoxEntry(poxAddr:PoxAddress, totalUstx:number, cycle:number):Promise<any> {
-    const result = await poxAddressInfo.findOne({poxAddr, totalUstx, cycle});
+  export async function findPoxEntryByPoxAddr(poxAddr:PoxAddress):Promise<any> {
+    const result = await poxAddressInfo.findOne({poxAddr});
     return result;
   }
   

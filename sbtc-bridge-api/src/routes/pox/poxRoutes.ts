@@ -3,6 +3,7 @@ import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSl
 import { findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
 import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getPoxStacksAddressInfo, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
+import { findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
 
 const router = express.Router();
 
@@ -141,6 +142,36 @@ router.get("/pox-entries/:cycle", async (req, res, next) => {
   try {
     const response = await findPoxEntriesByCycle(Number(req.params.cycle));
     return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/pool-stacker-events/:stacker", async (req, res, next) => {
+  try {
+    const response = await findPoolStackerEventsByStacker(req.params.stacker);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/pool-stacker-events/:stacker/:event", async (req, res, next) => {
+  try {
+    const response = await findPoolStackerEventsByStackerAndEvent(req.params.stacker, req.params.event);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/sync/stacker-events", async (req, res, next) => {
+  try {
+    readPoolStackerEvents();
+    return res.send('syncing data');
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')

@@ -197,65 +197,82 @@ export async function getProposalsForActiveVotingExts():Promise<any> {
 export async function getProposalsForActiveVotingExt(votingContractId:string) {
   const url = getConfig().stacksApi + '/extended/v1/contract/' + votingContractId + '/events?limit=' + 20;
   const proposals: Array<ProposalEvent> = [];
-  let val;
-  let response;
   let currentOffset = await countsVotesByMethod('vote')
+  console.log('getProposalsForActiveVotingExt: currentOffset:' + currentOffset)
   if (!currentOffset) currentOffset = 0
   let count = 0;
+  let moreEvents = true
   try {
     do {
-      let urlOffset = url + '&offset=' + (currentOffset + (count * 20))
-      response = await fetch(urlOffset);
-      console.log('getProposalsForActiveVotingExt: ' + urlOffset)
-      val = await response.json();
-      console.log('getProposalsForActiveVotingExt: ' + val.results.length)
-      for (const event of val.results) {
-        const result = cvToJSON(deserializeCV(event.contract_log.value.hex));
-        const concProp = result.value.proposal.value
-        if (result.value.event.value === 'propose') {
-          const proposalData = await getProposalData(result.value.proposal.value)
-          const contract = await getProposalContract(result.value.proposal.value)
-          const submissionData = await getSubmissionData(event.tx_id)
-          const funding = await getFunding(submissionData.contractId, result.value.proposal.value)
-          //const signals = await getSignals(result.value.proposal.value)
-          const executedAt = await getExecutedAt(result.value.proposal.value)
-          const proposal = {
-            event: 'propose',
-            proposer: result.value.proposer.value,
-            contractId: result.value.proposal.value,
-            proposalData,
-            contract,
-            submitTxId: event.tx_id,
-            proposalMeta: DaoUtils.getMetaData(contract.source),
-            votingContract: event.contract_log.contract_id,
-            submissionData,
-            funding,
-            //signals,
-            executedAt,
-            stage: ProposalStage.PROPOSED
-          } as ProposalEvent
-          await saveOrUpdateProposal(proposal)
-        } else if (result.value.event.value === 'vote') {
-          const vote = {
-            event: 'vote',
-            votingContractId: votingContractId,
-            proposalContractId: result.value.proposal.value,
-            voter: result.value.voter.value,
-            for: result.value.for.value,
-            amount: Number(result.value.amount.value),
-            submitTxId: event.tx_id,
-          } as VoteEvent
-          await saveOrUpdateVote(vote)
-        }
+      try {
+        moreEvents = await innerProposalsForActiveVotingExt(url, currentOffset, count, votingContractId)
+        count++;
+      } catch (err:any) {
+        console.log('getProposalsForActiveVotingExt' + err.message)
       }
-      count++;
     }
-    while (val.results.length > 0)
+    while (moreEvents)
   }
   catch (err) {
       console.log('callContractReadOnly4: ', err);
   }
   return proposals;
+}
+
+export async function innerProposalsForActiveVotingExt(url:string, currentOffset:number, currentCount:number, votingContractId:string):Promise<any> {
+  let urlOffset = url + '&offset=' + (currentOffset + (currentCount * 20))
+  const response = await fetch(urlOffset);
+  const val = await response.json();
+  console.log('innerProposalsForActiveVotingExt: url: ' + urlOffset)
+  console.log('innerProposalsForActiveVotingExt: cnt: ' + val.results?.length || -1)
+  for (const event of val.results) {
+    try {
+      const result = cvToJSON(deserializeCV(event.contract_log.value.hex));
+      if (result.value.event.value === 'propose') {
+        const proposalData = await getProposalData(result.value.proposal.value)
+        const contract = await getProposalContract(result.value.proposal.value)
+        const submissionData = await getSubmissionData(event.tx_id)
+        let funding:FundingData
+        try {
+          funding = await getFunding(submissionData.contractId, result.value.proposal.value)
+        } catch (err:any) {
+          console.error('innerProposalsForActiveVotingExt no funding data')
+        }
+        //const signals = await getSignals(result.value.proposal.value)
+        const executedAt = await getExecutedAt(result.value.proposal.value)
+        const proposal = {
+          event: 'propose',
+          proposer: result.value.proposer.value,
+          contractId: result.value.proposal.value,
+          proposalData,
+          contract,
+          submitTxId: event.tx_id,
+          proposalMeta: DaoUtils.getMetaData(contract.source),
+          votingContract: event.contract_log.contract_id,
+          submissionData,
+          funding,
+          //signals,
+          executedAt,
+          stage: ProposalStage.PROPOSED
+        } as ProposalEvent
+        await saveOrUpdateProposal(proposal)
+      } else if (result.value.event.value === 'vote') {
+        const vote = {
+          event: 'vote',
+          votingContractId,
+          proposalContractId: result.value.proposal.value,
+          voter: result.value.voter.value,
+          for: result.value.for.value,
+          amount: Number(result.value.amount.value),
+          submitTxId: event.tx_id,
+        } as VoteEvent
+        await saveOrUpdateVote(vote)
+      }
+    } catch (err:any) {
+      console.log('innerProposalsForActiveVotingExt: ' + err.message)
+    }
+  }
+  return val.results?.length > 0 || false
 }
 
 export async function getProposalsFromContractIds(submissionContractId:string, proposalContractIds:string):Promise<any> {
@@ -471,12 +488,20 @@ export async function getBurnBlockHeight(height:number):Promise<number> {
   let url = getConfig().stacksApi + '/extended/v1/block/by_height/' + height;
   let response = await fetch(url)
   let val = await response.json();
-  if (response.status !== 200) {
+  //console.log('getBurnBlockHeight: ' + url, val)
+  if (response.status !== 200) { 
     url = getConfig().stacksApi + '/extended/v2/burn-blocks/' + height;
     response = await fetch(url)
     val = await response.json();
   }
   return val.burn_block_height;
+}
+
+export async function getBurnBlockHeightFromHash(hash:string):Promise<number> {
+  let url = getConfig().mempoolUrl + '/block/' + hash;
+  let response = await fetch(url)
+  let val = await response.json();
+  return val.height;
 }
 
 export async function isExecutiveTeamMember(stxAddress:string):Promise<{executiveTeamMember:boolean}> {

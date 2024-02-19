@@ -12,6 +12,7 @@ export let delegationEvents:Collection;
 export let rewardSlotHolders:Collection;
 export let poxAddressInfo:Collection;
 export let daoMongoConfig:Collection;
+export let poolStackerEventsCollection:Collection;
 
 export async function connect() {
 	let uriPrefix:string = 'mongodb+srv'
@@ -60,6 +61,7 @@ export async function connect() {
 	poxAddressInfo = database.collection('poxAddressInfo');
 	//await poxAddressInfo.createIndex({hashBytes: 1, version: 1, totalUstx: 1, cycle: 1, stacker: 1}, { unique: true })
 	delegationEvents = database.collection('delegationEvents');
+	poolStackerEventsCollection = database.collection('poolStackerEventsCollection');
 }
 
 // Exchange Rates 

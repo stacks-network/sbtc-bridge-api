@@ -4,7 +4,9 @@ import { getAssetClasses, getBalanceAtHeight, getFunding, getGovernanceData, get
 import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
-import { findProposalVotesByProposal, findVotesByProposalAndMethod, findVotesByProposalAndVoter, findVotesByVoter, getSummary, syncPoolVotesByProposal, syncSoloVotesByProposal  } from "./dao/vote_count_helper.js";
+import { findProposalVotesByProposal, findVotesByProposalAndMethod, findVotesByProposalAndVoter, findVotesByVoter, getSummary  } from "./dao/vote_count_helper.js";
+import { getSoloTxs, reconcileSoloTxs } from "./dao/solo_votes.js";
+import { getPoolTxs, reconcilePoolTxs } from "./dao/pool_votes.js";
 
 const router = express.Router();
 
@@ -300,9 +302,29 @@ router.get("/set-current-proposal/:contractId", async (req, res, next) => {
   }
 });
 
-router.get("/sync/results/solo-stackers", async (req, res, next) => {
+router.get("/sync/results/solo-stackers/raw", async (req, res, next) => {
   try {
-    syncSoloVotesByProposal();
+    const soloTxs = await getSoloTxs();
+    return res.send(soloTxs);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/pool-stackers/raw", async (req, res, next) => {
+  try {
+    const poolTxs = await getPoolTxs();
+    return res.send(poolTxs);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/solo-stacker-amounts/:use_event_data", async (req, res, next) => {
+  try {
+    reconcileSoloTxs(Boolean(req.params.use_event_data));
     return res.send({result: 'syncing data'});
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -310,9 +332,9 @@ router.get("/sync/results/solo-stackers", async (req, res, next) => {
   }
 });
 
-router.get("/sync/results/pool-stackers", async (req, res, next) => {
+router.get("/sync/results/pool-stacker-amounts", async (req, res, next) => {
   try {
-    syncPoolVotesByProposal();
+    reconcilePoolTxs();
     return res.send({result: 'syncing data'});
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -322,19 +344,8 @@ router.get("/sync/results/pool-stackers", async (req, res, next) => {
 
 router.get("/sync/results/non-stackers", async (req, res, next) => {
   try {
-    console.log('Running: sync: ' + getConfig().network);
-    console.log('Running: sync: ' + getDaoConfig().VITE_DOA_DEPLOYER);
-    try {
-      await getProposalsForActiveVotingExt(getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
-    } catch(err) {
-      //
-    }
-    const submissionContractId = getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION
-    console.log('Running: sync: submissionContractId: ' + submissionContractId);
-    console.log('Running: sync: proposals: ' + getDaoConfig().VITE_DOA_PROPOSALS);
-    const props = await getProposalsFromContractIds(submissionContractId, getDaoConfig().VITE_DOA_PROPOSALS);
-    const response = await getProposals();
-    return res.send(response);
+    getProposalsForActiveVotingExt(getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
+    return res.send({result: 'syncing dao data'});
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')

@@ -215,7 +215,7 @@ async function getPartialStackedByCycle(address:string, cycle:number, sender:str
   console.debug('getPartialStackedByCycle: ', poxAddress)
   try {
     const functionArgs = [
-      `0x${hex.encode(serializeCV(tupleCV({version: bufferCV(poxAddress.version), hashbytes: bufferCV(poxAddress.hashBytes)})))}`,
+      `0x${hex.encode(serializeCV(tupleCV({version: bufferCV(hex.decode(poxAddress.version)), hashbytes: bufferCV(hex.decode(poxAddress.hashBytes))})))}`,
       `0x${hex.encode(serializeCV(uintCV(cycle)))}`,
       (sender.indexOf('.') === -1) ? `0x${hex.encode(serializeCV(principalCV(sender)))}` : `0x${hex.encode(serializeCV(contractPrincipalCV(sender.split('.')[0], sender.split('.')[1] )))}`
     ];

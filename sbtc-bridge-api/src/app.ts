@@ -82,7 +82,7 @@ async function connectToMongoCloud() {
     return;
   });
   const wss = new WebSocketServer({ server })
-  revealCheckJob.start();
+  //revealCheckJob.start();
   sbtcEventJob.start();
   peginRequestJob.start();
   let rates = await getExchangeRates()
