@@ -1,9 +1,9 @@
 import express from "express";
 import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, readRewardSlots } from "./reward_slot_helper.js";
-import { findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
+import { findPoxEntriesByAddress, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
 import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getPoxStacksAddressInfo, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
-import { findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
+import { findPoolStackerEventsByHashBytes, findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
 
 const router = express.Router();
 
@@ -40,6 +40,17 @@ router.get("/sync/delegation-events/:poolPrincipal/:offset/:limit", async (req, 
 router.get("/get-allowance-contract-callers/:address/:contract", async (req, res, next) => {
   try {
     const response = await getAllowanceContractCallers(req.params.address, req.params.contract);
+    console.log(response)
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/pox-entries/:bitcoinAddress", async (req, res, next) => {
+  try {
+    const response = await findPoxEntriesByAddress(req.params.bitcoinAddress);
     console.log(response)
     return res.send(response);
   } catch (error) {
@@ -147,6 +158,16 @@ router.get("/pox-entries/:cycle", async (req, res, next) => {
     next('An error occurred fetching sbtc data.')
   }
 });
+
+router.get("/solo-stacker-events/:hashBytes/:page/:limit", async (req, res, next) => {
+  try {
+    const response = await findPoolStackerEventsByHashBytes(req.params.hashBytes, Number(req.params.page), Number(req.params.limit));
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+})
 
 router.get("/pool-stacker-events/:stacker", async (req, res, next) => {
   try {

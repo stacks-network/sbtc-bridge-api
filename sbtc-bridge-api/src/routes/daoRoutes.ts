@@ -6,7 +6,7 @@ import { getConfig } from "../lib/config.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
 import { findProposalVotesByProposal, findVotesByProposalAndMethod, findVotesByProposalAndVoter, findVotesByVoter, getSummary  } from "./dao/vote_count_helper.js";
 import { getSoloTxs, reconcileSoloTxs } from "./dao/solo_votes.js";
-import { getPoolTxs, reconcilePoolTxs } from "./dao/pool_votes.js";
+import { getPoolTxs, reconcilePoolTxs, reconcilePoolTxsByBalance } from "./dao/pool_votes.js";
 
 const router = express.Router();
 
@@ -179,7 +179,7 @@ router.get("/stacks-info", async (req, res, next) => {
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
-    next('An error occurred fetching stacks-info.') 
+    next('An error occurred fetching stacks-info.')
   }
 });
 
@@ -335,6 +335,16 @@ router.get("/sync/results/solo-stacker-amounts/:use_event_data", async (req, res
 router.get("/sync/results/pool-stacker-amounts", async (req, res, next) => {
   try {
     reconcilePoolTxs();
+    return res.send({result: 'syncing data'});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/pool-stacker-amounts-by-balance", async (req, res, next) => {
+  try {
+    reconcilePoolTxsByBalance();
     return res.send({result: 'syncing data'});
   } catch (error) {
     console.log('Error in routes: ', error)

@@ -1,10 +1,10 @@
 import { fetchAddressTransactions } from "../../lib/bitcoin/api_mempool.js"
 import { getConfig } from "../../lib/config.js"
 import { getDaoConfig } from "../../lib/config_dao.js";
-import { getDaoMongoConfig, poxAddressInfo } from "../../lib/data/db_models.js";
+import { getDaoMongoConfig } from "../../lib/data/db_models.js";
 import { VoteEvent } from "../../types/stxeco_type.js";
-import { findPoolStackerEventsByHashBytes, findPoolStackerEventsByHashBytesAndEvent } from "../pox/pool_stacker_events_helper.js";
-import { findPoxEntriesByAddress, findPoxEntryByPoxAddr, getAddressFromHashBytes, getHashBytesFromAddress } from "../pox/pox_helper.js";
+import { findPoolStackerEventsByHashBytesAndEvent } from "../pox/pool_stacker_events_helper.js";
+import { findPoxEntriesByAddress, getAddressFromHashBytes, getHashBytesFromAddress } from "../pox/pox_helper.js";
 import { soloStackerAddresses } from "./solo_pool_addresses.js"
 import { NAKAMOTO_VOTE_START_HEIGHT, findVotesByProposalAndMethod, saveOrUpdateVote } from "./vote_count_helper.js";
 
@@ -82,7 +82,7 @@ async function addToMongoDB(txs:Array<any>, vfor:boolean):Promise<Array<VoteEven
       for: vfor,
       submitTxId: v.txid,
       event: 'solo-vote',
-      proposal: proposalCid,
+      proposalContractId: proposalCid,
       votingContractId: votingCid,
       poxAddr,
       voter: bitcoinAddress,

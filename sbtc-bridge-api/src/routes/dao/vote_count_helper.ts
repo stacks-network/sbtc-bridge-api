@@ -19,7 +19,9 @@ export async function getSummary():Promise<any> {
   const p = await getProposalFromContractId(getDaoConfig().VITE_DOA_DEPLOYER + '.' + getDaoConfig().VITE_DOA_FUNDED_SUBMISSION_EXTENSION, proposalCid)
 //const soloFor = countsVotesByFilter({proposalContractId, for: true, event: 'solo-vote', amount: {$sum:1} })
   //const soloFor = proposalVotes.aggregate([{proposalContractId, for: true, event: 'solo-vote', $group: {sum_val:{$sum:"$amount"}}}]).toArray()
-  const summary = await proposalVotes.aggregate([ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
+  const summaryWithZeros = await proposalVotes.aggregate([ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
+  
+  const summary = await proposalVotes.aggregate([{$match: {amount: { $gt: 0 }}}, { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
   //const poolSummary = await proposalVotes.aggregate([ { $group: {_id:{"event":"pool-event", "for":"$for"}, "total": {$avg: "$stackerEvent.data.amountUstx" }, count: {$avg:1} } } ]).toArray();
                                               //[ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]
   //const uniqueVoters = await proposalVotes.aggregate([ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
@@ -33,6 +35,7 @@ export async function getSummary():Promise<any> {
   return {
     proposalData: p.proposalData,
     summary, 
+    summaryWithZeros,
     uniqueDaoVoters: uv.filter((o) => o._id.event === 'vote').length,
     uniquePoolVoters: uv.filter((o) => o._id.event === 'pool-vote').length,
     uniqueSoloVoters: uv.filter((o) => o._id.event === 'solo-vote').length
@@ -71,7 +74,7 @@ export async function getSummary():Promise<any> {
   }
   
   export async function findVotesByProposalAndMethod(proposal:string, method:string):Promise<any> {
-    const result = await proposalVotes.find({"proposal":proposal, "event":method}).toArray();
+    const result = await proposalVotes.find({"proposalContractId":proposal, "event":method}).toArray();
     return result;
   }
   

@@ -1,9 +1,7 @@
 import express from "express";
-import { TransactionController, BlocksController, WalletController } from "./bitcoin/BitcoinRPCController.js";
 import { SbtcWalletController, DepositsController } from "./stacks/StacksRPCController.js";
 import type { BridgeTransactionType } from 'sbtc-bridge-lib';
 import { isUpdateAllowed } from "../lib/utils_stacks.js";
-import { EventsController } from "./events/EventsController.js";
 
 const router = express.Router();
 

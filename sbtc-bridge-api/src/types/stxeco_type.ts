@@ -37,7 +37,6 @@ export type ProposalEvent = {
 export type VoteEvent = {
   stackerData?: any;
   event: string;
-  proposal: string;
   voter: string;
   for: boolean;
   amount: number;

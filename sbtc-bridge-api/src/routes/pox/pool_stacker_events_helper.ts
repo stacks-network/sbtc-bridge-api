@@ -73,7 +73,7 @@ export async function innerReadPoolStackerEvents(val:any):Promise<any> {
           unlockBurnHeight: Number(result.data.value['unlock-burn-height'].value),
           stacker: result.data.value['stacker'].value,
           poxAddr: extractPoxAddress(result.data.value['pox-addr'])
-        }    
+        }
       } else if (eventName === 'delegate-stack-stx') {
         data = {
           amountUstx:0,
@@ -84,7 +84,7 @@ export async function innerReadPoolStackerEvents(val:any):Promise<any> {
           startBurnHeight: Number(result.data.value['start-burn-height'].value),
           stacker: result.data.value['stacker'].value,
           poxAddr: extractPoxAddress(result.data.value['pox-addr'])
-        }    
+        }
       } else if (eventName === 'delegate-stx') {
         data = {
           amountUstx: Number(result.data.value['amount-ustx'].value),
@@ -178,9 +178,9 @@ export async function countsPoolStackerEvents():Promise<number> {
   }
 }
 
-export async function findPoolStackerEventsByHashBytes(hashBytes:string):Promise<any> {
+export async function findPoolStackerEventsByHashBytes(hashBytes:string, page:number, limit:number):Promise<any> {
   if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
-  const result = await poolStackerEventsCollection.find({"data.paxAddr.hashBytes":hashBytes}).toArray();
+  const result = await poolStackerEventsCollection.find({"data.poxAddr.hashBytes":hashBytes}).skip(page * limit).limit( limit ).toArray();
   return result;
 }
 
@@ -191,7 +191,7 @@ export async function findPoolStackerEventsByHashBytesAndEvent(hashBytes:string,
 }
 
 export async function findPoolStackerEventsByStacker(stacker:string):Promise<any> {
-  const result = await poolStackerEventsCollection.find({"stacker":stacker, event:'delegate-stx'}).toArray();
+  const result = await poolStackerEventsCollection.find({"stacker":stacker}).toArray();
   return result;
 }
 

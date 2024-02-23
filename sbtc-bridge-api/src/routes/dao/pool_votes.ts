@@ -2,9 +2,9 @@ import { getConfig } from "../../lib/config.js"
 import { ProposalEvent, VoteEvent } from "../../types/stxeco_type.js"
 import { poolStackerAddresses } from "./solo_pool_addresses.js"
 import { findProposalByContractId, getDaoMongoConfig } from "../../lib/data/db_models.js"
-import { getBurnBlockHeight, getBurnBlockHeightFromHash } from "./dao_helper.js"
+import { getBalanceAtHeight, getBurnBlockHeight, getBurnBlockHeightFromHash } from "./dao_helper.js"
 import { getDaoConfig } from "../../lib/config_dao.js"
-import { findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent } from "../pox/pool_stacker_events_helper.js"
+import { findPoolStackerEventsByStackerAndEvent } from "../pox/pool_stacker_events_helper.js"
 import { NAKAMOTO_VOTE_START_HEIGHT, NAKAMOTO_VOTE_STOPS_HEIGHT, findVotesByProposalAndMethod, saveOrUpdateVote, updateVote } from "./vote_count_helper.js"
 
 const limit = 50 ;
@@ -39,7 +39,7 @@ async function addToMongoDB(txs:Array<any>, vfor:boolean):Promise<Array<VoteEven
     const potVote:any = {
       amount: 0,
       for: vfor,
-      proposal: proposalCid,
+      proposalContractId: proposalCid,
       submitTxId: v.tx_id,
       event: 'pool-vote',
       votingContractId: votingCid,
@@ -56,48 +56,82 @@ async function addToMongoDB(txs:Array<any>, vfor:boolean):Promise<Array<VoteEven
 
 
 export async function reconcilePoolTxs():Promise<any> {
-    try {
-      const proposalCid = (await getDaoMongoConfig()).contractId
-      const votesAll:Array<VoteEvent> = await findVotesByProposalAndMethod(proposalCid, 'pool-vote');
-      const votes:Array<VoteEvent> = votesAll.slice(0,7)
-      let offset = 0; //await countContractEvents();
-      for (const voteTx of votesAll) {
-        //const voted = votes.filter((o) => o.voter === voteTx.sender_address)
-        //console.log('reconcilePoolTxs: vote: ', voteTx)
-        //if (!voted || voted.length === 0) {
-        if (voteTx.voter && isVoteAllowed(voteTx, voteTx.voter, voteTx.burnBlockHeight)) {
-          let updates:any;
-          const stackerEvents = await findPoolStackerEventsByStackerAndEvent(voteTx.voter, 'delegate-stx');
-          if (stackerEvents && stackerEvents.length > 0) {
-            console.log('reconcilePoolTxs: stackerEvents: ' + stackerEvents.length)
-            try {
-              let event = stackerEvents.find((o) => o.burnchainUnlockHeight === 0)
-              if (!event) event = stackerEvents[0]
-              updates = {
-                delegateTo: event.data.delegator,
-                delegateTxId: event.submitTxId,
-                amount: (event.data.amountUstx) ? event.data.amountUstx : 0,
-              }
-              await updateVote(voteTx, updates)
-              console.log('reconcilePoolTxs: updated: ' + voteTx.event + ' : ' + voteTx.voter + ' : ' + voteTx.amount)
-            } catch(err:any) {
-              console.log('reconcilePoolTxs: error: getting first amount + ', stackerEvents)
+  try {
+    const proposalCid = (await getDaoMongoConfig()).contractId
+    const votesAll:Array<VoteEvent> = await findVotesByProposalAndMethod(proposalCid, 'pool-vote');
+    const votes:Array<VoteEvent> = votesAll.slice(0,7)
+    let offset = 0; //await countContractEvents();
+    for (const voteTx of votesAll) {
+      //const voted = votes.filter((o) => o.voter === voteTx.sender_address)
+      //console.log('reconcilePoolTxs: vote: ', voteTx)
+      //if (!voted || voted.length === 0) {
+      if (voteTx.voter && isVoteAllowed(voteTx, voteTx.voter, voteTx.burnBlockHeight)) {
+        let updates:any;
+        const stackerEvents = await findPoolStackerEventsByStackerAndEvent(voteTx.voter, 'delegate-stx');
+        if (stackerEvents && stackerEvents.length > 0) {
+          console.log('reconcilePoolTxs: stackerEvents: ' + stackerEvents.length)
+          try {
+            let event = stackerEvents.find((o) => o.burnchainUnlockHeight === 0)
+            if (!event) event = stackerEvents[0]
+            updates = {
+              delegateTo: event.data.delegator,
+              delegateTxId: event.submitTxId,
+              amount: (event.data.amountUstx) ? event.data.amountUstx : 0,
             }
-          } else {
-            console.log('reconcilePoolTxs: stackerEvents: not found for ' + voteTx.voter + ' : delegate-stx')
+            await updateVote(voteTx, updates)
+            console.log('reconcilePoolTxs: updated: ' + voteTx.event + ' : ' + voteTx.voter + ' : ' + voteTx.amount)
+          } catch(err:any) {
+            console.log('reconcilePoolTxs: error: getting first amount + ', stackerEvents)
           }
         } else {
-          console.log('reconcilePoolTxs: rejected: vote: ' + voteTx.voter + ' offset: ' + offset)
+          console.log('reconcilePoolTxs: stackerEvents: not found for ' + voteTx.voter + ' : delegate-stx')
         }
+      } else {
+        console.log('reconcilePoolTxs: rejected: vote: ' + voteTx.voter + ' offset: ' + offset)
       }
-      return;
-    } catch (err:any) {
-      console.log('err reconcilePoolTxs: ' + err);
-      return [];
     }
+    return;
+  } catch (err:any) {
+    console.log('err reconcilePoolTxs: ' + err);
+    return [];
   }
+}
 
-  function isVoteAllowed(v:any, principle:string, burnBlockHeight:number) {
+export async function reconcilePoolTxsByBalance():Promise<any> {
+  try {
+    const proposalCid = (await getDaoMongoConfig()).contractId
+    const votesAll:Array<VoteEvent> = await findVotesByProposalAndMethod(proposalCid, 'pool-vote');
+    let bal1 = 0
+    let bal2 = 0
+    let bal3 = 0
+    for (const voteTx of votesAll) {
+        if (voteTx.voter && isVoteAllowed(voteTx, voteTx.voter, voteTx.burnBlockHeight)) {
+          bal1 = (await getBalanceAtHeight(voteTx.voter, NAKAMOTO_VOTE_START_HEIGHT + 500))?.stx?.locked || 0
+          bal2 = (await getBalanceAtHeight(voteTx.voter, NAKAMOTO_VOTE_STOPS_HEIGHT - 500))?.stx?.locked || 0
+          bal3 = Math.max(bal1, bal2)
+          let updates:any;
+          console.log('reconcilePoolTxs: bal1=' + bal1 + ' bal2=' + bal2 + ' bal3=' + bal3)
+          try {
+            updates = {
+              amount: bal3,
+            }
+            await updateVote(voteTx, updates)
+            console.log('reconcilePoolTxs: updated: ' + voteTx.event + ' : ' + voteTx.voter + ' : ' + voteTx.amount)
+          } catch(err:any) {
+            console.log('reconcilePoolTxs: error: getting first amount + ', bal3)
+          }
+        } else {
+          console.log('reconcilePoolTxs: stackerEvents: not found for ' + voteTx.voter + ' : delegate-stx')
+        }
+    }
+    return;
+  } catch (err:any) {
+    console.log('err reconcilePoolTxs: ' + err);
+    return [];
+  }
+}
+
+function isVoteAllowed(v:any, principle:string, burnBlockHeight:number) {
     return v.voter === principle //&& burnBlockHeight >= NAKAMOTO_VOTE_START_HEIGHT && burnBlockHeight < NAKAMOTO_VOTE_STOPS_HEIGHT
   }
 
