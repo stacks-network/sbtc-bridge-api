@@ -17,8 +17,8 @@ export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
 export const peginRequestJob = cron.schedule('* */2 * * *', (fireDate) => {
   console.log('Running: peginRequestJob at: ' + fireDate);
   try {
-    scanBridgeTransactions();
-    scanPeginRRTransactions();
+    //scanBridgeTransactions();
+    //scanPeginRRTransactions();
   } catch (err) {
     console.log('Error running: scanBridgeTransactions: ', err);
   }

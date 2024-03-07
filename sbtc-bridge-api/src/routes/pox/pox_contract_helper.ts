@@ -19,8 +19,9 @@ export async function getPoxBitcoinAddressInfo(address:string, cycle:number, sen
   };
 }
 
-export async function getPoxStacksAddressInfo(address:string, cycle:number):Promise<StackerInfo> {
+export async function getStackerInfoFromContract(address:string, cycle:number):Promise<StackerInfo> {
   return {
+    cycle,
     stacksAddress: address,
     stacker: await getStackerInfo(address),
     delegation: await getCheckDelegation(address),
@@ -99,25 +100,29 @@ async function getStackerInfo(address:string):Promise<Stacker|undefined> {
 }
 
 async function getCheckDelegation(address:string):Promise<Delegation> {
-  const functionArgs = [`0x${hex.encode(serializeCV(principalCV(address)))}`];
-  const data = {
-    contractAddress: getConfig().poxContractId.split('.')[0],
-    contractName: getConfig().poxContractId.split('.')[1],
-    functionName: 'get-check-delegation',
-    functionArgs,
-  }
-  const val = await callContractReadOnly(data);
-  console.log('getCheckDelegation: ', val.value)
-  return (val.value) ? {
-    amountUstx: val.value.value['first-reward-cycle'].value,
-    delegatedTo: val.value.value['delegated-to'].value,
-    untilBurnHt: val.value.value['first-reward-cycle'].value,
-    poxAddr: val.value.value['first-reward-cycle'].value,
-  } : {
-    amountUstx: 0,
-    delegatedTo: undefined,
-    untilBurnHt: 0,
-    poxAddr: undefined
+  try {
+    const functionArgs = [`0x${hex.encode(serializeCV(principalCV(address)))}`];
+    const data = {
+      contractAddress: getConfig().poxContractId.split('.')[0],
+      contractName: getConfig().poxContractId.split('.')[1],
+      functionName: 'get-check-delegation',
+      functionArgs,
+    }
+    const val = await callContractReadOnly(data);
+    console.log('getCheckDelegation: ', val.value)
+    return (val.value) ? {
+      amountUstx: Number(val.value.value['amount-ustx'].value),
+      delegatedTo: val.value.value['delegated-to'].value,
+      untilBurnHt: val.value.value['pox-addr'].value,
+      poxAddr: val.value.value['until-burn-ht'].value || 0,
+    } : {
+      amountUstx: 0,
+      delegatedTo: undefined,
+      untilBurnHt: 0,
+      poxAddr: undefined
+    }
+  } catch(err:any) {
+    console.log('getCheckDelegation: ' + err.message)
   }
 }
 

@@ -1,7 +1,7 @@
 import express from "express";
-import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, readRewardSlots } from "./reward_slot_helper.js";
-import { findPoxEntriesByAddress, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
-import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getPoxStacksAddressInfo, getRewardSetPoxAddress } from "./pox_contract_helper.js";
+import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, getRewardsByAddress, readAllRewardSlots, readRewardSlots } from "./reward_slot_helper.js";
+import { collateStackerInfo, findPoxEntriesByAddress, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
+import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getStackerInfoFromContract, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
 import { findPoolStackerEventsByHashBytes, findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
 
@@ -37,10 +37,41 @@ router.get("/sync/delegation-events/:poolPrincipal/:offset/:limit", async (req, 
   }
 });
 
+router.get("/sync/reward-slots", async (req, res, next) => {
+  try {
+    const response = await readAllRewardSlots();
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
 router.get("/get-allowance-contract-callers/:address/:contract", async (req, res, next) => {
   try {
     const response = await getAllowanceContractCallers(req.params.address, req.params.contract);
     console.log(response)
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/stacker-info/:address", async (req, res, next) => {
+  try {
+    const poxInfo = await getPoxInfo()
+    const response = await collateStackerInfo(req.params.address, poxInfo.current_cycle.id);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/stacker-info/:address/:cycle", async (req, res, next) => {
+  try {
+    const response = await collateStackerInfo(req.params.address, Number(req.params.cycle));
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)
@@ -76,7 +107,7 @@ router.get("/stacker/:stxAddress/:cycle", async (req, res, next) => {
   try {
     const stxAddress = req.params.stxAddress
     let response:any = {};
-    response = await getPoxStacksAddressInfo(stxAddress, Number(req.params.cycle));
+    response = await getStackerInfoFromContract(stxAddress, Number(req.params.cycle));
     response.cycleInfo = await getPoxCycleInfo(Number(req.params.cycle));
     console.log(response)
     return res.send(response);
@@ -117,6 +148,16 @@ router.get("/sync/reward-slots/:offset/:limit", async (req, res, next) => {
   }
 });
 
+router.get("/reward-slots/:address/:offset/:limit", async (req, res, next) => {
+  try {
+    const response = await getRewardsByAddress(Number(req.params.offset), Number(req.params.limit), req.params.address);
+    return res.send(response);
+  } catch (error) {
+    console.error('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.') 
+  }
+});
+
 router.get("/sync/pox-entries/:cycle", async (req, res, next) => {
   try {
     const response = await readPoxEntriesFromContract(Number(req.params.cycle));
@@ -124,6 +165,17 @@ router.get("/sync/pox-entries/:cycle", async (req, res, next) => {
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching sbtc data.')
+  }
+});
+router.get("/pox-entry/:cycle/:index", async (req, res, next) => {
+  try {
+    const cycle = Number(req.params.cycle)
+    const index = Number(req.params.index)
+    const response = await readSavePoxEntries(cycle, index + 1, index);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
   }
 });
 router.get("/sync/pox-entries/:cycle/:index", async (req, res, next) => {

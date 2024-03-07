@@ -190,8 +190,20 @@ export async function findPoolStackerEventsByHashBytesAndEvent(hashBytes:string,
   return result;
 }
 
+export async function findPoolStackerEventsByHashBytesAndVersion(version:string, hashBytes:string, page:number, limit:number):Promise<any> {
+  if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
+  if (!version.startsWith('0x')) version = '0x' + version
+  const result = await poolStackerEventsCollection.find({"data.poxAddr.hashBytes":hashBytes, "data.poxAddr.version":version, }).skip(page * limit).limit( limit ).toArray();
+  return result;
+}
+
 export async function findPoolStackerEventsByStacker(stacker:string):Promise<any> {
   const result = await poolStackerEventsCollection.find({"stacker":stacker}).toArray();
+  return result;
+}
+
+export async function findPoolStackerEventsByDelegator(stacker:string):Promise<any> {
+  const result = await poolStackerEventsCollection.find({"data.delegator":stacker}).toArray();
   return result;
 }
 

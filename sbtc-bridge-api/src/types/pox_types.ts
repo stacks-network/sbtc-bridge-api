@@ -1,17 +1,34 @@
 import { Delete } from "tsoa";
+import { VoteEvent } from "./stxeco_type";
 
+
+export type StackerStats = {
+    address: string;
+    addressType: string;
+    cycle: number,
+    stackerInfo?: Array<StackerInfo>,
+    rewardSlots?: Array<any>,
+    poxEntries: Array<PoxEntry>;
+    votes: Array<VoteEvent>,
+    stackerEvents:Array<PoolStackerEvent>;
+    stackerEventsAsDelegator?:Array<PoolStackerEvent>;
+    stackerEventsAsPoxAddress?:Array<PoolStackerEvent>;
+}
 
 export type StackerInfo = {
     stacksAddress: string;
     stacker?: Stacker,
     delegation?: Delegation,
     poxRejection: PoxRejection,
+    cycle?:number;
+    cycleInfo?:any;
+    poxStackerInfo?:Array<StackerInfo>
 }
 export type Stacker = {
     poxAddr?: PoxAddress;
     lockPeriod: Array<{value:number}>;
     firstRewardCycle: number;
-    rewardSetIndexes: Array<number>;
+    rewardSetIndexes: Array<{type:string, value:number}>;
     delegatedTo?: string;
     bitcoinAddr?: string;
   }

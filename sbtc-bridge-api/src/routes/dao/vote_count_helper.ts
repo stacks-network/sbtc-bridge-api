@@ -108,7 +108,7 @@ export async function getSummary():Promise<any> {
     }
   }
   
-  async function saveVote(vote:any) {
+  export async function saveVote(vote:any) {
     const result = await proposalVotes.insertOne(vote);
     return result;
   }

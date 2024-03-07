@@ -49,20 +49,36 @@ export async function fetchAddress(address:string):Promise<AddressMempoolObject>
   return result;
 }
 
-export async function fetchAddressTransactions(address:string, lastId?:string) {
-  let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
-  console.log('fetchAddressTransactions: url: ' + url)
-  let response:any;
-  let allResults:Array<any> = [];
-  let results:Array<any>;
-  do {
-    response = await fetch(url);
-    results = await response.json();
-    if (results && results.length === 50) url += '/chain/' + results[49].txid
-    if (results.length > 0) allResults = allResults.concat(results)
-  } while (results.length === 50);
-  return allResults;
-} 
+export async function fetchAddressTransactions(address:string, txId?:string) {
+	const urlBase = getConfig().mempoolUrl + '/address/' + address + '/txs';
+	let url = urlBase
+	if (txId) {
+		url = urlBase + '/chain/' + txId;
+	}
+	console.log('fetchAddressTransactions: url: ' + url)
+	let response:any;
+	let allResults:Array<any> = [];
+	let results:Array<any>;
+	let fetchMore = true;
+	do {
+		try {
+			response = await fetch(url);
+			results = await response.json();
+			if (results && results.length > 0) {
+				console.log('fetchAddressTransactions: ' + results.length + ' found at ' + results[(results.length-1)].status.block_height)
+				url = urlBase + '/chain/' + results[(results.length-1)].txid;
+				allResults = allResults.concat(results)
+			} else {
+			  fetchMore = false
+			}
+		} catch(err:any) {
+			console.error('fetchAddressTransactions' + err.message)
+			fetchMore = false
+		}
+	} while (fetchMore);
+	console.log('fetchAddressTransactions: total of ' + allResults.length + ' found at ' + address)
+	return allResults;
+  } 
 
 export async function fetchUtxosForAddress(address:string) {
   let url = getConfig().electrumUrl + '/address/' + address + '/utxo';

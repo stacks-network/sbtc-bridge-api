@@ -322,9 +322,9 @@ router.get("/sync/results/pool-stackers/raw", async (req, res, next) => {
   }
 });
 
-router.get("/sync/results/solo-stacker-amounts/:use_event_data", async (req, res, next) => {
+router.get("/sync/results/solo-stacker-amounts", async (req, res, next) => {
   try {
-    reconcileSoloTxs(Boolean(req.params.use_event_data));
+    reconcileSoloTxs();
     return res.send({result: 'syncing data'});
   } catch (error) {
     console.log('Error in routes: ', error)
