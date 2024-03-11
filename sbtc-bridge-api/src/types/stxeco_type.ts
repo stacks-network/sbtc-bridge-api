@@ -38,11 +38,14 @@ export type VoteEvent = {
   stackerData?: any;
   event: string;
   voter: string;
+  voterProxy: string;
   for: boolean;
   amount: number;
+  amountNested: number;
   votingContractId:string;
   proposalContractId: string;
   submitTxId: string;
+  submitTxIdProxy: string;
   blockHeight: number;
   burnBlockHeight: number;
   delegateTo?: string;

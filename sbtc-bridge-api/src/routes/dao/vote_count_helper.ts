@@ -21,7 +21,7 @@ export async function getSummary():Promise<any> {
   //const soloFor = proposalVotes.aggregate([{proposalContractId, for: true, event: 'solo-vote', $group: {sum_val:{$sum:"$amount"}}}]).toArray()
   const summaryWithZeros = await proposalVotes.aggregate([ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
   
-  const summary = await proposalVotes.aggregate([{$match: {amount: { $gt: 0 }}}, { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
+  const summary = await proposalVotes.aggregate([{$match: {amount: { $gt: 0 }}}, { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, "totalNested": {$sum: "$amountNested" }, count: {$sum:1} } } ]).toArray();
   //const poolSummary = await proposalVotes.aggregate([ { $group: {_id:{"event":"pool-event", "for":"$for"}, "total": {$avg: "$stackerEvent.data.amountUstx" }, count: {$avg:1} } } ]).toArray();
                                               //[ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]
   //const uniqueVoters = await proposalVotes.aggregate([ { $group: {_id:{"event":"$event", "for":"$for"}, "total": {$sum: "$amount" }, count: {$sum:1} } } ]).toArray();
@@ -75,6 +75,11 @@ export async function getSummary():Promise<any> {
   
   export async function findVotesByProposalAndMethod(proposal:string, method:string):Promise<any> {
     const result = await proposalVotes.find({"proposalContractId":proposal, "event":method}).toArray();
+    return result;
+  }
+  
+  export async function findVotesBySoloZeroAmounts():Promise<any> {
+    const result = await proposalVotes.find({"amount":0, "event":'solo-vote'}).toArray();
     return result;
   }
   

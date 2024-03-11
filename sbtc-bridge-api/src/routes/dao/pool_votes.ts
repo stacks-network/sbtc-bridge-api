@@ -9,6 +9,24 @@ import { NAKAMOTO_VOTE_START_HEIGHT, NAKAMOTO_VOTE_STOPS_HEIGHT, findVotesByProp
 
 const limit = 50 ;
 
+export async function getPoolTransactions():Promise<{poolTxsYes , poolTxsNo}> {
+  const addresses = poolStackerAddresses(getConfig().network)
+  let poolTxsYes:Array<VoteEvent> = []
+  let poolTxsNo:Array<VoteEvent> = []
+  let offset = 0; //await countContractEvents();
+  let events:any;
+  do {
+    events = await getPoolVotes(offset, addresses.yAddress);
+    if (events && events.results.length > 0) poolTxsYes = poolTxsYes.concat(events.results)
+    offset += limit;
+  } while (events.results.length > 0);
+  do {
+    events = await getPoolVotes(offset, addresses.nAddress);
+    if (events && events.results.length > 0) poolTxsNo = poolTxsNo.concat(events.results)
+    offset += limit;
+  } while (events.results.length > 0);
+  return {poolTxsYes , poolTxsNo};
+}
 export async function getPoolTxs():Promise<{poolTxsYes , poolTxsNo}> {
   const addresses = poolStackerAddresses(getConfig().network)
   let poolTxsYes:Array<VoteEvent> = []

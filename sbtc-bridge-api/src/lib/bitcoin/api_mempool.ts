@@ -80,15 +80,22 @@ export async function fetchAddressTransactions(address:string, txId?:string) {
 	return allResults;
   } 
 
-export async function fetchUtxosForAddress(address:string) {
-  let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
-  console.log('fetchUtxoSetDevnet: fetchUtxosForAddress' + url);
-  const response = await fetch(url);
-  const result = await response.json();
-  return result;
-}
-
-export async function fetchUTXOs(address:string) {
+  export async function fetchAddressTransactionsMin(address:string) {
+    const url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  }
+  
+  export async function fetchUtxosForAddress(address:string) {
+    let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
+    console.log('fetchUtxoSetDevnet: fetchUtxosForAddress' + url);
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  }
+  
+  export async function fetchUTXOs(address:string) {
   try {
     // this will work on test/main net but not devnet
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';

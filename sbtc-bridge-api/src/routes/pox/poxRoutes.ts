@@ -1,9 +1,9 @@
 import express from "express";
 import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, getRewardsByAddress, readAllRewardSlots, readRewardSlots } from "./reward_slot_helper.js";
-import { collateStackerInfo, findPoxEntriesByAddress, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
+import { collateStackerInfo, extractAllPoxEntriesInCycle, findPoxEntriesByAddress, findPoxEntriesByAddressAndCycle, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
 import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getStackerInfoFromContract, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
-import { findPoolStackerEventsByHashBytes, findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
+import { findPoolStackerEventsByDelegator, findPoolStackerEventsByHashBytes, findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
 
 const router = express.Router();
 
@@ -82,6 +82,17 @@ router.get("/stacker-info/:address/:cycle", async (req, res, next) => {
 router.get("/pox-entries/:bitcoinAddress", async (req, res, next) => {
   try {
     const response = await findPoxEntriesByAddress(req.params.bitcoinAddress);
+    console.log(response)
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/pox-entries/:bitcoinAddress/:cycle", async (req, res, next) => {
+  try {
+    const response = await extractAllPoxEntriesInCycle(req.params.bitcoinAddress, Number(req.params.cycle));
     console.log(response)
     return res.send(response);
   } catch (error) {
@@ -211,9 +222,29 @@ router.get("/pox-entries/:cycle", async (req, res, next) => {
   }
 });
 
-router.get("/solo-stacker-events/:hashBytes/:page/:limit", async (req, res, next) => {
+router.get("/stacker-events-by-hashbytes/:hashBytes/:page/:limit", async (req, res, next) => {
   try {
     const response = await findPoolStackerEventsByHashBytes(req.params.hashBytes, Number(req.params.page), Number(req.params.limit));
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+})
+
+router.get("/stacker-events-by-stacker/:address", async (req, res, next) => {
+  try {
+    const response = await findPoolStackerEventsByStacker(req.params.address);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+})
+
+router.get("/stacker-events-by-delegator/:address", async (req, res, next) => {
+  try {
+    const response = await findPoolStackerEventsByDelegator(req.params.address);
     return res.send(response);
   } catch (error) {
     console.log('Error in routes: ', error)

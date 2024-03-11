@@ -5,8 +5,9 @@ import { getDaoConfig } from "../lib/config_dao.js";
 import { getConfig } from "../lib/config.js";
 import { poolStackerAddresses, soloStackerAddresses } from "./dao/solo_pool_addresses.js";
 import { findProposalVotesByProposal, findVotesByProposalAndMethod, findVotesByProposalAndVoter, findVotesByVoter, getSummary  } from "./dao/vote_count_helper.js";
-import { getSoloTxs, reconcileSoloTxs } from "./dao/solo_votes.js";
-import { getPoolTxs, reconcilePoolTxs, reconcilePoolTxsByBalance } from "./dao/pool_votes.js";
+import { readSoloVote, readSoloVotes, readSoloZeroVote, reconcileSoloTxs } from "./dao/solo_votes.js";
+import { getPoolTransactions, getPoolTxs, reconcilePoolTxs, reconcilePoolTxsByBalance } from "./dao/pool_votes.js";
+import { fetchAddressTransactions } from "../lib/bitcoin/api_mempool.js";
 
 const router = express.Router();
 
@@ -82,6 +83,29 @@ router.get("/get-signals/:principle", async (req, res, next) => {
   }
 });
 
+/**
+ * votes for solo and pool stackers and addresses - for the configured proposal.
+ */
+router.get("/votes-solo", async (req, res, next) => {
+  try {
+    const addresses = soloStackerAddresses(getConfig().network)
+    const soloFor = await fetchAddressTransactions(addresses.yAddress);
+    const soloAgainst = await fetchAddressTransactions(addresses.nAddress);
+    return res.send({soloFor, soloAgainst});
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+router.get("/votes-pool", async (req, res, next) => {
+  try {
+    const poolTxs = await getPoolTransactions();
+    return res.send(poolTxs);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
 /**
  * votes for solo and pool stackers and addresses - for the configured proposal.
  */
@@ -302,10 +326,37 @@ router.get("/set-current-proposal/:contractId", async (req, res, next) => {
   }
 });
 
-router.get("/sync/results/solo-stackers/raw", async (req, res, next) => {
+router.get("/sync/results/solo-stackers", async (req, res, next) => {
   try {
-    const soloTxs = await getSoloTxs();
-    return res.send(soloTxs);
+    console.log('== READING SOLO VOTES ==================================')
+    const soloTxs = await readSoloVotes();
+    //await res.send(soloTxs);
+    console.log('== READING SOLO ZERO VOTE ==============================')
+    console.log('========================================================')
+    await readSoloZeroVote();
+    const currentProposal = await getDaoMongoConfig()
+    const soloVotes = await findVotesByProposalAndMethod(currentProposal.contractId, 'solo-vote');
+    return res.send(soloVotes);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/results/solo-stackers/:address", async (req, res, next) => {
+  try {
+    const soloTx = await readSoloVote(req.params.address);
+    return res.send(soloTx);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching pox-info.')
+  }
+});
+
+router.get("/sync/results/solo-zeroes", async (req, res, next) => {
+  try {
+    const soloTx = await readSoloZeroVote();
+    return res.send(soloTx);
   } catch (error) {
     console.log('Error in routes: ', error)
     next('An error occurred fetching pox-info.')

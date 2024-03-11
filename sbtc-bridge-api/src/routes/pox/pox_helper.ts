@@ -74,19 +74,21 @@ async function countEntries(cycle:number, stackerInfo:StackerInfo) {
 
 export async function extractAllPoxEntriesInCycle(address:string, cycle:number) {
   const poxEntries:Array<any> = await findPoxEntriesByAddressAndCycle(address, cycle);
-  console.log('extractAllPoxEntriesInCycle: ' + poxEntries.length)
+  //console.log('extractAllPoxEntriesInCycle: poxEntries: address: ' + address + ' cycle: ' + cycle, poxEntries)
   const newEntries = [];
   for (const entry of poxEntries) {
     const idx = newEntries.findIndex((o) => o.index === entry.index)
     if (idx === -1) newEntries.push(entry)
   }
-  console.log('extractAllPoxEntriesInCycle: ' + newEntries.length)
+  //console.log('extractAllPoxEntriesInCycle: ' + newEntries.length)
 
   for (const entry of newEntries) {
     if (entry.stacker) {
       const stackerInfoPerCycle = (await getStackerInfoFromContract(entry.stacker, entry.cycle));
       if (stackerInfoPerCycle?.stacker?.rewardSetIndexes) {
         entry.poxStackerInfo = await countEntries(entry.cycle, stackerInfoPerCycle)
+      } else {
+        entry.poxStackerInfo = []
       }
     }
   }
@@ -94,14 +96,31 @@ export async function extractAllPoxEntriesInCycle(address:string, cycle:number) 
 }
 
 export async function collateSoloStackerInfo(address:string, cycle:number):Promise<StackerStats> {
+
   const addressType = 'bitcoin'
   const votes = await findVotesByVoter(address)
+
+  if (!votes || votes.length !== 1) return {
+    address,
+    addressType,
+    cycle,
+    votes: [],
+  } as StackerStats
+
+  const vote = votes[0]
+
+  let voterProxy = address
+  if (vote.voterProxy) voterProxy = vote.voterProxy
+  console.log('collateSoloStackerInfo: address: ' + address + ' proxy: ' + voterProxy)
+
   //const rewardSlots:Array<any> = await findRewardSlotByAddress(address);
-  const rewardSlots:Array<any> = await getRewardsByAddress(0, 30, address);
-  const poxEntries:Array<any> = await extractAllPoxEntriesInCycle(address, cycle);
-  const stackerEvents:Array<PoolStackerEvent> = await findPoolStackerEventsByStacker(address)
-  const stackerEventsAsDelegator:Array<PoolStackerEvent> = await findPoolStackerEventsByStacker(address);
-  const hashBytes = getHashBytesFromAddress(address)
+  const rewardSlots:Array<any> = await getRewardsByAddress(0, 30, voterProxy);
+  let poxEntries:Array<any> = await extractAllPoxEntriesInCycle(voterProxy, cycle);
+  const poxEntries1:Array<any> = await extractAllPoxEntriesInCycle(voterProxy, cycle + 1);
+  poxEntries = poxEntries.concat(poxEntries1)
+  const stackerEvents:Array<PoolStackerEvent> = await findPoolStackerEventsByStacker(vote.poxStacker)
+  const stackerEventsAsDelegator:Array<PoolStackerEvent> = await findPoolStackerEventsByStacker(vote.poxStacker);
+  const hashBytes = getHashBytesFromAddress(voterProxy)
   const stackerEventsAsPoxAddress:Array<PoolStackerEvent> = await findPoolStackerEventsByHashBytesAndVersion(hashBytes.version, hashBytes.hashBytes, 0, 100);
   
   const stackerInfo:Array<StackerInfo> = [];
@@ -122,7 +141,6 @@ export async function collateSoloStackerInfo(address:string, cycle:number):Promi
     stackerEvents,
     stackerEventsAsDelegator,
     stackerEventsAsPoxAddress,
-
   }
 }
 

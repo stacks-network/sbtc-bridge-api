@@ -109,7 +109,7 @@ async function getCheckDelegation(address:string):Promise<Delegation> {
       functionArgs,
     }
     const val = await callContractReadOnly(data);
-    console.log('getCheckDelegation: ', val.value)
+    //console.log('getCheckDelegation: ', val.value)
     return (val.value) ? {
       amountUstx: Number(val.value.value['amount-ustx'].value),
       delegatedTo: val.value.value['delegated-to'].value,
@@ -122,7 +122,7 @@ async function getCheckDelegation(address:string):Promise<Delegation> {
       poxAddr: undefined
     }
   } catch(err:any) {
-    console.log('getCheckDelegation: ' + err.message)
+    console.error('getCheckDelegation: error: ' + err.message)
   }
 }
 
