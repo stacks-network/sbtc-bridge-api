@@ -1,13 +1,42 @@
-import { fetchAddressTransactions, fetchAddressTransactionsMin, fetchTransaction } from "../../lib/bitcoin/api_mempool.js"
+import { getAddressFromOutScript } from "sbtc-bridge-lib";
+import { fetchAddressTransactions, fetchAddressTransactionsMin, fetchTransaction, fetchTransactionHex } from "../../lib/bitcoin/api_mempool.js"
 import { getConfig } from "../../lib/config.js"
 import { getDaoConfig } from "../../lib/config_dao.js";
 import { getDaoMongoConfig } from "../../lib/data/db_models.js";
 import { VoteEvent } from "../../types/stxeco_type.js";
 import { findPoolStackerEventsByHashBytesAndEvent } from "../pox/pool_stacker_events_helper.js";
 import { extractAllPoxEntriesInCycle, findPoxEntriesByAddressAndCycle, getAddressFromHashBytes, getHashBytesFromAddress } from "../pox/pox_helper.js";
-import { soloStackerAddresses } from "./solo_pool_addresses.js"
-import { findVotesByProposalAndMethod, findVotesBySoloZeroAmounts, saveOrUpdateVote, saveVote, updateVote } from "./vote_count_helper.js";
+import { getNet, soloStackerAddresses } from "./solo_pool_addresses.js"
+import { findVotesByProposalAndMethod, findVotesBySoloZeroAmounts, findVotesByVoter, saveOrUpdateVote, saveVote, updateVote } from "./vote_count_helper.js";
+import * as btc from '@scure/btc-signer';
+import { hex } from '@scure/base';
 
+
+export async function analyseMultisig(address:string) {
+  const vote = await findVotesByVoter(address)
+  const tx = await fetchTransaction(vote[0].submitTxId)
+	//const tx1:btc.Transaction = btc.Transaction.fromRaw(hex.decode(tx.hex), {allowUnknowInput:true, allowUnknowOutput: true, allowUnknownOutputs: true, allowUnknownInputs: true})
+  const scripts = tx.vin[0].inner_witnessscript_asm.split(' ')
+  const pubKeys = [hex.decode(scripts[2]), hex.decode(scripts[4]), hex.decode(scripts[6])]
+  const p2wsh1 = btc.p2wsh(btc.p2ms(2, pubKeys))
+  const inner0Pkh = btc.p2pkh(pubKeys[0])
+  const inner0Wpkh = btc.p2wpkh(pubKeys[0])
+  const inner1Pkh = btc.p2pkh(pubKeys[1])
+  const inner1Wpkh = btc.p2wpkh(pubKeys[1])
+  const inner2Pkh = btc.p2pkh(pubKeys[2])
+  const inner2Wpkh = btc.p2wpkh(pubKeys[2])
+
+  const poxEntries = []
+  poxEntries.push(await findPoxEntriesByAddressAndCycle(inner0Pkh.address, 79))
+  poxEntries.push(await findPoxEntriesByAddressAndCycle(inner1Pkh.address, 79))
+  poxEntries.push(await findPoxEntriesByAddressAndCycle(inner2Pkh.address, 79))
+
+  //const net = getNet(getConfig().network);
+	//const outputScript = btc.OutScript.decode(tx.vin[0].inner_witnessscript_asm);
+
+  //const addr1 = btc.Address().encode()
+  return {inner0Wpkh, inner1Wpkh, inner2Wpkh}
+}
 
 export async function readSoloVotes() {
   const addresses = soloStackerAddresses(getConfig().network)
@@ -35,30 +64,41 @@ export async function readSoloZeroVote() {
   //const votes = votesAll.filter((o) => o.voter === myTx)
   //console.log('readSoloZeroVote: ', votes)
   const linkedVotes:Array<any> = []
+  let addressTxs:Array<any> = []
+  let feederTx:any
+  let feederAddress:string
+  let vcheck:number
+  let result:{total: number, totalNested: number, poxStacker:string} //await determineTotalAverageUstx(feederAddress)
   for (const vote of votes) {
     try {
       if (vote.voter && vote.voter !== 'unknown') {
-        const vcheck = linkedVotes.findIndex((o) => o.voter === vote.voter)
+        vcheck = linkedVotes.findIndex((o) => o.voter === vote.voter)
         if (vcheck === -1) {
-          const addressTxs = await fetchAddressTransactionsMin(vote.voter)
-          let feederTx = addressTxs[0]
-          let feederAddress;// = feederTx.vin[0].prevout.scriptpubkey_address;
-          let result = await determineTotalAverageUstx(feederAddress)
-          if (result.total === 0 || feederAddress === vote.voter) {
-            if (addressTxs.length > 1) {
-              feederTx = addressTxs[1]
-              feederAddress = feederTx.vin[0].prevout.scriptpubkey_address;
-              result = await determineTotalAverageUstx(feederAddress)
+          addressTxs = await fetchAddressTransactionsMin(vote.voter)
+          if (addressTxs.length > 1) {
+            feederTx = addressTxs[1]
+            feederAddress = feederTx.vin[0].prevout.scriptpubkey_address;
+            result = await determineTotalAverageUstx(feederAddress)
+            if (result.total > 0) {
+              vcheck = linkedVotes.findIndex((o) => o.voterProxy === feederAddress)
+              // eg several votes sent from eg 33af7jGkctpsG3jGBiTxgavLBxFFN5NbS2
+              // which all link back to bc1qmv2pxw5ahvwsu94kq5f520jgkmljs3af8ly6tr
+              // and same pox entries..
+              if (vcheck === -1) {
+
+                const newVote = {
+                  submitTxIdProxy: feederTx.txid,
+                  voterProxy: feederAddress,
+                  amount: result.total,
+                  amountNested: result.totalNested,
+                  poxStacker: result.poxStacker
+                }
+                await updateVote(vote, newVote)
+                linkedVotes.push(newVote)
+                console.log('readSoloZeroVote: feederAddress ' + feederAddress + ' vote.voter: ' + vote.voter + ' vote.voterProxy: ' + vote.voterProxy + ' amount: ' + result.total)
+              }
             }
           }
-          const newVote = updateVote(vote, {
-            submitTxIdProxy: feederTx.txid,
-            voterProxy: feederAddress,
-            amount: result.total,
-            amountNested: result.totalNested,
-          })
-          linkedVotes.push(newVote)
-          console.log('readSoloZeroVote: feederAddress ' + feederAddress + ' vote.voter: ' + vote.voter + ' amount: ' + result.total)
         }
       }
     } catch(err:any) {

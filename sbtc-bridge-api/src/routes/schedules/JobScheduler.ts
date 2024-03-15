@@ -1,14 +1,11 @@
 import cron from 'node-cron';
-import { saveAllSbtcEvents } from '../events/events_helper.js';
-import { scanBridgeTransactions, scanPeginRRTransactions } from '../../lib/bitcoin/rpc_commit.js';
 import { updateExchangeRates } from '../../lib/bitcoin/api_blockcypher.js';
-import { checkReveal } from '../../lib/bitcoin/rpc_reveal.js';
 import { SbtcWalletController } from '../stacks/StacksRPCController.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
   console.log('Running: sbtcEventJob at: ' + fireDate);
   try {
-    saveAllSbtcEvents();
+    //saveAllSbtcEvents();
   } catch (err) {
     console.log('Error running: saveAllSbtcEvents: ', err);
   }
@@ -27,7 +24,7 @@ export const peginRequestJob = cron.schedule('* */2 * * *', (fireDate) => {
 export const revealCheckJob = cron.schedule('*/23 * * * *', (fireDate) => {
   console.log('Running: revealCheckJob at: ' + fireDate);
   try {
-    checkReveal();
+    //checkReveal();
   } catch (err) {
     console.log('Error running: revealCheckJob: ', err);
   }
