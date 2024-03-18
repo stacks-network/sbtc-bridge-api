@@ -1,9 +1,10 @@
 import express from "express";
 import { findRewardSlotByAddress, findRewardSlotByAddressMinHeight, findRewardSlotByCycle, getRewardsByAddress, readAllRewardSlots, readRewardSlots } from "./reward_slot_helper.js";
-import { collateStackerInfo, extractAllPoxEntriesInCycle, findPoxEntriesByAddress, findPoxEntriesByAddressAndCycle, findPoxEntriesByCycle, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
+import { collateStackerInfo, extractAllPoxEntriesInCycle, findPoxEntriesByAddress, findPoxEntriesByAddressAndCycle, findPoxEntriesByCycle, getAddressFromHashBytes, getHashBytesFromAddress, readPoxEntriesFromContract, readSavePoxEntries } from "./pox_helper.js";
 import { getAllowanceContractCallers, getPoxBitcoinAddressInfo, getPoxCycleInfo, getPoxInfo, getStackerInfoFromContract, getRewardSetPoxAddress } from "./pox_contract_helper.js";
 import { readDelegationEvents } from "./delegation_helper.js";
 import { findPoolStackerEventsByDelegator, findPoolStackerEventsByHashBytes, findPoolStackerEventsByStacker, findPoolStackerEventsByStackerAndEvent, readPoolStackerEvents } from "./pool_stacker_events_helper.js";
+import { getConfig } from "../../lib/config.js";
 
 const router = express.Router();
 
@@ -201,6 +202,26 @@ router.get("/sync/pox-entries/:cycle/:index", async (req, res, next) => {
   }
 });
 
+
+router.get("/decode/:address", async (req, res, next) => {
+  try {
+    const response = await getHashBytesFromAddress(req.params.address);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
+
+router.get("/encode/:version/:hashBytes", async (req, res, next) => {
+  try {
+    const response = await getAddressFromHashBytes(req.params.hashBytes, req.params.version);
+    return res.send(response);
+  } catch (error) {
+    console.log('Error in routes: ', error)
+    next('An error occurred fetching sbtc data.')
+  }
+});
 
 router.get("/reward-slots/:cycle", async (req, res, next) => {
   try {
