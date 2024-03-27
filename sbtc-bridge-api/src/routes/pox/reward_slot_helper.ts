@@ -69,6 +69,19 @@ export async function readRewardSlots(offset:number, limit:number, poxInfo:PoxIn
   }
 }
 
+export async function getRewardsByAddress(offset:number, limit:number, address:string) {
+
+  const url = getConfig().stacksApi + '/extended/v1/burnchain/rewards/' + address + '?offset=' + offset + '&limit=' + limit;
+  console.log('readRewardSlots: ' + url);
+  try {
+    const response = await fetch(url);
+    const val = await response.json();
+    return (val.results) ? val.results : [];
+  } catch (err) {
+      console.error('readRewardSlots: ' + err.message);
+  }
+}
+
 // -- mongo: reward slots -------------
 export async function findRewardSlotByCycle(cycle:number):Promise<any> {
 	const result = await rewardSlotHolders.find({"cycle":cycle}).toArray();

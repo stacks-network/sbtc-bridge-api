@@ -236,6 +236,7 @@
 					"cardinalInfo": {
 						"$ref": "#/components/schemas/AddressMempoolObject"
 					},
+					"bnsNameInfo": {},
 					"stacksTokenInfo": {
 						"$ref": "#/components/schemas/AddressHiroObject"
 					},

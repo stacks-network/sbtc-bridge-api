@@ -242,7 +242,7 @@ export async function scanCommitments(btcAddress:string, stxAddress:string, sbtc
       matchCount++;
     }
     try {
-      txs = await fetchAddressTransactions(btcAddress, getLastSeenTxId(txs));
+      txs = await fetchAddressTransactions(btcAddress);
     } catch(err) {
       txs = undefined;
     }

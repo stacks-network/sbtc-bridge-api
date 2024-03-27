@@ -159,6 +159,7 @@ export type AddressObject = {
   sBTCBalance: number;
   stxBalance: number;
   stacksTokenInfo?: AddressHiroObject;
+  bnsNameInfo?: any;
   cardinalInfo?: AddressMempoolObject;
   ordinalInfo?: AddressMempoolObject;
   btcPubkeySegwit0?: string;

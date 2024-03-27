@@ -31,9 +31,10 @@ export async function fetchTransactionHex(txid:string) {
 
 export async function fetchTransaction(txid:string) {
   try {
+    if (txid.split(':').length > 0) return;
     const url = getConfig().mempoolUrl + '/tx/' + txid;
     const response = await fetch(url);
-    if (response.status !== 200) throw new Error('Unable to fetch transaction for: ' + txid);
+    if (response.status !== 200) throw new Error('fetchTransaction: Unable to fetch transaction for: ' + txid);
     const tx = await response.json();
     return tx;
   } catch(err) {
@@ -49,24 +50,53 @@ export async function fetchAddress(address:string):Promise<AddressMempoolObject>
   return result;
 }
 
-export async function fetchAddressTransactions(address:string, lastId?:string) {
-  let url = getConfig().mempoolUrl + '/address/' + address + '/txs';
-  if (lastId) url += '/' + lastId
-  console.log('fetchAddressTransactions: url: ' + url)
-  const response = await fetch(url);
-  const result = await response.json();
-  return result;
-}
+export async function fetchAddressTransactions(address:string, txId?:string) {
+	const urlBase = getConfig().mempoolUrl + '/address/' + address + '/txs';
+	let url = urlBase
+	if (txId) {
+		url = urlBase + '/chain/' + txId;
+	}
+	console.log('fetchAddressTransactions: url: ' + url)
+	let response:any;
+	let allResults:Array<any> = [];
+	let results:Array<any>;
+	let fetchMore = true;
+	do {
+		try {
+			response = await fetch(url);
+			results = await response.json();
+			if (results && results.length > 0) {
+				console.log('fetchAddressTransactions: ' + results.length + ' found at ' + results[(results.length-1)].status.block_height)
+				url = urlBase + '/chain/' + results[(results.length-1)].txid;
+				allResults = allResults.concat(results)
+			} else {
+			  fetchMore = false
+			}
+		} catch(err:any) {
+			console.error('fetchAddressTransactions' + err.message)
+			fetchMore = false
+		}
+	} while (fetchMore);
+	console.log('fetchAddressTransactions: total of ' + allResults.length + ' found at ' + address)
+	return allResults;
+  } 
 
-export async function fetchUtxosForAddress(address:string) {
-  let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
-  console.log('fetchUtxoSetDevnet: fetchUtxosForAddress' + url);
-  const response = await fetch(url);
-  const result = await response.json();
-  return result;
-}
-
-export async function fetchUTXOs(address:string) {
+  export async function fetchAddressTransactionsMin(address:string) {
+    const url = getConfig().mempoolUrl + '/address/' + address + '/txs';
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  }
+  
+  export async function fetchUtxosForAddress(address:string) {
+    let url = getConfig().electrumUrl + '/address/' + address + '/utxo';
+    console.log('fetchUtxoSetDevnet: fetchUtxosForAddress' + url);
+    const response = await fetch(url);
+    const result = await response.json();
+    return result;
+  }
+  
+  export async function fetchUTXOs(address:string) {
   try {
     // this will work on test/main net but not devnet
     const url = getConfig().mempoolUrl + '/address/' + address + '/utxo';

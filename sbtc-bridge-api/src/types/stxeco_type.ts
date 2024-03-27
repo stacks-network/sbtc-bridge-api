@@ -1,3 +1,4 @@
+import { PoxAddress } from "./pox_types";
 
 export type HoldingsType = {
   nfts: any;
@@ -34,18 +35,23 @@ export type ProposalEvent = {
   stage: ProposalStage;
 }
 export type VoteEvent = {
+  stackerData?: any;
   event: string;
-  proposal: string;
   voter: string;
+  voterProxy: string;
   for: boolean;
   amount: number;
+  amountNested: number;
   votingContractId:string;
   proposalContractId: string;
   submitTxId: string;
+  submitTxIdProxy: string;
   blockHeight: number;
   burnBlockHeight: number;
-  delegations?: number;
+  delegateTo?: string;
+  delegateTxId?: string;
   poxStacker?: string;
+  poxAddr?: PoxAddress;
 }
 export enum ProposalStage {
   UNFUNDED,

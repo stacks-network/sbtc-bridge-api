@@ -79,7 +79,7 @@
     "node-cron": "^3.0.2",
     "node-fetch": "^2.6.9",
     "npm": "^10.2.5",
-    "sbtc-bridge-lib": "^1.1.25",
+    "sbtc-bridge-lib": "^1.1.27",
     "swagger-ui-express": "^4.6.3",
     "tsoa": "^5.1.1",
     "uninstall": "^0.0.0",

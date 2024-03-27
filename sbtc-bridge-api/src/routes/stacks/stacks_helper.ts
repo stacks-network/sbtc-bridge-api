@@ -178,6 +178,16 @@ export async function fetchUserBalances(stxAddress:string, cardinal:string, ordi
   } catch(err:any) {
     //console.error('fetchUserBalances: stacksTokenInfo: ' + err.message)
   }
+  // fetch bns info
+  try {
+    const url = getConfig().stacksApi + '/v1/addresses/stacks/' + stxAddress;
+    const response = await fetch(url);
+    const result:any = await response.json();
+    userBalances.bnsNameInfo = result
+  } catch(err:any) {
+    userBalances.bnsNameInfo = { names: [] }
+    console.log('fetchUserBalances: sBtcBalance: ' + err.message)
+  }
   try {
     if (userBalances.stxAddress) {
       const sBtcBalance = await fetchUserSbtcBalance(userBalances.stxAddress);
