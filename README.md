@@ -88,8 +88,78 @@ Note: `docker-compose.yml` is used for production deployment.
   kompose convert --chart --out sbtc-bridge-api-chart
   helm upgrade sbtc-bridge-api sbtc-bridge-api-chart --install --namespace sbtc
   ```
+
 - Inspect the Ingresses
   ```
   kubectl get ingress -n sbtc
   ```
-  
+
+docker run -d --rm --name postgres --net=stacks-blockchain -e POSTGRES_PASSWORD=postgres -v /mnt/bitcoin-testnet/stacks-testnet/postgres/postgresql/15/main:/var/lib/postgresql/data -p 5432:5432 postgres:alpine
+
+docker run -d --rm --name stacks-blockchain-api --net=stacks-blockchain --env-file $(pwd)/.env -v $(pwd)/bns:/bns-data -p 3700:3700 -p 3999:3999 blockstack/stacks-blockchain-api
+
+docker run -d --rm --name stacks-blockchain --net=stacks-blockchain -v /mnt/bitcoin-testnet/stacks-testnet:/root/stacks-node/data -v $(pwd)/config:/src/stacks-node -p 20443:20443 -p 20444:20444 blockstack/stacks-blockchain /bin/stacks-node start --config /src/stacks-node/Config.toml
+
+docker run -d --rm --name stacks-blockchain-api --net=stacks-blockchain --env-file $(pwd)/.env -v $(pwd)/bns:/bns-data -p 5432:5432 -p 20443:20443 -p 20444:20444 -p 3700:3700 -p 3999:3999 blockstack/stacks-blockchain-api
+
+## Comments on running full api node from restore
+
+https://docs.hiro.so/hiro-archive
+
+The section on restoring the API needs a link to the correct method to run the api. 
+
+Don't rely on the v2/info end point. Also check a well known contract for [deployment](https://api.testnet.hiro.so/extended/v1/contract/ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3).
+
+```bash
+pg_restore --username=postgres --verbose --jobs=4 -d stacks_blockchain_api  /stacks-blockchain-api-pg-15-latest.dump
+pg_restore: connecting to database for restore
+Password:
+pg_restore: error: connection to server on socket "/var/run/postgresql/.s.PGSQL.5432" failed: FATAL:  database "stacks_blockchain_api" does not exist
+```
+
+Database command to create the db (note that the dump then tries and fails to create the db)?
+
+```bash
+CREATE DATABASE stacks_blockchain_api WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+```
+
+Not clear what the database name should be when starting the api node in docker?
+
+node ./lib/index.js import-events --file /mnt/bitcoin-testnet/stacks-testnet/archives/testnet-stacks-blockchain-api-7.8.2-20240322.tsv  --wipe-db --force
+Error: UNDEFINED_VALUE: Undefined values are not allowed
+
+PGDMP
+|stacks_blockchain_api15.615.6N0ENCODINENCODINGSET client_encoding = 'UTF8';
+false00
+STDSTRINGS
+STDSTRINGS(SET standard_conforming_strings = 'on';
+false00
+SEARCHPATH
+SEARCHPATH8SELECT pg_catalog.set_config('search_path', '', false);
+false126216384stacks_blockchain_apDATABASE�CREATE DATABASE stacks_blockchain_api WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+%DROP DATABASE stacks_blockchain_api;
+postgresfalse00DATABASE stacks_blockchain_apiACLHREVOKE CONNECT,TEMPORARY ON DATABASE stacks_blockchain_api FROM PUBLIC;
+postgresfalse384400stacks_blockchain_apiDATABASE PROPERTIESALTER DATABASE stacks_blockchain_api SET default_transaction_read_only TO 'off';
+ALTER DATABASE stacks_blockchain_api SET search_path TO 'stacks_blockchain_api', 'public';
+ALTER ROLE postgres IN DATABASE stacks_blockchain_api SET search_path TO 'stacks_blockchain_api', 'public';
+postgresfalse00
+pg_database_ownerfalse5261516389stacks_blockchain_apiSCHEMA%CREATE SCHEMA stacks_blockchain_api;
+#DROP SCHEMA stacks_blockchain_api;
+
+PGDM|stacks_blockchain_api15.215.6N�0ENCODINENCODINGSET client_encoding = 'UTF8';
+false�00
+STDSTRINGS
+STDSTRINGS(SET standard_conforming_strings = 'on';
+false�00
+SEARCHPATH
+SEARCHPATH8SELECT pg_catalog.set_config('search_path', '', false);
+false�126216384stacks_blockchain_apDATABASE�CREATE DATABASE stacks_blockchain_api WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'en_US.UTF-8';
+%DROP DATABASE stacks_blockchain_api;
+postgresfalse�00DATABASE stacks_blockchain_apiACLHREVOKE CONNECT,TEMPORARY ON DATABASE stacks_blockchain_api FROM PUBLIC;
+postgresfalse3822�00stacks_blockchain_apiDATABASE PROPERTIESALTER DATABASE stacks_blockchain_api SET default_transaction_read_only TO 'off';
+ALTER DATABASE stacks_blockchain_api SET search_path TO 'stacks_blockchain_api', 'public';
+ALTER ROLE postgres IN DATABASE stacks_blockchain_api SET search_path TO 'stacks_blockchain_api', 'public';
+postgresfalse�00
+pg_database_ownerfalse5261516385stacks_blockchain_apiSCHEMA%CREATE SCHEMA stacks_blockchain_api;
+#DROP SCHEMA stacks_blockchain_api;
+postgresfalse�125916386blocksTABLE	CREATE TABLE stacks_blockchain_api.blocks (

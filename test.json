@@ -1,0 +1,21 @@
+{
+  "level": "error",
+  "time": "2024-03-24T16:20:20.710Z",
+  "pid": 127787,
+  "hostname": "leibniz.brightblock.org",
+  "name": "stacks-blockchain-api",
+  "component": "core-api",
+  "err": {
+    "type": "DatabaseError",
+    "message": "relation \"blocks\" already exists",
+    "stack": "error: relation \"blocks\" already exists\n    at Parser.parseErrorMessage (/mnt/bitcoin-testnet/stacks-testnet/stacks-blockchain-api-7.8.0/node_modules/pg-protocol/src/parser.ts:369:69)\n    at Parser.handlePacket (/mnt/bitcoin-testnet/stacks-testnet/stacks-blockchain-api-7.8.0/node_modules/pg-protocol/src/parser.ts:188:21)\n    at Parser.parse (/mnt/bitcoin-testnet/stacks-testnet/stacks-blockchain-api-7.8.0/node_modules/pg-protocol/src/parser.ts:103:30)\n    at Socket.<anonymous> (/mnt/bitcoin-testnet/stacks-testnet/stacks-blockchain-api-7.8.0/node_modules/pg-protocol/src/index.ts:7:48)\n    at Socket.emit (node:events:519:28)\n    at addChunk (node:internal/streams/readable:559:12)\n    at readableAddChunkPushByteMode (node:internal/streams/readable:510:3)\n    at Socket.Readable.push (node:internal/streams/readable:390:5)\n    at TCP.onStreamRead (node:internal/stream_base_commons:190:23)",
+    "length": 100,
+    "name": "error",
+    "severity": "ERROR",
+    "code": "42P07",
+    "file": "heap.c",
+    "line": "1146",
+    "routine": "heap_create_with_catalog"
+  },
+  "msg": "app failed to start"
+}

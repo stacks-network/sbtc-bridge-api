@@ -5,10 +5,9 @@
 export SERVER1=spinoza.brightblock.org;
 export DOCKER_NAME1=bridge_api_production
 export TARGET_ENV1=linode-production
-export PORT1=22
+export PORT=22
 
-export SERVER2=chomsky.brightblock.org
-export PORT2=7019
+export SERVER2=leibniz.brightblock.org
 export DOCKER_NAME2=bridge_api_staging
 export TARGET_ENV2=linode-staging
 
@@ -20,10 +19,10 @@ $DOCKER_CMD tag mijoco/bridge_api mijoco/bridge_api
 $DOCKER_CMD push mijoco/bridge_api:latest
 
 printf "\n\n===================================================="
-printf "\nConnecting to: $SERVER1:$PORT1"
+printf "\nConnecting to: $SERVER1:$PORT"
 printf "\nDeploying docker container: $DOCKER_NAME1"
 
-  ssh -i ~/.ssh/id_rsa -p $PORT1 bob@$SERVER1 "
+  ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER1 "
     cd /home/bob/hubgit/sbtc-bridge-api
     pwd
     source ~/.profile;
@@ -54,10 +53,10 @@ printf "\nDeploying docker container: $DOCKER_NAME1"
   ";
 
   printf "\n\n\n===================================================="
-  printf "\nConnecting to: $SERVER2:$PORT2."
+  printf "\nConnecting to: $SERVER2:$PORT."
   printf "\nDeploying docker container: $DOCKER_NAME2"
 
-  ssh -i ~/.ssh/id_rsa -p $PORT2 bob@$SERVER2 "
+  ssh -i ~/.ssh/id_rsa -p $PORT bob@$SERVER2 "
     cd /home/bob/hubgit/sbtc-bridge-api
     pwd
     source ~/.profile;

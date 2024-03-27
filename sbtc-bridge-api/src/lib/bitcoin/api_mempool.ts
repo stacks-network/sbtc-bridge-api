@@ -31,9 +31,10 @@ export async function fetchTransactionHex(txid:string) {
 
 export async function fetchTransaction(txid:string) {
   try {
+    if (txid.split(':').length > 0) return;
     const url = getConfig().mempoolUrl + '/tx/' + txid;
     const response = await fetch(url);
-    if (response.status !== 200) throw new Error('Unable to fetch transaction for: ' + txid);
+    if (response.status !== 200) throw new Error('fetchTransaction: Unable to fetch transaction for: ' + txid);
     const tx = await response.json();
     return tx;
   } catch(err) {
