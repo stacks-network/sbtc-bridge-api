@@ -13,6 +13,10 @@ export let rewardSlotHolders:Collection;
 export let poxAddressInfo:Collection;
 export let daoMongoConfig:Collection;
 export let poolStackerEventsCollection:Collection;
+export let pox4EventsCollection:Collection;
+export let pox4RewardSlotHolders:Collection;
+export let pox4AddressInfoCollection:Collection;
+export let pox4BitcoinStacksTxCollection:Collection;
 
 export async function connect() {
 	let uriPrefix:string = 'mongodb+srv'
@@ -37,9 +41,9 @@ export async function connect() {
 	// The connect() method does not attempt a connection; instead it instructs
 	// the driver to connect using the settings provided when a connection
 	// is required.
+    //console.log("Pinging");
 	await client.connect();
 	await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
 	
 	// Create references to the database and collection in order to run
 	// operations on them.
@@ -62,6 +66,19 @@ export async function connect() {
 	//await poxAddressInfo.createIndex({hashBytes: 1, version: 1, totalUstx: 1, cycle: 1, stacker: 1}, { unique: true })
 	delegationEvents = database.collection('delegationEvents');
 	poolStackerEventsCollection = database.collection('poolStackerEventsCollection');
+
+	pox4EventsCollection = database.collection('pox4EventsCollection');
+	//await pox4EventsCollection.createIndex({eventIndex: 1, event: 1}, { unique: true })
+
+	pox4RewardSlotHolders = database.collection('pox4RewardSlotHolders');
+	await pox4RewardSlotHolders.createIndex({txId: 1}, { unique: true })
+
+	pox4AddressInfoCollection = database.collection('pox4AddressInfoCollection');
+	pox4BitcoinStacksTxCollection = database.collection('pox4BitcoinStacksTxCollection');
+	await pox4BitcoinStacksTxCollection.createIndex({txId: 1}, { unique: true })
+
+	//const rates = await getExchangeRates(); // test connections
+	//console.log(rates)
 }
 
 // Exchange Rates 

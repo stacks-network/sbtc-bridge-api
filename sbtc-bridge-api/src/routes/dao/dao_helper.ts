@@ -10,7 +10,6 @@ import { saveOrUpdateProposal } from '../../lib/data/db_models.js';
 import { getDaoConfig } from '../../lib/config_dao.js';
 import { callContractReadOnly, fetchDataVar } from '../stacks/stacks_helper.js';
 import { NFTHolding, NFTHoldings } from '../../types/stxeco_nft_type.js';
-import { BlockchainInfo } from 'sbtc-bridge-lib';
 import { countsVotesByMethod, countsVotesByProposalAndMethod, saveOrUpdateVote } from './vote_count_helper.js';
 
 let uris:any = {};
@@ -19,6 +18,7 @@ const gatewayAr = "https://arweave.net/";
 
 export async function getStacksInfo() {
   const url = getConfig().stacksApi + '/v2/info';
+  console.log('getStacksInfo: ' + url)
   const response = await fetch(url)
   return await response.json();
 }
@@ -208,7 +208,8 @@ export async function getProposalsForActiveVotingExt(votingContractId:string) {
         moreEvents = await innerProposalsForActiveVotingExt(url, currentOffset, count, votingContractId)
         count++;
       } catch (err:any) {
-        console.log('getProposalsForActiveVotingExt' + err.message)
+        console.log('getProposalsForActiveVotingExt: ' + url)
+        console.log('getProposalsForActiveVotingExt: ' + err.message)
       }
     }
     while (moreEvents)
@@ -288,7 +289,9 @@ export async function getProposalsFromContractIds(submissionContractId:string, p
 export async function getProposalFromContractId(submissionContractId:string, proposalContractId:string):Promise<ProposalEvent|undefined> {
   let proposal:ProposalEvent|undefined = undefined;
   try {
+    console.log('getProposalData: proposalContractId: ' + proposalContractId)
     const contract = await getProposalContract(proposalContractId)
+    let proposalMeta;
     let funding;
     let signals;
     let stage = ProposalStage.PARTIAL_FUNDING;
@@ -296,14 +299,17 @@ export async function getProposalFromContractId(submissionContractId:string, pro
       funding = await getFunding(submissionContractId, proposalContractId);
       if (funding.funding === 0) stage = ProposalStage.UNFUNDED
       //signals = await getSignals(proposalContractId)
+      proposalMeta = DaoUtils.getMetaData(contract.source)
     } catch (err:any) {
-      console.log(err.message)
+      console.log('getProposalFromContractId: funding: ' + err.message)
     }
-    const proposalMeta = DaoUtils.getMetaData(contract.source)
     let proposalData:ProposalData;
     try {
       proposalData = await getProposalData(proposalContractId)
-    } catch (e) { }
+    } catch (err) { 
+      console.log('getProposalFromContractId: proposalData1: ' + err.message)
+
+    }
     const p = {
       contract,
       proposalMeta,
@@ -317,12 +323,13 @@ export async function getProposalFromContractId(submissionContractId:string, pro
     saveOrUpdateProposal(p)
     proposal = p
   } catch(err:any) {
-    console.log(err)
+    console.log('getProposalFromContractId: proposalData2: ' + err.message)
   }
   return proposal
 }
 
 export async function getProposalData(principle:string):Promise<ProposalData> {
+  console.log('getProposalData: data: ' + principle)
   const functionArgs = [`0x${hex.encode(serializeCV(contractPrincipalCV(principle.split('.')[0], principle.split('.')[1] )))}`];
   const data = {
     contractAddress: getDaoConfig().VITE_DOA_DEPLOYER,
@@ -479,6 +486,7 @@ async function getSubmissionData(txId:string):Promise<SubmissionData> {
 
 async function getProposalContract(principle:string):Promise<ProposalContract> {
   const url = getConfig().stacksApi + '/v2/contracts/source/' + principle.split('.')[0] + '/' + principle.split('.')[1] + '?proof=0';
+  //console.log('getProposalData: url: ' + url)
   const response = await fetch(url)
   const val = await response.json();
   return val;

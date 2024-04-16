@@ -15,17 +15,12 @@ const LOCAL_REGTEST_CONFIG = {
   port: 3010,
   walletPath: '',
   network: 'devnet',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset-3',
   stacksApi: 'http://localhost:3999',
   stacksExplorerUrl: 'http://127.0.0.1:3020',
   bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
   mempoolUrl: 'https://mempool.space/testnet/api',
   electrumUrl: 'http://45.79.130.153:3002',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
-  btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
-  btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
-  btcSchnorrOracle: 'f0e8dfde982fb06e26739502d92cdf433cc40036e120df45259fe590a3f043e3',
   publicAppName: 'UASU Staging API',
   publicAppVersion: '1.0.0',
 }
@@ -38,15 +33,10 @@ const LOCAL_TESTNET_CONFIG = {
   btcNode: '127.0.0.1:18332',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
-  btcSchnorrReveal: '8854e0f3b4979edc55330722626ce4e12f67ef89f0ac00032d18e6da3a2dc60b',
-  btcSchnorrReclaim: '1eba17807c82b0aa676b85839ea84663ceb6fbbfb3e0a23a2bdae9cd3df096cb',
-  btcSchnorrOracle: '8181ea91f5f8e9273dc333e04abefa06ac942d85a4081684ccf3534884a66f8c',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'testnet',
-  poxContractId: 'ST000000000000000000002AMW42H.pox-3',
-  sbtcContractId: 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3',
   //stacksApi: 'https://leibniz.brightblock.org',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.so/',
@@ -55,6 +45,30 @@ const LOCAL_TESTNET_CONFIG = {
   electrumUrl: '',
   blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
   publicAppName: 'UASU Staging API',
+  publicAppVersion: '1.0.0'
+}
+
+const LOCAL_NAKAMOTO_CONFIG = {
+  // api running n develop mode on localhost against local testnet
+  mongoDbUrl: 'cluster0.kepjbx0.mongodb.net',
+  mongoDbName: 'sbtc-bridge-simnet-db',
+  mongoUser: 'dockerdev1',
+  mongoPwd: 'FbKWBThNLIjqExG1',
+  btcNode: '127.0.0.1:18332',
+  btcRpcUser: 'devnet',
+  btcRpcPwd: 'devnet',
+  host: 'http://localhost',
+  port: 3010,
+  walletPath: '/wallet/descwallet',
+  network: 'testnet',
+  //stacksApi: 'https://leibniz.brightblock.org',
+  stacksApi: 'https://api.nakamoto.testnet.hiro.so',
+  stacksExplorerUrl: 'https://explorer.hiro.so/',
+  bitcoinExplorerUrl: 'https://mempool.space/testnet/api',
+  mempoolUrl: 'https://mempool.space/testnet/api',
+  electrumUrl: '',
+  blockCypherUrl: 'https://api.blockcypher.com/v1/btc/test3',
+  publicAppName: 'Nakamoto DAO API',
   publicAppVersion: '1.0.0'
 }
 
@@ -67,15 +81,10 @@ const LOCAL_MAINNET_CONFIG = {
   btcNode: '127.0.0.1:18332',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
-  btcSchnorrReveal: '8854e0f3b4979edc55330722626ce4e12f67ef89f0ac00032d18e6da3a2dc60b',
-  btcSchnorrReclaim: '1eba17807c82b0aa676b85839ea84663ceb6fbbfb3e0a23a2bdae9cd3df096cb',
-  btcSchnorrOracle: '8181ea91f5f8e9273dc333e04abefa06ac942d85a4081684ccf3534884a66f8c',
   host: 'http://localhost',
   port: 3010,
   walletPath: '/wallet/descwallet',
   network: 'mainnet',
-  poxContractId: 'SP000000000000000000002Q6VF78.pox-3',
-  sbtcContractId: '',
   //stacksApi: 'https://leibniz.brightblock.org',
   stacksApi: 'https://api.hiro.so',
   stacksExplorerUrl: 'https://explorer.hiro.so/',
@@ -95,16 +104,10 @@ const LOCAL_DEVENV_CONFIG = {
   btcNode: '127.0.0.1:18332',
   btcRpcUser: 'devnet',
   btcRpcPwd: 'devnet',
-  btcSchnorrReveal: 'd796ea3dd9d6cc91dac7ae254b111099acc7b640ce98b74c83975d26b7f49804',
-  btcSchnorrReclaim: 'f32a129e799bacde2d451569e56598cdc56f83e0e8708303cc72d5852990b7d8',
-  btcSchnorrOracle: 'f0e8dfde982fb06e26739502d92cdf433cc40036e120df45259fe590a3f043e3',
   host: 'http://localhost',
   port: 3010,
   walletPath: '',
   network: 'testnet',
-  poxContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3',
-  sbtcContractId: 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.asset-3',
-  //stacksApi: 'http://45.79.130.153:3999',
   stacksApi: 'https://api.testnet.hiro.so',
   stacksExplorerUrl: 'http://127.0.0.1:3020',
   bitcoinExplorerUrl: 'http://45.79.130.153:8083',
@@ -117,6 +120,7 @@ const LOCAL_DEVENV_CONFIG = {
 
 export function setConfigOnStart() {
 	if (isLocalTestnet()) CONFIG = LOCAL_TESTNET_CONFIG;
+	else if (isLocalNakamoto()) CONFIG = LOCAL_NAKAMOTO_CONFIG;
 	else if (isLocalMainnet()) CONFIG = LOCAL_MAINNET_CONFIG;
 	else if (isLocalRegtest()) CONFIG = LOCAL_REGTEST_CONFIG;
 	else if (isLocalDevenv()) CONFIG = LOCAL_DEVENV_CONFIG;
@@ -125,10 +129,23 @@ export function setConfigOnStart() {
 
 function setOverrides() {
   console.log('================================================ >> ' + process.env.NODE_ENV)
+  CONFIG.poxContractId = 'ST000000000000000000002AMW42H.pox-3'
+  CONFIG.pox4ContractId = 'ST000000000000000000002AMW42H.pox-4'
+  CONFIG.signerVotingContractId = 'ST000000000000000000002AMW42H.signers-voting'
+  CONFIG.signersContractId = 'ST000000000000000000002AMW42H.signers'
+  CONFIG.sbtcContractId = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3'
+  if (isLocalMainnet() || CONFIG.network === 'mainnet') {
+    CONFIG.poxContractId = 'SP000000000000000000002Q6VF78.pox-3'
+    CONFIG.pox4ContractId = 'SP000000000000000000002Q6VF78.pox-4'
+    CONFIG.signerVotingContractId = 'SP000000000000000000002Q6VF78.signers-voting'
+    CONFIG.signersContractId = 'SP000000000000000000002Q6VF78.signers'
+    CONFIG.sbtcContractId = 'ST1R1061ZT6KPJXQ7PAXPFB6ZAZ6ZWW28G8HXK9G5.asset-3'
+  }
+
   if (isLocalDevenv() || isLocalRegtest()) {
     // outside docker : config is provided by the application
     CONFIG.publicAppVersion = '1.0.0';
-  } else if (isLocalTestnet() || isLocalMainnet()) {
+  } else if (isLocalTestnet() || isLocalMainnet() || isLocalNakamoto()) {
     //CONFIG.btcNode = 'localhost:18332'
     //CONFIG.poxContractId = 'ST1PQHQKV0RJXZFY1DGX8MNSNYVE3VGZJSRTPGZGM.pox-3'
     //CONFIG.stacksApi = 'https://api.hiro.so'
@@ -143,8 +160,6 @@ function setOverrides() {
     CONFIG.btcRpcUser = process.env.btcRpcUser || '';
     CONFIG.btcRpcPwd = process.env.btcRpcPwd || '';
     
-    CONFIG.poxContractId = process.env.poxContractId || '';
-    CONFIG.sbtcContractId = process.env.sbtcContractId || '';
     CONFIG.network = process.env.network || '';
     CONFIG.stacksApi = process.env.stacksApi || '';
     CONFIG.stacksExplorerUrl =  process.env.stacksExplorerUrl || '';
@@ -159,6 +174,8 @@ function setOverrides() {
     CONFIG.port = Number(process.env.port) || 3010;
     CONFIG.walletPath = process.env.walletPath || '';
   }
+
+
 }
 
 export function isDevenv() {
@@ -181,6 +198,11 @@ export function isLocalTestnet() {
   return (environ && environ === 'local-testnet')
 }
 
+export function isLocalNakamoto() {
+  const environ = process.env.NODE_ENV;
+  return (environ && environ === 'local-nakamoto')
+}
+
 export function isLocalMainnet() {
   const environ = process.env.NODE_ENV;
   return (environ && environ === 'local-mainnet')
@@ -198,6 +220,7 @@ export function getConfig() {
 
 export function printConfig() {
   console.log('== ' + process.env.NODE_ENV + ' ==========================================================')
+  console.log('CONFIG.mongoDbUrl = ' + CONFIG.mongoDbUrl)
   console.log('CONFIG.mongoDbName = ' + CONFIG.mongoDbName)
   console.log('CONFIG.mongoUser = ' + CONFIG.mongoUser)
   console.log('CONFIG.mongoPwd = ' + CONFIG.mongoPwd.substring(0,2))
@@ -207,6 +230,11 @@ export function printConfig() {
   console.log('CONFIG.port = ' + CONFIG.port)
   console.log('CONFIG.walletPath = ' + CONFIG.walletPath)
   console.log('CONFIG.sbtcContractId = ' + CONFIG.sbtcContractId)
+  console.log('CONFIG.pox4ContractId = ' + CONFIG.pox4ContractId)
+  console.log('CONFIG.signersContractId = ' + CONFIG.signersContractId)
+  console.log('CONFIG.signerVotingContractId = ' + CONFIG.signerVotingContractId)
+  console.log('CONFIG.poxContractId = ' + CONFIG.poxContractId)
+  console.log('CONFIG.stacksApi = ' + CONFIG.stacksApi)
   console.log('CONFIG.stacksApi = ' + CONFIG.stacksApi)
   console.log('CONFIG.bitcoinExplorerUrl = ' + CONFIG.bitcoinExplorerUrl)
   console.log('CONFIG.mempoolUrl = ' + CONFIG.mempoolUrl)

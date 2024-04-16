@@ -9,7 +9,7 @@ export type StackerStats = {
     stackerInfo?: Array<StackerInfo>,
     rewardSlots?: Array<any>,
     poxEntries: Array<PoxEntry>;
-    votes: Array<VoteEvent>,
+    votes?: Array<VoteEvent>,
     stackerEvents:Array<PoolStackerEvent>;
     stackerEventsAsDelegator?:Array<PoolStackerEvent>;
     stackerEventsAsPoxAddress?:Array<PoolStackerEvent>;

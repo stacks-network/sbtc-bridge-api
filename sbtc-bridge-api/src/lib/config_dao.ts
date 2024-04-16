@@ -38,7 +38,7 @@ export let DAO_CONFIG = DAO_CONFIG_TESTNET;
 
 export function setDaoConfig(network:string) {
 	if (isLocalTestnet()) {
-        DAO_CONFIG = DAO_CONFIG_TESTNET;
+        DAO_CONFIG = DAO_CONFIG_MAINNET;
         return
     } else if (isLocalMainnet()) {
         DAO_CONFIG = DAO_CONFIG_MAINNET;
@@ -69,13 +69,13 @@ export function getDaoConfig() {
   
 export function printDaoConfig() {
     console.log('== ' + process.env.NODE_ENV + ' ==========================================================')
-    console.log('VITE_DOA_PROPOSAL = ' + DAO_CONFIG.VITE_DOA_PROPOSAL);
-    console.log('VITE_DOA_PROPOSALS = ' + DAO_CONFIG.VITE_DOA_PROPOSALS);
-    console.log('VITE_DOA_DEPLOYER = ' + DAO_CONFIG.VITE_DOA_DEPLOYER);
-    console.log('VITE_DOA_SNAPSHOT_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
-    console.log('VITE_DOA_PROPOSAL_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_PROPOSAL_VOTING_EXTENSION);
-    console.log('VITE_DOA_FUNDED_SUBMISSION_EXTENSION = ' + DAO_CONFIG.VITE_DOA_FUNDED_SUBMISSION_EXTENSION);
-    console.log('VITE_DOA_POX = ' + DAO_CONFIG.VITE_DOA_POX);
+    console.log('DOA_PROPOSAL = ' + DAO_CONFIG.VITE_DOA_PROPOSAL);
+    console.log('DOA_PROPOSALS = ' + DAO_CONFIG.VITE_DOA_PROPOSALS);
+    console.log('DOA_DEPLOYER = ' + DAO_CONFIG.VITE_DOA_DEPLOYER);
+    console.log('DOA_SNAPSHOT_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_SNAPSHOT_VOTING_EXTENSION);
+    console.log('DOA_PROPOSAL_VOTING_EXTENSION = ' + DAO_CONFIG.VITE_DOA_PROPOSAL_VOTING_EXTENSION);
+    console.log('DOA_FUNDED_SUBMISSION_EXTENSION = ' + DAO_CONFIG.VITE_DOA_FUNDED_SUBMISSION_EXTENSION);
+    console.log('DOA_POX = ' + DAO_CONFIG.VITE_DOA_POX);
   }
   
   export function isLocalMainnet() {

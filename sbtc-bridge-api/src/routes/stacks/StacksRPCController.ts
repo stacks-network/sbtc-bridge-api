@@ -159,13 +159,13 @@ export class SbtcWalletController {
 
   public async initUiCache(): Promise<any> {
     try {
-      console.log('Adding [keys, sbtcContractData, btcFeeRates] data to cache')
       const sbtcContractData = await this.fetchSbtcContractData();
       const controller2 = new TransactionController();
       const keys = await controller2.getKeys();
       const rates = await controller2.getRates();
       const controller = new BlocksController();
       const btcFeeRates = await controller.getFeeEstimate();
+      //console.log('initUiCache: sbtcContractData: ', sbtcContractData)
 
       cachedUIObject = {
         keys,

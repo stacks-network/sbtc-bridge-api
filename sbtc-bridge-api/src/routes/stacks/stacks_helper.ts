@@ -218,7 +218,7 @@ export async function callContractReadOnly(data:any) {
   let val;
   try {
 
-    //console.log('callContractReadOnly: url: ', url)
+    console.log('callContractReadOnly: url: ', url)
     const hiroApi1 = 'ae4ecb7b39e8fbc0326091ddac461bc6'
     const response = await fetch(url, {
       method: 'POST',

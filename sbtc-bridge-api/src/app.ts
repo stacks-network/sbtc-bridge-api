@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import swaggerUi from 'swagger-ui-express';
 import express, { Application } from "express";
 import morgan from "morgan";
-import { sbtcEventJob, peginRequestJob, revealCheckJob } from './routes/schedules/JobScheduler.js';
+import { initUiCacheJob, pox4EventsJob } from './routes/schedules/JobScheduler.js';
 import cors from "cors";
 import { connect, getExchangeRates } from './lib/data/db_models.js'
 import { WebSocketServer } from 'ws'
@@ -12,6 +12,11 @@ import { bitcoinRoutes } from './routes/bitcoinRoutes.js'
 import { sbtcRoutes } from './routes/sbtcRoutes.js'
 import { daoRoutes } from './routes/daoRoutes.js'
 import { poxRoutes } from './routes/pox/poxRoutes.js'
+import { pox4Routes } from './routes/v4/pox/pox4Routes.js'
+import { pox4ContractRoutes } from './routes/v4/pox-contract/pox4ContractRoutes.js'
+import { signersContractRoutes } from './routes/v4/signers/signersContractRoutes.js'
+import { miningContractRoutes } from './routes/v4/mining/miningContractRoutes.js'
+import { pox4EventRoutes } from './routes/v4/pox-events/pox4EventRoutes.js'
 import { eventsRoutes } from './routes/eventsRoutes.js'
 import { createRequire } from 'node:module';
 import { authorised } from './lib/utils_stacks.js';
@@ -62,6 +67,11 @@ app.use('/bridge-api/v1/sbtc', sbtcRoutes);
 app.use('/bridge-api/v1/dao', daoRoutes);
 app.use('/bridge-api/v1/pox', poxRoutes);
 app.use('/bridge-api/v1/events', eventsRoutes);
+app.use('/bridge-api/v4/pox', pox4Routes);
+app.use('/bridge-api/v4/pox-events', pox4EventRoutes);
+app.use('/bridge-api/v4/pox-contract', pox4ContractRoutes);
+app.use('/bridge-api/v4/signers', signersContractRoutes);
+app.use('/bridge-api/v4/mining', miningContractRoutes);
 
 console.log(`Express is listening at http://localhost:${getConfig().port} \nsBTC Wallet: ${getConfig().sbtcContractId}`);
 console.log('Startup Environment: ', process.env.NODE_ENV);
@@ -79,12 +89,13 @@ printDaoConfig()
 async function connectToMongoCloud() {
   await connect();
   const server = app.listen(getConfig().port, () => {
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
     return;
   });
   const wss = new WebSocketServer({ server })
-  //revealCheckJob.start();
-  sbtcEventJob.start();
-  peginRequestJob.start();
+  pox4EventsJob.start();
+  initUiCacheJob.start()
+  //sbtcEventJob.start();
   let rates = await getExchangeRates()
 
   wss.on('connection', function connection(ws) {

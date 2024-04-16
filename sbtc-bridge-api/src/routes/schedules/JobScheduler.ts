@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 import { updateExchangeRates } from '../../lib/bitcoin/api_blockcypher.js';
 import { SbtcWalletController } from '../stacks/StacksRPCController.js';
+import { readPox4Events } from '../v4/pox-events/pox4_events_helper.js';
 
 export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
   console.log('Running: sbtcEventJob at: ' + fireDate);
@@ -8,25 +9,6 @@ export const sbtcEventJob = cron.schedule('*/17 * * * *', (fireDate) => {
     //saveAllSbtcEvents();
   } catch (err) {
     console.log('Error running: saveAllSbtcEvents: ', err);
-  }
-});
-
-export const peginRequestJob = cron.schedule('* */2 * * *', (fireDate) => {
-  console.log('Running: peginRequestJob at: ' + fireDate);
-  try {
-    //scanBridgeTransactions();
-    //scanPeginRRTransactions();
-  } catch (err) {
-    console.log('Error running: scanBridgeTransactions: ', err);
-  }
-});
-
-export const revealCheckJob = cron.schedule('*/23 * * * *', (fireDate) => {
-  console.log('Running: revealCheckJob at: ' + fireDate);
-  try {
-    //checkReveal();
-  } catch (err) {
-    console.log('Error running: revealCheckJob: ', err);
   }
 });
 
@@ -48,6 +30,16 @@ export const initUiCacheJob = cron.schedule('*/3 * * * *', (fireDate) => {
     console.log('Error running: initUiCacheJob: ', err);
   }
 });
+
+export const pox4EventsJob = cron.schedule('*/20 * * * *', (fireDate) => {
+  try {
+    console.log('NOT Running: readDaoVotesJob at: ' + fireDate);
+    readPox4Events();
+  } catch (err) {
+    console.log('Error running: readDaoVotesJob: ', err);
+  }
+});
+
 /**
 export const initDaoProposalsJob = cron.schedule('* * * * *', (fireDate) => {
   console.log('Running: initDaoProposalsJob at: ' + fireDate);

@@ -53,8 +53,8 @@ export class TransactionController {
   public getKeys(): KeySet {
     return {
       deposits: {
-        revealPubKey: (process.env.btcSchnorrReveal) ? hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReveal)) : '',
-        reclaimPubKey: (process.env.btcSchnorrReclaim) ? hex.encode(schnorr.getPublicKey(process.env.btcSchnorrReclaim)) : '',
+        revealPubKey: '',
+        reclaimPubKey: '',
         oraclePubKey: '' 
       }
     }

@@ -2,16 +2,16 @@
  * sbtc - interact with Stacks Blockchain to read sbtc contract info
  */
 import { cvToJSON, deserializeCV } from '@stacks/transactions';
-import { getConfig } from '../../lib/config.js';
-import { poolStackerEventsCollection } from '../../lib/data/db_models.js';
+import { getConfig } from '../../../lib/config.js';
+import { pox4EventsCollection } from '../../../lib/data/db_models.js';
 import util from 'util'
-import { DelegationAggregationIncrease, DelegationStackExtend, DelegationStackIncrease, DelegationStackStx, DelegationStx, HandleUnlock, PoolStackerEvent, PoxAddress, StackExtend, StackIncrease, StackStx } from '../../types/pox_types.js';
+import { DelegationAggregationIncrease, DelegationStackExtend, DelegationStackIncrease, DelegationStackStx, DelegationStx, HandleUnlock, PoolStackerEvent, PoxAddress, StackExtend, StackIncrease, StackStx } from '../../../types/pox_types.js';
 
 
-export async function readPoolStackerEvents() {
-  const url = getConfig().stacksApi + '/extended/v1/contract/' + getConfig().poxContractId + '/events?limit=' + 20;
+export async function readPox4Events() {
+  const url = getConfig().stacksApi + '/extended/v1/contract/' + getConfig().pox4ContractId + '/events?limit=' + 20;
   let currentOffset = await countsPoolStackerEvents()
-  console.log('getProposalsForActiveVotingExt: currentOffset: ' + currentOffset)
+  console.log('readPox4Events: currentOffset:' + currentOffset)
   if (!currentOffset) currentOffset = 0
   let count = 0;
   let moreEvents = true
@@ -21,11 +21,11 @@ export async function readPoolStackerEvents() {
         let urlOffset = url + '&offset=' + (currentOffset + (count * 20))
         const response = await fetch(urlOffset);
         const val = await response.json();
-        console.log('innerReadPoolStackerEvents: reading more: ' + urlOffset)
-        moreEvents = await innerReadPoolStackerEvents(val)
+        console.log('innerReadPox4Events: reading more: ' + urlOffset)
+        moreEvents = await innerReadPox4Events(val)
         count++;
       } catch (err:any) {
-        console.log('getProposalsForActiveVotingExt: ' + url)
+        console.log('readPox4Events: ' + err.message)
       }
     }
     while (moreEvents)
@@ -35,16 +35,16 @@ export async function readPoolStackerEvents() {
   }
 }
 
-export async function innerReadPoolStackerEvents(val:any):Promise<any> {
+async function innerReadPox4Events(val:any):Promise<any> {
   let stackerEvent:PoolStackerEvent;
   let result:any;
   if (!val || !val.results || val.results.length === 0) {
-    console.log('innerReadPoolStackerEvents: all done.');
+    console.log('innerReadPox4Events: all done.');
     return false
   }
   for (const event of val.results) {
     try {
-      //console.log('innerReadPoolStackerEvents: event.contract_log.value: ', event.contract_log.value)
+      //console.log('innerReadPox4Events: event.contract_log.value: ', event.contract_log.value)
       result = cvToJSON(deserializeCV(event.contract_log.value.hex)).value.value;
       const eventName = result.name.value
       stackerEvent = {
@@ -146,14 +146,14 @@ export async function innerReadPoolStackerEvents(val:any):Promise<any> {
           firstUnlockedCycle: Number(result.data.value['first-unlocked-cycle'].value),
         }
       } else {
-        console.log('innerReadPoolStackerEvents: missed: ', util.inspect(result, false, null, true /* enable colors */));
+        console.log('innerReadPox4Events: missed: ', util.inspect(result, false, null, true /* enable colors */));
       }
       stackerEvent.data = data;
-      //console.log('innerReadPoolStackerEvents: ', util.inspect(stackerEvent, false, null, true /* enable colors */));
+      //console.log('innerReadPox4Events: ', util.inspect(stackerEvent, false, null, true /* enable colors */));
       await savePoolStackerEvent(stackerEvent)
     } catch (err:any) {
-      console.log('innerReadPoolStackerEvents: error: ', util.inspect(result, false, null, true /* enable colors */));
-      console.log('innerReadPoolStackerEvents: error: ' + err.message)
+      console.log('innerReadPox4Events: error: ', util.inspect(result, false, null, true /* enable colors */));
+      console.log('innerReadPox4Events: error: ' + err.message)
     }
   }
   return true
@@ -169,51 +169,81 @@ function extractPoxAddress(result: any):PoxAddress {
   }
 }
 
-export async function countsPoolStackerEvents():Promise<number> {
+export async function countsPoolStackerEventsByEvent(event:string):Promise<number> {
   try {
-    const result = await poolStackerEventsCollection.countDocuments();
+    const result = await pox4EventsCollection.countDocuments({event});
     return Number(result);
   } catch (err:any) {
     return 0
   }
 }
 
+export async function countsPoolStackerEvents():Promise<number> {
+  try {
+    const result = await pox4EventsCollection.countDocuments();
+    return Number(result);
+  } catch (err:any) {
+    return 0
+  }
+}
+
+export async function findPoolStackerEvents(page:number, limit:number):Promise<any> {
+  const result = await pox4EventsCollection.find({}).skip(page * limit).limit( limit ).toArray();
+  return result;
+}
+
+export async function aggregateDelegationData():Promise<any> {
+  const result1Query = '{$match: {"data.delegator": {$exists: true}}}, { $group: {_id:{"delegator":"$data.delegator"}, "total": {$sum: "$data.amountUstx" }, delegations: {$sum:1} } }'
+  const result2Query = '{$match: {"data.delegator": {$exists: true}, event:"delegate-stx"}}, { $group: {_id:{"delegator":"$data.delegator"}, "total": {$sum: "$data.amountUstx" }, delegations: {$sum:1} } }'
+  const result3Query = '{ $group: {_id:{"event":"$event"}, "total": {$sum: "$amountUstx" }, count: {$sum:1} } }'
+  const result1 = await pox4EventsCollection.aggregate([{$match: {"data.delegator": {$exists: true}}}, { $group: {_id:{"delegator":"$data.delegator"}, "total": {$sum: "$data.amountUstx" }, delegations: {$sum:1} } } ]).toArray();
+  const result2 = await pox4EventsCollection.aggregate([{$match: {"data.delegator": {$exists: true}, event:'delegate-stx'}}, { $group: {_id:{"delegator":"$data.delegator"}, "total": {$sum: "$data.amountUstx" }, delegations: {$sum:1} } } ]).toArray();
+  const result3 = await pox4EventsCollection.aggregate([ { $group: {_id:{"event":"$event"}, "total": {$sum: "$amountUstx" }, count: {$sum:1} } } ]).toArray();
+  return {result1, result1Query, result2, result2Query, result3, result3Query};
+}
+
+export async function findPoolStackerEventsByEvent(event:string, page:number, limit:number):Promise<any> {
+  const result = await pox4EventsCollection.find({event}).skip(page * limit).limit( limit ).toArray();
+  return result;
+}
+
+
 export async function findPoolStackerEventsByHashBytes(hashBytes:string, page:number, limit:number):Promise<any> {
   if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
-  const result = await poolStackerEventsCollection.find({"data.poxAddr.hashBytes":hashBytes}).skip(page * limit).limit( limit ).toArray();
+  const result = await pox4EventsCollection.find({"data.poxAddr.hashBytes":hashBytes}).skip(page * limit).limit( limit ).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsByHashBytesAndEvent(hashBytes:string, event:string):Promise<any> {
   if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
-  const result = await poolStackerEventsCollection.find({"data.poxAddr.hashBytes":hashBytes, event}).toArray();
+  const result = await pox4EventsCollection.find({"data.poxAddr.hashBytes":hashBytes, event}).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsByHashBytesAndVersion(version:string, hashBytes:string, page:number, limit:number):Promise<any> {
   if (!hashBytes.startsWith('0x')) hashBytes = '0x' + hashBytes
   if (!version.startsWith('0x')) version = '0x' + version
-  const result = await poolStackerEventsCollection.find({"data.poxAddr.hashBytes":hashBytes, "data.poxAddr.version":version, }).skip(page * limit).limit( limit ).toArray();
+  const result = await pox4EventsCollection.find({"data.poxAddr.hashBytes":hashBytes, "data.poxAddr.version":version, }).skip(page * limit).limit( limit ).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsByStacker(stacker:string):Promise<any> {
-  const result = await poolStackerEventsCollection.find({"stacker":stacker}).toArray();
+  const result = await pox4EventsCollection.find({"stacker":stacker}).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsByDelegator(stacker:string):Promise<any> {
-  const result = await poolStackerEventsCollection.find({"data.delegator":stacker}).toArray();
+  const result = await pox4EventsCollection.find({"data.delegator":stacker}).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsByStackerAndEvent(stacker:string, event:string):Promise<any> {
-  const result = await poolStackerEventsCollection.find({stacker:stacker, event: event}).toArray();
+  const result = await pox4EventsCollection.find({stacker:stacker, event: event}).toArray();
   return result;
 }
 
 export async function findPoolStackerEventsBySubmitTxId(criteria:any):Promise<any> {
-  const result = await poolStackerEventsCollection.findOne(criteria);
+  const result = await pox4EventsCollection.findOne(criteria);
   return result;
 }
 
@@ -235,12 +265,12 @@ export async function saveOrUpdatePoolStackerEvent(v:PoolStackerEvent) {
 
 async function savePoolStackerEvent(v:any) {
   //console.log('saveOrUpdatePoolStackerEvent: saving: event: ' + v.event + ' amountUstx: ' + v.data.amountUstx + ' unlockHeight: ' + v.burnchainUnlockHeight);
-  const result = await poolStackerEventsCollection.insertOne(v);
+  const result = await pox4EventsCollection.insertOne(v);
   return result;
 }
 
 async function updatePoolStackerEvent(vote:any, changes: any) {
-  const result = await poolStackerEventsCollection.updateOne({
+  const result = await pox4EventsCollection.updateOne({
     _id: vote._id
   },
     { $set: changes});

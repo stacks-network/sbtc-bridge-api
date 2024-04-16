@@ -18,7 +18,10 @@ export type ConfigI = {
 	blockCypherUrl: string;
 	publicAppName: string;
 	publicAppVersion: string; 
-	sbtcContractId: string;
-	poxContractId: string;
+	sbtcContractId?: string;
+	poxContractId?: string;
+	pox4ContractId?: string;
+	signerVotingContractId?: string;
+	signersContractId?: string;
 };
 
